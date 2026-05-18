@@ -1,0 +1,16 @@
+# Dependencias
+node_modules/
+/backend/node_modules/
+/frontend/node_modules/
+
+# Variables de entorno / Secretos
+.env
+.env.local
+.env.development.local
+
+# Producción / Compilación
+/frontend/dist/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
