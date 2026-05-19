@@ -73,6 +73,9 @@
   --color-warning:    #F59E0B;
   --color-warning-bg: #FEF9C3;
 
+  /* Animations */
+  --animate-marquee: marquee 50s linear infinite;
+
   /* Shadows */
   --shadow-xs:    0 1px 3px rgba(0,0,0,0.06);
   --shadow-sm:    0 2px 8px rgba(0,0,0,0.08);
@@ -173,3 +176,22 @@ body {
 
 /* ─── Gradient utility (micro-elements only) ────────────────────────── */
 .gradient-brand { background: var(--gradient-brand); }
+
+/* ─── Hero entry animation ──────────────────────────────────────────── */
+@keyframes hero-fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes hero-fade-up {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+}
+
+/* ─── Marquee (LogosStrip) ──────────────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-33.33%); }
+}

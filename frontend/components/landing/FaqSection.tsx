@@ -31,7 +31,7 @@ export default function FaqSection() {
       <div className="container-landing">
         <div className="mb-12">
           <p className="text-label text-blue mb-4">Preguntas frecuentes</p>
-          <h2 className="text-h2 text-text-primary max-w-[440px]">
+          <h2 className="text-h2 text-text-primary max-w-110">
             Lo que los cirujanos preguntan antes de empezar.
           </h2>
         </div>

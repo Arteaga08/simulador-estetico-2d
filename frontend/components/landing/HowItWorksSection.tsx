@@ -27,7 +27,7 @@ export default function HowItWorksSection() {
       <div className="container-landing">
         <div className="mb-14">
           <p className="text-label text-blue mb-4">Cómo funciona</p>
-          <h2 className="text-h2 text-text-primary max-w-[500px]">
+          <h2 className="text-h2 text-text-primary max-w-125">
             De la consulta al resultado en cuatro pasos.
           </h2>
         </div>
@@ -36,7 +36,7 @@ export default function HowItWorksSection() {
         <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Connecting line (desktop only) */}
           <div
-            className="hidden lg:block absolute top-[22px] left-[10%] right-[10%] h-[1px]"
+            className="hidden lg:block absolute top-5.5 left-[10%] right-[10%] h-px"
             style={{ background: "linear-gradient(90deg, #4FACFE, #667EEA)" }}
           />
 
@@ -44,7 +44,7 @@ export default function HowItWorksSection() {
             <div key={step.n} className="relative flex flex-col gap-5">
               <div className="flex items-center gap-3">
                 <div
-                  className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 shadow-brand z-10"
+                  className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-brand z-10"
                   style={{ background: "linear-gradient(135deg, #4FACFE 0%, #667EEA 100%)" }}
                 >
                   <span

@@ -54,7 +54,7 @@ export default function PricingSection() {
       <div className="container-landing">
         <div className="mb-14">
           <p className="text-label text-blue mb-4">Precios</p>
-          <h2 className="text-h2 text-white max-w-[440px]">
+          <h2 className="text-h2 text-white max-w-110">
             Sin sorpresas. Sin funciones ocultas.
           </h2>
         </div>
@@ -63,7 +63,7 @@ export default function PricingSection() {
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className="rounded-[16px] p-7 flex flex-col"
+              className="rounded-3xl p-7 flex flex-col"
               style={
                 plan.highlight
                   ? {

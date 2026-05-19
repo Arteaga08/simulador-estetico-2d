@@ -6,14 +6,14 @@ export default function FeatureAnnotations() {
       <div className="container-landing grid grid-cols-1 lg:grid-cols-[480px_1fr] gap-16 items-center">
         {/* Left: annotations mock */}
         <div
-          className="rounded-[20px] overflow-hidden shadow-md"
+          className="rounded-4xl overflow-hidden shadow-md"
           style={{ background: "#F4F8FF", border: "1px solid #E0E7FF" }}
         >
           <div
-            className="relative h-[300px] flex items-center justify-center"
+            className="relative h-75 flex items-center justify-center"
             style={{ background: "#EEF2FF" }}
           >
-            <svg viewBox="0 0 200 240" className="h-[180px]" fill="none" stroke="#667EEA" strokeWidth="1.5">
+            <svg viewBox="0 0 200 240" className="h-45" fill="none" stroke="#667EEA" strokeWidth="1.5">
               <ellipse cx="100" cy="100" rx="62" ry="80" strokeOpacity="0.4" />
               <path d="M70 85 Q80 78 90 85" strokeOpacity="0.7" />
               <path d="M110 85 Q120 78 130 85" strokeOpacity="0.7" />
@@ -27,7 +27,7 @@ export default function FeatureAnnotations() {
                 <div className="w-5 h-5 rounded-full bg-blue flex items-center justify-center shadow">
                   <span className="text-white text-[9px] font-bold">1</span>
                 </div>
-                <div className="absolute top-0 left-7 w-[140px] bg-white rounded-[8px] shadow-md px-3 py-2">
+                <div className="absolute top-0 left-7 w-35 bg-white rounded-md shadow-md px-3 py-2">
                   <p className="text-[11px] font-semibold text-text-primary">Proyección dorsal</p>
                   <p className="text-[10px] text-text-muted mt-0.5">Reducción moderada del puente</p>
                 </div>
@@ -39,7 +39,7 @@ export default function FeatureAnnotations() {
                 <div className="w-5 h-5 rounded-full bg-indigo flex items-center justify-center shadow">
                   <span className="text-white text-[9px] font-bold">2</span>
                 </div>
-                <div className="absolute top-0 left-7 w-[130px] bg-white rounded-[8px] shadow-md px-3 py-2">
+                <div className="absolute top-0 left-7 w-32.5 bg-white rounded-md shadow-md px-3 py-2">
                   <p className="text-[11px] font-semibold text-text-primary">Mentoplastia</p>
                   <p className="text-[10px] text-text-muted mt-0.5">Avance +3mm eje horizontal</p>
                 </div>
@@ -69,7 +69,7 @@ export default function FeatureAnnotations() {
             El expediente con el razonamiento del cirujano, no solo las imágenes.
           </h2>
 
-          <p className="text-body-lg text-text-secondary mb-8 max-w-[460px]">
+          <p className="text-body-lg text-text-secondary mb-8 max-w-115">
             Pines numerados sobre el canvas, notas por zona, y todo guardado
             en el expediente del paciente. La próxima consulta empieza donde
             dejaste la última.

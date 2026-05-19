@@ -58,7 +58,7 @@ export default function FeatureShare() {
             </div>
           </div>
 
-          <div className="relative bg-[#F4F8FF] h-[220px] flex">
+          <div className="relative bg-bg-hero-light h-[220px] flex">
             {/* Before half */}
             <div className="flex-1 flex flex-col items-center justify-center border-r border-border/50">
               <svg viewBox="0 0 100 120" className="h-[100px]" fill="none" stroke="#94A3B8" strokeWidth="1.5">

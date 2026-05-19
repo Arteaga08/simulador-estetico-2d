@@ -26,7 +26,7 @@ export default function Footer() {
             >
               SimEstético
             </p>
-            <p className="text-body-sm text-white/45 max-w-[240px] leading-[1.7]">
+            <p className="text-body-sm text-white/45 max-w-60 leading-[1.7]">
               Simulador facial 2D en tiempo real para cirujanos y clínicas de estética.
             </p>
           </div>
