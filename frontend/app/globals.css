@@ -195,3 +195,56 @@ body {
   from { transform: translateX(0); }
   to   { transform: translateX(-33.33%); }
 }
+
+/* ─── Button utilities ───────────────────────────────────────────────── */
+.btn-primary {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  background: #667EEA;
+  color: white;
+  border: 1px solid #667EEA;
+  transition: background 0.15s, border-color 0.15s;
+}
+.btn-primary:hover { background: #4338CA; border-color: #4338CA; }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-secondary {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  background: white;
+  color: #6B7280;
+  border: 1px solid #E9D5FF;
+  transition: background 0.15s;
+}
+.btn-secondary:hover { background: #F9FAFB; }
+
+.btn-ghost {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  background: transparent;
+  color: #667EEA;
+  border: 1px solid transparent;
+  transition: background 0.15s;
+}
+.btn-ghost:hover { background: #EEF2FF; }
