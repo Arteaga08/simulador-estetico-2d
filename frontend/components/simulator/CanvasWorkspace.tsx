@@ -105,27 +105,26 @@ export function CanvasWorkspace() {
           backgroundSize: '20px 20px',
         }}
       >
-        {!state.imageUrl ? (
-          <div className="text-center">
+        {!state.imageUrl && (
+          <div className="text-center absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             <p className="text-[0.85rem] font-semibold text-[#1E1B4B] mb-1.5">Sin fotografía</p>
             <p className="text-[0.75rem] text-[#9CA3AF] mb-4">Sube una foto del paciente para comenzar la simulación</p>
-            <button onClick={handleUploadPhoto} className="btn-primary">
+            <button onClick={handleUploadPhoto} className="btn-primary pointer-events-auto">
               📷 Subir foto
             </button>
           </div>
-        ) : (
-          <div
-            className="relative rounded-xl overflow-hidden"
-            style={{ boxShadow: '0 8px 32px rgba(30,27,75,0.12)' }}
-          >
-            <canvas ref={canvasRef} className="block max-w-full max-h-full" />
-            {state.hudVisible && (
-              <HudOverlay width={containerSize.w} height={containerSize.h} />
-            )}
-            <AnnotationLayer width={containerSize.w} height={containerSize.h} />
-            <DrawingLayer width={containerSize.w} height={containerSize.h} />
-          </div>
         )}
+        <div
+          className="relative rounded-xl overflow-hidden"
+          style={{ boxShadow: state.imageUrl ? '0 8px 32px rgba(30,27,75,0.12)' : 'none', display: state.imageUrl ? 'block' : 'none' }}
+        >
+          <canvas ref={canvasRef} className="block max-w-full max-h-full" />
+          {state.hudVisible && (
+            <HudOverlay width={containerSize.w} height={containerSize.h} />
+          )}
+          <AnnotationLayer width={containerSize.w} height={containerSize.h} />
+          <DrawingLayer width={containerSize.w} height={containerSize.h} />
+        </div>
       </div>
     </div>
   )

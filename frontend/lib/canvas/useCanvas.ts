@@ -12,7 +12,6 @@ export function useCanvas(): UseCanvasReturn {
   const loadImage = useCallback(async (url: string): Promise<ImageData> => {
     const canvas = canvasRef.current
     if (!canvas) throw new Error('Canvas not mounted')
-    const ctx = canvas.getContext('2d')!
 
     const img = new Image()
     img.crossOrigin = 'anonymous'
@@ -22,9 +21,17 @@ export function useCanvas(): UseCanvasReturn {
       img.src = url
     })
 
+    // Use a temporary canvas to extract ImageData so the visible canvas
+    // stays context-free and can be transferred to OffscreenCanvas later.
+    const tmp = document.createElement('canvas')
+    tmp.width = img.naturalWidth
+    tmp.height = img.naturalHeight
+    const ctx = tmp.getContext('2d')!
+    ctx.drawImage(img, 0, 0)
+
     canvas.width = img.naturalWidth
     canvas.height = img.naturalHeight
-    ctx.drawImage(img, 0, 0)
+
     return ctx.getImageData(0, 0, img.naturalWidth, img.naturalHeight)
   }, [])
 
