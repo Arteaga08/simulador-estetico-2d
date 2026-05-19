@@ -10,23 +10,19 @@ import { SimulatorBottombar } from '@/components/simulator/SimulatorBottombar'
 export default function SimulatorPage() {
   return (
     <SimulatorProvider patientId={null} sessionId={null}>
-      <div
-        className="h-screen overflow-hidden grid"
-        style={{
-          gridTemplateRows: '44px 1fr 52px',
-          gridTemplateColumns: '220px 1fr',
-        }}
-      >
-        <SimulatorTopbar patientName="Paciente" sessionNumber={1} />
+      <div className="h-screen overflow-hidden flex">
+        {/* Sidebar spans full height — continuous dark column */}
         <ProcedureSidebar />
-        <div className="flex overflow-hidden col-start-2">
-          <CanvasWorkspace />
-          <SlidersPanel />
+
+        {/* Content column: topbar + workspace + bottombar */}
+        <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+          <SimulatorTopbar patientName="Paciente" sessionNumber={1} />
+          <div className="flex flex-1 overflow-hidden">
+            <CanvasWorkspace />
+            <SlidersPanel />
+          </div>
+          <SimulatorBottombar onExportPDF={() => {}} onShare={() => {}} />
         </div>
-        <SimulatorBottombar
-          onExportPDF={() => {}}
-          onShare={() => {}}
-        />
       </div>
     </SimulatorProvider>
   )
