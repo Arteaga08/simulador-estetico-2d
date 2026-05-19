@@ -1,3 +1,5 @@
+'use client'
+
 import { SimulatorProvider } from '@/components/simulator/SimulatorContext'
 import { SimulatorTopbar } from '@/components/simulator/SimulatorTopbar'
 import { ProcedureSidebar } from '@/components/simulator/ProcedureSidebar'
