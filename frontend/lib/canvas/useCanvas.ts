@@ -1,7 +1,7 @@
 import { useRef, useCallback } from 'react'
 
 interface UseCanvasReturn {
-  canvasRef: React.RefObject<HTMLCanvasElement>
+  canvasRef: React.RefObject<HTMLCanvasElement | null>
   loadImage: (url: string) => Promise<ImageData>
   getImageData: () => ImageData | null
 }
