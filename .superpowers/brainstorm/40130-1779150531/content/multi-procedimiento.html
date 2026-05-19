@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-procedimiento</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="../../../.claude/skills/brainstorming/scripts/helper.js" defer></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #F5F3FF; padding: 2rem; }
+
+  h2 { font-size: 1.1rem; font-weight: 700; color: #1E1B4B; margin-bottom: 4px; }
+  .subtitle { font-size: 0.8rem; color: #6B7280; margin-bottom: 1.75rem; }
+
+  .options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+
+  .option-card {
+    background: #fff;
+    border: 2px solid #E9D5FF;
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  }
+  .option-card:hover { border-color: #667EEA; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(102,126,234,0.12); }
+  .option-card.selected { border-color: #4FACFE; box-shadow: 0 0 0 3px rgba(79,172,254,0.15); }
+
+  .card-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px 0;
+  }
+  .letter {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: #EEF2FF;
+    color: #4338CA;
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .option-card.selected .letter { background: #4FACFE; color: #fff; }
+  .card-title { font-size: 0.82rem; font-weight: 700; color: #1E1B4B; }
+
+  /* Panel mockup container */
+  .panel-mock {
+    height: 360px;
+    margin: 10px 14px 14px;
+    background: #FAFAFA;
+    border: 1px solid #E9D5FF;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Shared atoms */
+  .panel-label {
+    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #9CA3AF;
+  }
+  .slider-row { margin-bottom: 11px; }
+  .slider-meta { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .slider-name { font-size: 0.68rem; color: #374151; font-weight: 500; }
+  .slider-val { font-size: 0.67rem; font-weight: 700; }
+  .slider-track { height: 3px; background: #E9D5FF; border-radius: 2px; position: relative; }
+  .slider-fill { height: 100%; border-radius: 2px; position: absolute; top: 0; left: 0; }
+  .slider-thumb { width: 11px; height: 11px; border-radius: 50%; background: #fff; border: 2px solid; box-shadow: 0 1px 3px rgba(0,0,0,0.15); position: absolute; top: -4px; transform: translateX(-50%); }
+
+  .badge-pill {
+    font-size: 0.62rem; font-weight: 600; padding: 1px 6px;
+    border-radius: 9999px; display: inline-flex; align-items: center; gap: 3px;
+  }
+  .divider { height: 1px; background: #F3F4F6; }
+  .proc-header { display: flex; align-items: center; justify-content: space-between; }
+
+  /* ── OPCIÓN A: Tabs ── */
+  .tabs-header {
+    display: flex;
+    border-bottom: 1px solid #E9D5FF;
+    background: #fff;
+  }
+  .tab {
+    flex: 1;
+    padding: 8px 6px;
+    text-align: center;
+    font-size: 0.67rem;
+    font-weight: 600;
+    color: #9CA3AF;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .tab.active { color: #4338CA; border-bottom-color: #667EEA; background: #F8F8FF; }
+  .tab-add {
+    width: 28px;
+    display: flex; align-items: center; justify-content: center;
+    color: #9CA3AF; font-size: 1rem; cursor: pointer;
+    border-left: 1px solid #E9D5FF;
+  }
+  .tabs-content { flex: 1; overflow-y: auto; padding: 12px 12px; }
+
+  /* ── OPCIÓN B: Accordion ── */
+  .accordion-item { border-bottom: 1px solid #F0EEF8; }
+  .accordion-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 12px;
+    cursor: pointer;
+    background: #fff;
+    transition: background 0.15s;
+  }
+  .accordion-header:hover { background: #FAFAFA; }
+  .accordion-header.open { background: #F8F6FF; }
+  .accordion-left { display: flex; align-items: center; gap: 7px; }
+  .color-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .acc-name { font-size: 0.73rem; font-weight: 600; color: #1E1B4B; }
+  .acc-chevron { font-size: 0.7rem; color: #9CA3AF; transition: transform 0.2s; }
+  .accordion-header.open .acc-chevron { transform: rotate(180deg); }
+  .accordion-body { padding: 10px 12px 12px; background: #FAFAFA; }
+  .add-proc-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 12px;
+    font-size: 0.72rem; color: #667EEA; font-weight: 500;
+    cursor: pointer; background: transparent;
+    border-top: 1px dashed #C7D2FE;
+  }
+
+  /* ── OPCIÓN C: Stack con color ── */
+  .stack-section { border-left: 3px solid; padding: 10px 10px 10px 10px; margin: 0; }
+  .stack-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .stack-name { font-size: 0.73rem; font-weight: 700; }
+  .remove-x { font-size: 0.65rem; color: #9CA3AF; cursor: pointer; }
+  .stack-divider { height: 6px; background: #F5F3FF; }
+  .stack-add {
+    padding: 10px 12px;
+    font-size: 0.72rem; color: #667EEA; font-weight: 500;
+    display: flex; align-items: center; gap: 5px; cursor: pointer;
+  }
+
+  /* Card footer */
+  .card-footer {
+    padding: 10px 14px 12px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .rec-badge {
+    font-size: 0.67rem; font-weight: 600; padding: 3px 8px;
+    border-radius: 9999px; width: fit-content;
+  }
+  .rec { background: rgba(79,172,254,0.1); color: #2563EB; }
+  .alt { background: #F0EEF8; color: #6B7280; }
+  .card-desc { font-size: 0.72rem; color: #6B7280; line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<h2>¿Cómo mostramos múltiples procedimientos en el panel de sliders?</h2>
+<p class="subtitle">3 formas de organizar los controles cuando hay 2 o más procedimientos activos simultáneamente</p>
+
+<div class="options-grid">
+
+  <!-- OPCIÓN A: TABS -->
+  <div class="option-card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-badge">
+      <div class="letter">A</div>
+      <div class="card-title">Tabs por procedimiento</div>
+    </div>
+    <div class="panel-mock">
+      <div class="tabs-header">
+        <div class="tab active">Rinoplastia</div>
+        <div class="tab">Labios</div>
+        <div class="tab">Mentón</div>
+        <div class="tab-add">+</div>
+      </div>
+      <div class="tabs-content">
+        <div style="margin-bottom:10px;">
+          <div class="badge-pill" style="background:#EEF2FF; color:#4338CA; margin-bottom:8px;">✓ Quirúrgico</div>
+        </div>
+        <div class="slider-row">
+          <div class="slider-meta">
+            <span class="slider-name">Giba nasal</span>
+            <span class="slider-val" style="color:#4338CA;">−32</span>
+          </div>
+          <div class="slider-track">
+            <div class="slider-fill" style="width:30%; background:linear-gradient(90deg,#4FACFE,#667EEA);"></div>
+            <div class="slider-thumb" style="left:30%; border-color:#667EEA;"></div>
+          </div>
+        </div>
+        <div class="slider-row">
+          <div class="slider-meta">
+            <span class="slider-name">Proyección de punta</span>
+            <span class="slider-val" style="color:#4338CA;">+18</span>
+          </div>
+          <div class="slider-track">
+            <div class="slider-fill" style="width:65%; background:linear-gradient(90deg,#4FACFE,#667EEA);"></div>
+            <div class="slider-thumb" style="left:65%; border-color:#667EEA;"></div>
+          </div>
+        </div>
+        <div class="slider-row">
+          <div class="slider-meta">
+            <span class="slider-name">Rotación de punta</span>
+            <span class="slider-val" style="color:#4338CA;">+5°</span>
+          </div>
+          <div class="slider-track">
+            <div class="slider-fill" style="width:55%; background:linear-gradient(90deg,#4FACFE,#667EEA);"></div>
+            <div class="slider-thumb" style="left:55%; border-color:#667EEA;"></div>
+          </div>
+        </div>
+        <div class="divider" style="margin-bottom:10px;"></div>
+        <div class="panel-label" style="margin-bottom:6px;">Intensidad</div>
+        <div class="slider-track">
+          <div class="slider-fill" style="width:70%; background:linear-gradient(90deg,#a78bfa,#667EEA);"></div>
+          <div class="slider-thumb" style="left:70%; border-color:#a78bfa;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <span class="rec-badge rec">Recomendado</span>
+      <p class="card-desc">Cada procedimiento tiene su tab. Fácil de navegar, sin scroll excesivo. El "+" agrega un procedimiento nuevo.</p>
+    </div>
+  </div>
+
+  <!-- OPCIÓN B: ACCORDION -->
+  <div class="option-card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-badge">
+      <div class="letter">B</div>
+      <div class="card-title">Acordeón expandible</div>
+    </div>
+    <div class="panel-mock">
+      <!-- Proc 1: open -->
+      <div class="accordion-item">
+        <div class="accordion-header open">
+          <div class="accordion-left">
+            <div class="color-dot" style="background:#667EEA;"></div>
+            <span class="acc-name">Rinoplastia</span>
+            <span class="badge-pill" style="background:#EEF2FF;color:#4338CA;font-size:0.6rem;">Quirúrg.</span>
+          </div>
+          <span class="acc-chevron">▾</span>
+        </div>
+        <div class="accordion-body">
+          <div class="slider-row">
+            <div class="slider-meta"><span class="slider-name">Giba nasal</span><span class="slider-val" style="color:#667EEA;">−32</span></div>
+            <div class="slider-track"><div class="slider-fill" style="width:30%;background:#667EEA;"></div><div class="slider-thumb" style="left:30%;border-color:#667EEA;"></div></div>
+          </div>
+          <div class="slider-row" style="margin-bottom:0;">
+            <div class="slider-meta"><span class="slider-name">Proyección punta</span><span class="slider-val" style="color:#667EEA;">+18</span></div>
+            <div class="slider-track"><div class="slider-fill" style="width:65%;background:#667EEA;"></div><div class="slider-thumb" style="left:65%;border-color:#667EEA;"></div></div>
+          </div>
+        </div>
+      </div>
+      <!-- Proc 2: closed -->
+      <div class="accordion-item">
+        <div class="accordion-header">
+          <div class="accordion-left">
+            <div class="color-dot" style="background:#F59E0B;"></div>
+            <span class="acc-name">Aumento de labios</span>
+            <span class="badge-pill" style="background:#FEF3C7;color:#92400E;font-size:0.6rem;">Filler</span>
+          </div>
+          <span class="acc-chevron">▾</span>
+        </div>
+      </div>
+      <!-- Proc 3: closed -->
+      <div class="accordion-item">
+        <div class="accordion-header">
+          <div class="accordion-left">
+            <div class="color-dot" style="background:#34D399;"></div>
+            <span class="acc-name">Aumento de mentón</span>
+            <span class="badge-pill" style="background:#D1FAE5;color:#065F46;font-size:0.6rem;">Implante</span>
+          </div>
+          <span class="acc-chevron">▾</span>
+        </div>
+      </div>
+      <div class="add-proc-btn">+ Agregar procedimiento</div>
+    </div>
+    <div class="card-footer">
+      <span class="rec-badge alt">Alternativa</span>
+      <p class="card-desc">Todos los procedimientos visibles a la vez, expandibles. Ideal si el médico quiere comparar configuraciones sin cambiar de tab.</p>
+    </div>
+  </div>
+
+  <!-- OPCIÓN C: STACK CON COLOR -->
+  <div class="option-card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-badge">
+      <div class="letter">C</div>
+      <div class="card-title">Stack con color por procedimiento</div>
+    </div>
+    <div class="panel-mock" style="overflow-y:auto;">
+      <!-- Proc 1 -->
+      <div class="stack-section" style="border-color:#667EEA; background:#F8F8FF;">
+        <div class="stack-header-row">
+          <span class="stack-name" style="color:#4338CA;">Rinoplastia</span>
+          <div style="display:flex;gap:4px;align-items:center;">
+            <span class="badge-pill" style="background:#EEF2FF;color:#4338CA;">Quirúrg.</span>
+            <span class="remove-x">✕</span>
+          </div>
+        </div>
+        <div class="slider-row">
+          <div class="slider-meta"><span class="slider-name">Giba nasal</span><span class="slider-val" style="color:#4338CA;">−32</span></div>
+          <div class="slider-track"><div class="slider-fill" style="width:30%;background:#667EEA;"></div><div class="slider-thumb" style="left:30%;border-color:#667EEA;"></div></div>
+        </div>
+        <div class="slider-row" style="margin-bottom:0;">
+          <div class="slider-meta"><span class="slider-name">Proyección punta</span><span class="slider-val" style="color:#4338CA;">+18</span></div>
+          <div class="slider-track"><div class="slider-fill" style="width:65%;background:#667EEA;"></div><div class="slider-thumb" style="left:65%;border-color:#667EEA;"></div></div>
+        </div>
+      </div>
+      <div class="stack-divider"></div>
+      <!-- Proc 2 -->
+      <div class="stack-section" style="border-color:#F59E0B; background:#FFFBF0;">
+        <div class="stack-header-row">
+          <span class="stack-name" style="color:#92400E;">Aumento de labios</span>
+          <div style="display:flex;gap:4px;align-items:center;">
+            <span class="badge-pill" style="background:#FEF3C7;color:#92400E;">Filler</span>
+            <span class="remove-x">✕</span>
+          </div>
+        </div>
+        <div class="slider-row">
+          <div class="slider-meta"><span class="slider-name">Volumen superior</span><span class="slider-val" style="color:#92400E;">+22</span></div>
+          <div class="slider-track"><div class="slider-fill" style="width:60%;background:#F59E0B;"></div><div class="slider-thumb" style="left:60%;border-color:#F59E0B;"></div></div>
+        </div>
+        <div class="slider-row" style="margin-bottom:0;">
+          <div class="slider-meta"><span class="slider-name">Definición de arco</span><span class="slider-val" style="color:#92400E;">+10</span></div>
+          <div class="slider-track"><div class="slider-fill" style="width:45%;background:#F59E0B;"></div><div class="slider-thumb" style="left:45%;border-color:#F59E0B;"></div></div>
+        </div>
+      </div>
+      <div class="stack-add">+ Agregar procedimiento</div>
+    </div>
+    <div class="card-footer">
+      <span class="rec-badge alt">Alternativa</span>
+      <p class="card-desc">Cada procedimiento tiene su propio color. Todo visible sin clics. El scroll es el único límite si hay muchos procedimientos.</p>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

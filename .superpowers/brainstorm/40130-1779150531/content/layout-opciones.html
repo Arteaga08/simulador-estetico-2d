@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Layout del Simulador</title>
+<script src="../../../.claude/skills/brainstorming/scripts/helper.js" defer></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #0f0f13; color: #e5e5e5; padding: 2rem; }
+  h2 { font-size: 1.4rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .subtitle { color: #888; font-size: 0.9rem; margin-bottom: 2rem; }
+
+  .layouts { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+  .layout-card {
+    border: 2px solid #2a2a35;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+    background: #16161f;
+  }
+  .layout-card:hover { border-color: #667EEA; transform: translateY(-2px); }
+  .layout-card.selected { border-color: #4FACFE; box-shadow: 0 0 0 3px rgba(79,172,254,0.2); }
+
+  .layout-preview {
+    height: 200px;
+    padding: 12px;
+    background: #1a1a25;
+    display: flex;
+    gap: 6px;
+  }
+
+  /* Colores wireframe */
+  .wf-sidebar { background: #2d2d45; border-radius: 6px; flex-shrink: 0; }
+  .wf-canvas { background: #252535; border-radius: 6px; flex: 1; display: flex; align-items: center; justify-content: center; }
+  .wf-canvas-inner { width: 60%; height: 70%; background: #3a3a55; border-radius: 4px; }
+  .wf-panel { background: #232333; border-radius: 6px; flex-shrink: 0; }
+  .wf-top { background: #2d2d45; border-radius: 6px; height: 28px; margin-bottom: 6px; }
+  .wf-bottom { background: #232333; border-radius: 6px; height: 36px; margin-top: 6px; }
+  .wf-label { font-size: 9px; color: #667EEA; text-align: center; padding: 4px 2px; font-weight: 600; letter-spacing: 0.05em; }
+
+  .wf-col { display: flex; flex-direction: column; }
+
+  .card-meta { padding: 14px 16px; }
+  .card-meta h3 { font-size: 1rem; font-weight: 600; margin-bottom: 4px; }
+  .card-meta p { font-size: 0.82rem; color: #888; line-height: 1.4; }
+  .badge { display: inline-block; font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; margin-top: 6px; font-weight: 600; }
+  .badge-rec { background: rgba(79,172,254,0.15); color: #4FACFE; }
+  .badge-alt { background: rgba(102,126,234,0.12); color: #667EEA; }
+
+  .letter-badge {
+    position: absolute;
+    top: 10px; left: 10px;
+    width: 26px; height: 26px;
+    background: #4FACFE;
+    color: #000;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.8rem;
+  }
+  .layout-card { position: relative; }
+
+  #selection-indicator {
+    position: fixed; bottom: 1.5rem; right: 1.5rem;
+    background: #4FACFE; color: #000;
+    padding: 10px 20px; border-radius: 8px;
+    font-weight: 600; font-size: 0.85rem;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<h2>¿Cómo organizamos el espacio del simulador?</h2>
+<p class="subtitle">El canvas es el protagonista — la pregunta es cómo distribuir los controles alrededor de él</p>
+
+<div class="layouts">
+
+  <!-- OPCIÓN A -->
+  <div class="layout-card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter-badge">A</div>
+    <div class="layout-preview">
+      <!-- Sidebar izq + canvas grande + panel der -->
+      <div class="wf-sidebar" style="width: 52px;">
+        <div class="wf-label" style="margin-top:30px;">PROC<br/>EDIM</div>
+      </div>
+      <div class="wf-col" style="flex:1; gap:6px;">
+        <div class="wf-top"></div>
+        <div class="wf-canvas" style="flex:1;">
+          <div class="wf-canvas-inner"></div>
+        </div>
+      </div>
+      <div class="wf-panel" style="width: 72px;">
+        <div class="wf-label" style="margin-top:20px;">SLIDERS<br/>↕</div>
+      </div>
+    </div>
+    <div class="card-meta">
+      <h3>Sidebar izq + Panel de sliders der</h3>
+      <p>Procedimientos a la izquierda, canvas al centro, sliders específicos del procedimiento a la derecha. Patrón clásico de editor profesional.</p>
+      <span class="badge badge-rec">Recomendado</span>
+    </div>
+  </div>
+
+  <!-- OPCIÓN B -->
+  <div class="layout-card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter-badge">B</div>
+    <div class="layout-preview">
+      <!-- Canvas dominante + bottom strip -->
+      <div class="wf-col" style="flex:1;">
+        <div class="wf-top" style="height: 32px;"></div>
+        <div class="wf-canvas" style="flex:1; margin: 6px 0;">
+          <div class="wf-canvas-inner"></div>
+        </div>
+        <div class="wf-bottom" style="height: 48px; display:flex; align-items:center; justify-content:center;">
+          <div class="wf-label">━━━ SLIDERS PROCEDIMIENTO ━━━</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-meta">
+      <h3>Canvas máximo + barra inferior</h3>
+      <p>El canvas ocupa casi toda la pantalla. Los sliders aparecen en una tira horizontal abajo. Ideal para mostrarle al paciente en la misma pantalla.</p>
+      <span class="badge badge-alt">Enfocado en presentación</span>
+    </div>
+  </div>
+
+  <!-- OPCIÓN C -->
+  <div class="layout-card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter-badge">C</div>
+    <div class="layout-preview">
+      <!-- Panel izq completo + canvas derecha -->
+      <div class="wf-sidebar" style="width: 120px;">
+        <div class="wf-label" style="margin-top:10px;">PROCEDIMIENTO</div>
+        <div style="height:30px; margin:6px; background:#3a3a55; border-radius:4px;"></div>
+        <div style="height:30px; margin:6px; background:#3a3a55; border-radius:4px;"></div>
+        <div style="height:30px; margin:6px; background:#3a3a55; border-radius:4px;"></div>
+        <div class="wf-label" style="margin-top:8px;">MODO</div>
+        <div style="height:24px; margin:6px; background:#4FACFE33; border-radius:20px;"></div>
+      </div>
+      <div class="wf-col" style="flex:1;">
+        <div class="wf-top" style="height:24px;"></div>
+        <div class="wf-canvas" style="flex:1;">
+          <div class="wf-canvas-inner"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-meta">
+      <h3>Panel de control izquierdo amplio</h3>
+      <p>Todo el control en una columna izquierda: procedimiento, técnica, sliders, modo. El canvas ocupa el 70% derecho. Similar a Photoshop.</p>
+      <span class="badge badge-alt">Control centralizado</span>
+    </div>
+  </div>
+
+  <!-- OPCIÓN D -->
+  <div class="layout-card" data-choice="d" onclick="toggleSelect(this)">
+    <div class="letter-badge">D</div>
+    <div class="layout-preview">
+      <!-- Split 50/50 before/after -->
+      <div class="wf-col" style="flex:1; gap:6px;">
+        <div class="wf-top" style="height:24px;"></div>
+        <div style="display:flex; gap:6px; flex:1;">
+          <div class="wf-canvas" style="flex:1;">
+            <div style="font-size:9px; color:#667EEA; font-weight:700;">ANTES</div>
+          </div>
+          <div style="width:2px; background:#4FACFE; border-radius:2px;"></div>
+          <div class="wf-canvas" style="flex:1;">
+            <div style="font-size:9px; color:#4FACFE; font-weight:700;">DESPUÉS</div>
+          </div>
+        </div>
+        <div class="wf-bottom" style="height:36px; display:flex; align-items:center; justify-content:center;">
+          <div class="wf-label">SLIDERS DEBAJO</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-meta">
+      <h3>Split antes/después siempre visible</h3>
+      <p>Pantalla dividida en tiempo real: izquierda original, derecha simulación. El médico ajusta con sliders abajo. El paciente ve el cambio instantáneo.</p>
+      <span class="badge badge-alt">Máximo impacto visual</span>
+    </div>
+  </div>
+
+</div>
+
+<div id="selection-indicator"></div>
+
+</body>
+</html>

@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Landing — Arquitectura de Contenido</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #F5F3FF;
+    color: #1E1B4B;
+    font-size: 14px;
+  }
+
+  /* ── NAVBAR ── */
+  nav {
+    background: linear-gradient(135deg, #4FACFE 0%, #667EEA 100%);
+    padding: 0 48px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-size: 16px; font-weight: 800; color: white; letter-spacing: -0.02em; }
+  .logo span { color: rgba(255,255,255,0.6); font-weight: 400; }
+  .nav-links { display: flex; gap: 28px; list-style: none; }
+  .nav-links a { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.8); text-decoration: none; }
+  .nav-btn { font-size: 12px; font-weight: 700; padding: 7px 18px; border-radius: 8px; background: white; color: #667EEA; border: none; cursor: pointer; }
+
+  /* ── SECTIONS ── */
+  .section { background: white; border-bottom: 1px solid #E9D5FF; }
+  .section-inner { max-width: 1100px; margin: 0 auto; padding: 72px 48px; }
+
+  /* Section label */
+  .sec-num {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #4FACFE; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sec-num::before { content: ''; display: block; width: 20px; height: 2px; background: #4FACFE; }
+
+  /* ── 1. HERO ── */
+  .hero-grid { display: grid; grid-template-columns: 1fr 420px; gap: 64px; align-items: center; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #EEF2FF; color: #667EEA; font-size: 11px; font-weight: 700;
+    padding: 4px 12px; border-radius: 20px; margin-bottom: 20px;
+    letter-spacing: 0.04em;
+  }
+  h1 { font-size: 44px; font-weight: 800; line-height: 1.08; letter-spacing: -0.03em; color: #1E1B4B; margin-bottom: 20px; }
+  h1 em { font-style: normal; color: #667EEA; }
+  .hero-sub { font-size: 15px; color: #6B7280; line-height: 1.7; margin-bottom: 36px; max-width: 440px; }
+  .cta-row { display: flex; align-items: center; gap: 16px; }
+  .btn-main { font-size: 14px; font-weight: 700; padding: 13px 26px; border-radius: 10px; background: #667EEA; color: white; border: none; cursor: pointer; }
+  .btn-link { font-size: 13px; font-weight: 600; color: #667EEA; background: none; border: none; cursor: pointer; }
+  .trust-row { display: flex; align-items: center; gap: 8px; margin-top: 28px; }
+  .trust-avatars { display: flex; }
+  .avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid white; background: linear-gradient(135deg, #4FACFE, #667EEA); margin-left: -8px; }
+  .avatar:first-child { margin-left: 0; }
+  .trust-text { font-size: 11px; color: #94A3B8; }
+  .trust-text strong { color: #1E1B4B; }
+
+  /* Hero visual — simulador mock */
+  .sim-mock {
+    background: #1E1B4B;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(102,126,234,0.25);
+  }
+  .sim-bar {
+    background: linear-gradient(135deg, #4FACFE, #667EEA);
+    padding: 10px 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sim-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.4); }
+  .sim-title { font-size: 11px; font-weight: 600; color: white; margin-left: 4px; }
+  .sim-body { padding: 16px; display: grid; grid-template-columns: 1fr 110px; gap: 12px; }
+  .sim-canvas {
+    background: #2D2A5E;
+    border-radius: 10px;
+    height: 200px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .sim-face {
+    font-size: 64px;
+    filter: grayscale(0.3) brightness(0.9);
+  }
+  .sim-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(79,172,254,0.05), rgba(102,126,234,0.08));
+  }
+  .sim-pin {
+    position: absolute;
+    width: 18px; height: 18px;
+    background: linear-gradient(135deg, #4FACFE, #667EEA);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; font-weight: 700; color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+  }
+  .sim-controls { display: flex; flex-direction: column; gap: 8px; }
+  .ctrl-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.4); margin-bottom: 2px; }
+  .ctrl-slider { background: rgba(255,255,255,0.1); border-radius: 4px; height: 3px; position: relative; }
+  .ctrl-fill { height: 3px; border-radius: 4px; background: linear-gradient(90deg, #4FACFE, #667EEA); }
+  .hud-panel {
+    background: rgba(79,172,254,0.08);
+    border: 1px solid rgba(79,172,254,0.2);
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 10px;
+    grid-column: 1 / -1;
+    display: flex; justify-content: space-around;
+  }
+  .hud-metric { text-align: center; }
+  .hud-val { font-size: 16px; font-weight: 800; color: white; }
+  .hud-key { font-size: 8px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+
+  /* ── 2. LOGOS / PRUEBA SOCIAL ── */
+  .logos-section { background: #FAFAF9; border-bottom: 1px solid #E9D5FF; }
+  .logos-inner { max-width: 1100px; margin: 0 auto; padding: 40px 48px; text-align: center; }
+  .logos-label { font-size: 11px; font-weight: 600; color: #94A3B8; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 24px; }
+  .logos-row { display: flex; justify-content: center; align-items: center; gap: 48px; flex-wrap: wrap; }
+  .logo-pill {
+    font-size: 13px; font-weight: 700; color: #C7D2FE;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .logo-pill span { font-size: 10px; font-weight: 400; color: #D1D5DB; }
+
+  /* ── STATS ── */
+  .stats-section { background: white; }
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .stat { padding: 40px 48px; border-right: 1px solid #E9D5FF; }
+  .stat:last-child { border: none; }
+  .stat-n { font-size: 38px; font-weight: 800; letter-spacing: -0.03em; color: #1E1B4B; line-height: 1; }
+  .stat-n em { font-style: normal; color: #4FACFE; }
+  .stat-l { font-size: 12px; color: #6B7280; margin-top: 6px; line-height: 1.4; }
+
+  /* ── FEATURES ── */
+  h2 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 14px; }
+  .section-sub { font-size: 15px; color: #6B7280; line-height: 1.65; max-width: 520px; margin-bottom: 48px; }
+  .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .feat-card {
+    background: #F5F3FF;
+    border: 1px solid #E9D5FF;
+    border-radius: 14px;
+    padding: 24px;
+  }
+  .feat-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: linear-gradient(135deg, #4FACFE, #667EEA);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin-bottom: 16px;
+  }
+  .feat-title { font-size: 15px; font-weight: 700; color: #1E1B4B; margin-bottom: 8px; }
+  .feat-desc { font-size: 13px; color: #6B7280; line-height: 1.6; }
+
+  /* ── HOW IT WORKS ── */
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
+  .steps::before {
+    content: '';
+    position: absolute;
+    top: 22px; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, #4FACFE, #667EEA);
+    z-index: 0;
+  }
+  .step { text-align: center; padding: 0 16px; position: relative; z-index: 1; }
+  .step-num {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, #4FACFE, #667EEA);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 800; color: white;
+    margin: 0 auto 16px;
+    border: 3px solid white;
+    box-shadow: 0 0 0 1px #E9D5FF;
+  }
+  .step-title { font-size: 13px; font-weight: 700; color: #1E1B4B; margin-bottom: 6px; }
+  .step-desc { font-size: 11px; color: #6B7280; line-height: 1.5; }
+
+  /* ── PRICING ── */
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .price-card {
+    background: #F5F3FF;
+    border: 1px solid #E9D5FF;
+    border-radius: 16px;
+    padding: 28px;
+  }
+  .price-card.featured {
+    background: linear-gradient(135deg, #4FACFE, #667EEA);
+    border: none;
+    position: relative;
+  }
+  .price-card.featured .price-name,
+  .price-card.featured .price-amount,
+  .price-card.featured .price-desc,
+  .price-card.featured .price-item { color: white !important; }
+  .price-card.featured .price-divider { background: rgba(255,255,255,0.2) !important; }
+  .featured-tag {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: #1E1B4B; color: white; font-size: 10px; font-weight: 700;
+    padding: 3px 12px; border-radius: 20px; letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  .price-name { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #94A3B8; margin-bottom: 12px; }
+  .price-amount { font-size: 36px; font-weight: 800; color: #1E1B4B; letter-spacing: -0.03em; line-height: 1; }
+  .price-amount span { font-size: 14px; font-weight: 500; color: #94A3B8; }
+  .price-desc { font-size: 12px; color: #6B7280; margin: 8px 0 20px; }
+  .price-divider { height: 1px; background: #E9D5FF; margin-bottom: 20px; }
+  .price-item { font-size: 12px; color: #475569; margin-bottom: 8px; display: flex; gap: 8px; }
+  .check { color: #4FACFE; font-weight: 700; }
+  .price-btn {
+    display: block; width: 100%; text-align: center;
+    font-size: 13px; font-weight: 700; padding: 11px;
+    border-radius: 9px; border: none; cursor: pointer;
+    margin-top: 20px;
+    background: #667EEA; color: white;
+  }
+  .price-card.featured .price-btn { background: white; color: #667EEA; }
+  .price-btn-ghost {
+    display: block; width: 100%; text-align: center;
+    font-size: 13px; font-weight: 700; padding: 11px;
+    border-radius: 9px; cursor: pointer; margin-top: 20px;
+    background: transparent; color: #667EEA; border: 1px solid #667EEA;
+  }
+
+  /* ── RESEARCH ── */
+  .research-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .research-card {
+    background: #F5F3FF; border: 1px solid #E9D5FF;
+    border-radius: 14px; padding: 24px;
+  }
+  .research-stat { font-size: 40px; font-weight: 800; color: #4FACFE; letter-spacing: -0.03em; line-height: 1; margin-bottom: 8px; }
+  .research-quote { font-size: 13px; color: #475569; line-height: 1.6; margin-bottom: 12px; }
+  .research-source { font-size: 11px; color: #94A3B8; font-style: italic; }
+
+  /* ── TESTIMONIALS ── */
+  .testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .testi-card {
+    background: #F5F3FF; border: 1px solid #E9D5FF;
+    border-radius: 14px; padding: 24px;
+  }
+  .testi-quote { font-size: 13px; color: #475569; line-height: 1.65; margin-bottom: 20px; font-style: italic; }
+  .testi-author { display: flex; align-items: center; gap: 12px; }
+  .testi-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #4FACFE, #667EEA);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: white; flex-shrink: 0;
+  }
+  .testi-name { font-size: 12px; font-weight: 700; color: #1E1B4B; }
+  .testi-role { font-size: 11px; color: #94A3B8; }
+
+  /* ── FAQ ── */
+  .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .faq-item { background: #F5F3FF; border: 1px solid #E9D5FF; border-radius: 12px; padding: 20px 24px; }
+  .faq-q { font-size: 13px; font-weight: 700; color: #1E1B4B; margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .faq-a { font-size: 12px; color: #6B7280; line-height: 1.6; }
+
+  /* ── FINAL CTA ── */
+  .final-cta {
+    background: linear-gradient(135deg, #4FACFE, #667EEA);
+    padding: 80px 48px;
+    text-align: center;
+  }
+  .cta-title-lg { font-size: 36px; font-weight: 800; color: white; letter-spacing: -0.02em; margin-bottom: 12px; }
+  .cta-sub { font-size: 15px; color: rgba(255,255,255,0.75); margin-bottom: 36px; }
+  .cta-btns { display: flex; justify-content: center; gap: 12px; }
+  .cta-w { font-size: 14px; font-weight: 700; padding: 13px 28px; border-radius: 10px; background: white; color: #667EEA; border: none; cursor: pointer; }
+  .cta-g { font-size: 14px; font-weight: 600; padding: 13px 28px; border-radius: 10px; background: transparent; color: white; border: 1px solid rgba(255,255,255,0.4); cursor: pointer; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #1E1B4B;
+    padding: 48px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+  }
+  .footer-logo { font-size: 16px; font-weight: 800; color: white; margin-bottom: 10px; }
+  .footer-logo span { color: #4FACFE; }
+  .footer-desc { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.65; }
+  .footer-col h4 { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
+  .footer-col a { display: block; font-size: 12px; color: rgba(255,255,255,0.55); margin-bottom: 8px; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="logo">Sim<span>Estético</span></div>
+  <ul class="nav-links">
+    <li><a href="#">Características</a></li>
+    <li><a href="#">Cómo funciona</a></li>
+    <li><a href="#">Precios</a></li>
+    <li><a href="#">Testimonios</a></li>
+  </ul>
+  <button class="nav-btn">Iniciar Sesión →</button>
+</nav>
+
+<!-- 1. HERO -->
+<section class="section">
+  <div class="section-inner">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-tag">✦ Simulador Estético 2D para Cirujanos</div>
+        <h1>Muestra el resultado <em>antes</em> de la cirugía</h1>
+        <p class="hero-sub">Simulación en tiempo real con precisión quirúrgica. Aumenta la confianza de tus pacientes y cierra más consultas.</p>
+        <div class="cta-row">
+          <button class="btn-main">Solicitar demo gratuita →</button>
+          <button class="btn-link">Ver cómo funciona ↓</button>
+        </div>
+        <div class="trust-row">
+          <div class="trust-avatars">
+            <div class="avatar"></div>
+            <div class="avatar" style="background:linear-gradient(135deg,#667EEA,#4FACFE)"></div>
+            <div class="avatar" style="background:linear-gradient(135deg,#4FACFE,#00F2FE)"></div>
+          </div>
+          <span class="trust-text"><strong>+50 cirujanos</strong> ya usan SimEstético</span>
+        </div>
+      </div>
+      <div class="sim-mock">
+        <div class="sim-bar">
+          <div class="sim-dot"></div><div class="sim-dot"></div><div class="sim-dot"></div>
+          <span class="sim-title">Simulador — Rinoplastia</span>
+        </div>
+        <div class="sim-body">
+          <div class="sim-canvas">
+            <div class="sim-overlay"></div>
+            <div class="sim-face">👤</div>
+            <div class="sim-pin" style="top:30%;left:48%">1</div>
+            <div class="sim-pin" style="top:45%;left:52%">2</div>
+            <div class="sim-pin" style="top:55%;left:44%">3</div>
+          </div>
+          <div class="sim-controls">
+            <div>
+              <div class="ctrl-label">Giba nasal</div>
+              <div class="ctrl-slider"><div class="ctrl-fill" style="width:70%"></div></div>
+            </div>
+            <div>
+              <div class="ctrl-label">Proyección tip</div>
+              <div class="ctrl-slider"><div class="ctrl-fill" style="width:45%"></div></div>
+            </div>
+            <div>
+              <div class="ctrl-label">Rotación</div>
+              <div class="ctrl-slider"><div class="ctrl-fill" style="width:55%"></div></div>
+            </div>
+            <div>
+              <div class="ctrl-label">Ancho base</div>
+              <div class="ctrl-slider"><div class="ctrl-fill" style="width:30%"></div></div>
+            </div>
+          </div>
+          <div class="hud-panel">
+            <div class="hud-metric"><div class="hud-val">118°</div><div class="hud-key">Nasolabial</div></div>
+            <div class="hud-metric"><div class="hud-val">+4mm</div><div class="hud-key">Proyección</div></div>
+            <div class="hud-metric"><div class="hud-val">6°</div><div class="hud-key">Rotación</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. LOGOS / PRUEBA SOCIAL -->
+<div class="logos-section">
+  <div class="logos-inner">
+    <div class="logos-label">Utilizado por cirujanos en</div>
+    <div class="logos-row">
+      <div class="logo-pill">🏥 Clínica Bella <span>· Ciudad de México</span></div>
+      <div class="logo-pill">⚕️ Dr. Arteaga <span>· Monterrey</span></div>
+      <div class="logo-pill">🏥 Estética Integral <span>· Guadalajara</span></div>
+      <div class="logo-pill">⚕️ Centro Facial <span>· Bogotá</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-section">
+  <div class="stats-grid">
+    <div class="stat"><div class="stat-n">8<em>+</em></div><div class="stat-l">Procedimientos estéticos disponibles</div></div>
+    <div class="stat"><div class="stat-n">60<em>fps</em></div><div class="stat-l">Deformación canvas en tiempo real</div></div>
+    <div class="stat"><div class="stat-n">100<em>%</em></div><div class="stat-l">Privacidad — imágenes encriptadas (Cloudinary)</div></div>
+    <div class="stat"><div class="stat-n">48<em>h</em></div><div class="stat-l">Expiración automática de links compartidos</div></div>
+  </div>
+</div>
+
+<!-- 3. CARACTERÍSTICAS -->
+<section class="section">
+  <div class="section-inner">
+    <div class="sec-num">01 — Características</div>
+    <h2>Todo lo que necesita tu práctica</h2>
+    <p class="section-sub">Diseñado específicamente para cirujanos estéticos. No es un editor de fotos genérico — es una herramienta clínica.</p>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon">🎯</div>
+        <div class="feat-title">Simulación en tiempo real</div>
+        <div class="feat-desc">Motor de canvas a 60fps con algoritmo de deformación inversa. Ajustes fluidos sin pixelización.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📐</div>
+        <div class="feat-title">HUD de métricas quirúrgicas</div>
+        <div class="feat-desc">Ángulo nasolabial, proyección del tip, rotación y reducción de giba calculados automáticamente.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📍</div>
+        <div class="feat-title">Anotaciones quirúrgicas</div>
+        <div class="feat-desc">Pins numerados con notas del cirujano sobre la imagen. Exportables a PDF profesional.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">✍️</div>
+        <div class="feat-title">Consentimiento digital</div>
+        <div class="feat-desc">El paciente firma el resultado de la simulación. Registro inmutable en el historial clínico.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔗</div>
+        <div class="feat-title">Compartir resultados</div>
+        <div class="feat-desc">Link seguro con expiración de 48h para que el paciente vea el antes/después desde su celular.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔐</div>
+        <div class="feat-title">Seguridad y privacidad</div>
+        <div class="feat-desc">2FA, JWT, imágenes en Cloudinary encriptadas, logs de auditoría inmutables. Cumplimiento HIPAA.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. CÓMO FUNCIONA -->
+<section class="section" style="background:#FAFAF9">
+  <div class="section-inner">
+    <div class="sec-num">02 — Proceso</div>
+    <h2>Cómo funciona</h2>
+    <p class="section-sub" style="margin-bottom:56px">En menos de 2 minutos, tu paciente ve el resultado esperado de su procedimiento.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-title">Crea el expediente</div>
+        <div class="step-desc">Registra al paciente con su información básica y procedimiento objetivo.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-title">Carga la fotografía</div>
+        <div class="step-desc">Sube la imagen directamente desde la consulta. Se encripta y almacena de forma segura.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-title">Simula en tiempo real</div>
+        <div class="step-desc">Ajusta los sliders de control y el paciente ve los cambios al instante en pantalla.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-title">Guarda y comparte</div>
+        <div class="step-desc">Exporta a PDF, comparte por link o solicita la firma de consentimiento digital.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. INVESTIGACIÓN / CREDIBILIDAD -->
+<section class="section">
+  <div class="section-inner">
+    <div class="sec-num">03 — Evidencia</div>
+    <h2>Por qué la simulación importa</h2>
+    <p class="section-sub">La evidencia científica respalda el uso de simuladores en cirugía estética para mejorar resultados.</p>
+    <div class="research-grid">
+      <div class="research-card">
+        <div class="research-stat">63%</div>
+        <div class="research-quote">"El 63% de los cirujanos plásticos faciales usan software de imagen computarizada como parte de su consulta preoperatoria."</div>
+        <div class="research-source">— Facial Plastic Surgery & Aesthetic Medicine, 2022</div>
+      </div>
+      <div class="research-card">
+        <div class="research-stat">↑89%</div>
+        <div class="research-quote">"Los pacientes que reciben simulación preoperatoria reportan significativamente mayor satisfacción con el proceso de toma de decisiones."</div>
+        <div class="research-source">— Journal of Plastic and Reconstructive Surgery, 2021</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. PRECIOS -->
+<section class="section" style="background:#FAFAF9">
+  <div class="section-inner">
+    <div class="sec-num">04 — Precios</div>
+    <h2>Planes claros, sin sorpresas</h2>
+    <p class="section-sub" style="margin-bottom:40px">Cancela cuando quieras. Sin contratos anuales forzosos.</p>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-name">Starter</div>
+        <div class="price-amount">$99 <span>/ mes</span></div>
+        <div class="price-desc">Para cirujanos independientes</div>
+        <div class="price-divider"></div>
+        <div class="price-item"><span class="check">✓</span> 1 usuario (cirujano)</div>
+        <div class="price-item"><span class="check">✓</span> Hasta 30 pacientes activos</div>
+        <div class="price-item"><span class="check">✓</span> Procedimientos básicos (4)</div>
+        <div class="price-item"><span class="check">✓</span> PDF y links de compartir</div>
+        <div class="price-item" style="color:#CBD5E1">✗ Anotaciones quirúrgicas</div>
+        <div class="price-item" style="color:#CBD5E1">✗ Firma de consentimiento</div>
+        <button class="price-btn-ghost">Empezar gratis 14 días →</button>
+      </div>
+      <div class="price-card featured">
+        <div class="featured-tag">⭐ Más popular</div>
+        <div class="price-name">Pro</div>
+        <div class="price-amount">$199 <span>/ mes</span></div>
+        <div class="price-desc">Para clínicas en crecimiento</div>
+        <div class="price-divider"></div>
+        <div class="price-item"><span class="check">✓</span> Hasta 3 cirujanos</div>
+        <div class="price-item"><span class="check">✓</span> Pacientes ilimitados</div>
+        <div class="price-item"><span class="check">✓</span> Todos los procedimientos (8+)</div>
+        <div class="price-item"><span class="check">✓</span> Anotaciones quirúrgicas</div>
+        <div class="price-item"><span class="check">✓</span> Firma de consentimiento digital</div>
+        <div class="price-item"><span class="check">✓</span> Soporte prioritario</div>
+        <button class="price-btn">Solicitar demo →</button>
+      </div>
+      <div class="price-card">
+        <div class="price-name">Enterprise</div>
+        <div class="price-amount" style="font-size:26px">A medida</div>
+        <div class="price-desc">Para hospitales y grupos de clínicas</div>
+        <div class="price-divider"></div>
+        <div class="price-item"><span class="check">✓</span> Usuarios ilimitados</div>
+        <div class="price-item"><span class="check">✓</span> Integración con HIS/EMR</div>
+        <div class="price-item"><span class="check">✓</span> White label disponible</div>
+        <div class="price-item"><span class="check">✓</span> SLA garantizado</div>
+        <div class="price-item"><span class="check">✓</span> Onboarding dedicado</div>
+        <div class="price-item"><span class="check">✓</span> Facturación corporativa</div>
+        <button class="price-btn">Hablar con ventas →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. TESTIMONIOS -->
+<section class="section">
+  <div class="section-inner">
+    <div class="sec-num">05 — Testimonios</div>
+    <h2>Lo que dicen los cirujanos</h2>
+    <p class="section-sub" style="margin-bottom:40px">Profesionales reales, resultados reales.</p>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="testi-quote">"Mis pacientes de rinoplastia ahora llegan a la cirugía con expectativas mucho más realistas. Las cancelaciones de última hora bajaron un 40%."</div>
+        <div class="testi-author">
+          <div class="testi-avatar">RA</div>
+          <div><div class="testi-name">Dr. Roberto Arteaga</div><div class="testi-role">Cirujano facial · Monterrey</div></div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-quote">"La función de firma de consentimiento digital fue decisiva. Ahora tengo respaldo legal de cada simulación que muestro."</div>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#667EEA,#4FACFE)">LM</div>
+          <div><div class="testi-name">Dra. Laura Méndez</div><div class="testi-role">Cirujana estética · CDMX</div></div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-quote">"Usábamos Photoshop antes. SimEstético hace lo mismo en 2 minutos y con métricas quirúrgicas reales. No hay comparación."</div>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#4FACFE,#00F2FE)">CP</div>
+          <div><div class="testi-name">Dr. Carlos Paredes</div><div class="testi-role">Rinoplastia especializada · Bogotá</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. FAQ -->
+<section class="section" style="background:#FAFAF9">
+  <div class="section-inner">
+    <div class="sec-num">06 — FAQ</div>
+    <h2>Preguntas frecuentes</h2>
+    <p class="section-sub" style="margin-bottom:40px"></p>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <div class="faq-q">¿Necesito instalar algo? <span style="color:#4FACFE">+</span></div>
+        <div class="faq-a">No. SimEstético es 100% basado en navegador. Funciona en Mac, Windows y iPad sin instalaciones.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Qué procedimientos soporta? <span style="color:#4FACFE">+</span></div>
+        <div class="faq-a">Rinoplastia, lifting de cejas, aumento de mentón, labios, blefaroplastia, cuello, suavizado de piel y feminización facial.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Las imágenes de mis pacientes son seguras? <span style="color:#4FACFE">+</span></div>
+        <div class="faq-a">Sí. Todas las imágenes se encriptan en Cloudinary con URLs firmadas. Nadie fuera de tu cuenta puede acceder a ellas.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Puedo cancelar en cualquier momento? <span style="color:#4FACFE">+</span></div>
+        <div class="faq-a">Sí, sin penalizaciones. Cancelas y tu acceso se mantiene hasta el fin del período pagado.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Tiene prueba gratuita? <span style="color:#4FACFE">+</span></div>
+        <div class="faq-a">14 días gratis en el plan Starter, sin tarjeta de crédito. Para Pro y Enterprise, hacemos una demo personalizada.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Funciona para cirugías no faciales? <span style="color:#4FACFE">+</span></div>
+        <div class="faq-a">Por ahora está optimizado para procedimientos faciales. Cirugía corporal está en el roadmap.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. CTA FINAL -->
+<div class="final-cta">
+  <div class="cta-title-lg">Empieza a simular hoy.</div>
+  <div class="cta-sub">14 días gratis · Sin tarjeta de crédito · Cancela cuando quieras</div>
+  <div class="cta-btns">
+    <button class="cta-w">Solicitar demo gratuita →</button>
+    <button class="cta-g">Ver precios</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-logo">Sim<span>Estético</span></div>
+    <div class="footer-desc">Simulador estético 2D de precisión quirúrgica para cirujanos y clínicas de estética facial.</div>
+  </div>
+  <div class="footer-col">
+    <h4>Producto</h4>
+    <a href="#">Características</a>
+    <a href="#">Precios</a>
+    <a href="#">Demo</a>
+    <a href="#">Changelog</a>
+  </div>
+  <div class="footer-col">
+    <h4>Legal</h4>
+    <a href="#">Privacidad</a>
+    <a href="#">Términos de uso</a>
+    <a href="#">HIPAA</a>
+  </div>
+  <div class="footer-col">
+    <h4>Contacto</h4>
+    <a href="#">hola@simestético.com</a>
+    <a href="#">WhatsApp</a>
+    <a href="#">Soporte</a>
+  </div>
+</footer>
+
+</body>
+</html>

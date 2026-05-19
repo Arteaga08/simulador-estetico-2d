@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Funciones por zona</title>
+<script src="../../../.claude/skills/brainstorming/scripts/helper.js" defer></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #0f0f13; color: #e5e5e5; padding: 2rem; min-height: 100vh; }
+  h2 { font-size: 1.35rem; font-weight: 600; margin-bottom: 0.4rem; }
+  .subtitle { color: #888; font-size: 0.875rem; margin-bottom: 1.75rem; }
+
+  /* Layout diagram */
+  .layout-diagram {
+    display: grid;
+    grid-template-columns: 180px 1fr 220px;
+    grid-template-rows: 44px 1fr 52px;
+    gap: 8px;
+    height: 520px;
+    margin-bottom: 2rem;
+  }
+
+  .zone {
+    border-radius: 10px;
+    padding: 12px;
+    border: 1.5px solid transparent;
+    transition: border-color 0.2s;
+  }
+
+  .zone-topbar {
+    grid-column: 1 / -1;
+    background: #1e1e2e;
+    border-color: #3a3a55;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .zone-left {
+    background: #191926;
+    border-color: #667EEA55;
+    grid-row: 2;
+    overflow-y: auto;
+  }
+
+  .zone-canvas {
+    background: #13131c;
+    border-color: #4FACFE33;
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .zone-right {
+    background: #191926;
+    border-color: #a78bfa55;
+    grid-row: 2;
+    overflow-y: auto;
+  }
+
+  .zone-bottom {
+    grid-column: 1 / -1;
+    background: #1a1a28;
+    border-color: #3a3a55;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 16px;
+  }
+
+  /* Zone labels */
+  .zone-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-blue { background: #4FACFE; }
+  .dot-purple { background: #667EEA; }
+  .dot-violet { background: #a78bfa; }
+  .dot-gray { background: #555; }
+
+  /* Feature chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+  .chip {
+    font-size: 0.72rem;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .chip-blue { background: rgba(79,172,254,0.12); color: #4FACFE; border: 1px solid rgba(79,172,254,0.25); }
+  .chip-purple { background: rgba(102,126,234,0.12); color: #818cf8; border: 1px solid rgba(102,126,234,0.25); }
+  .chip-violet { background: rgba(167,139,250,0.12); color: #c4b5fd; border: 1px solid rgba(167,139,250,0.2); }
+  .chip-gray { background: rgba(255,255,255,0.06); color: #aaa; border: 1px solid rgba(255,255,255,0.1); }
+  .chip-amber { background: rgba(251,191,36,0.1); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+  .chip-green { background: rgba(52,211,153,0.1); color: #34d399; border: 1px solid rgba(52,211,153,0.2); }
+  .chip-question { background: rgba(239,68,68,0.08); color: #f87171; border: 1px solid rgba(239,68,68,0.2); cursor: pointer; }
+  .chip-question:hover { background: rgba(239,68,68,0.15); }
+
+  /* Canvas mockup */
+  .canvas-area {
+    flex: 1;
+    background: #0d0d15;
+    border-radius: 6px;
+    margin: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .face-placeholder {
+    width: 120px; height: 155px;
+    border-radius: 50% 50% 40% 40%;
+    background: linear-gradient(160deg, #2a2a3d, #1e1e2e);
+    border: 1px solid #3a3a55;
+    position: relative;
+  }
+  .hud-line {
+    position: absolute;
+    background: rgba(79,172,254,0.25);
+  }
+  .hud-h { width: 100%; height: 1px; top: 40%; }
+  .hud-v { width: 1px; height: 100%; left: 50%; }
+  .annotation-pin {
+    position: absolute;
+    width: 10px; height: 10px;
+    background: #fbbf24;
+    border-radius: 50%;
+    border: 2px solid #000;
+  }
+  .canvas-tools {
+    display: flex;
+    gap: 6px;
+    padding: 6px 10px;
+    align-items: center;
+  }
+  .tool-btn {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 5px;
+    background: #252535;
+    color: #888;
+    border: 1px solid #333;
+  }
+
+  /* Topbar items */
+  .top-item {
+    font-size: 0.72rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: #252535;
+    color: #aaa;
+    border: 1px solid #333;
+  }
+  .top-item.active { background: rgba(79,172,254,0.15); color: #4FACFE; border-color: #4FACFE44; }
+
+  /* Sliders mockup */
+  .slider-group { margin-bottom: 12px; }
+  .slider-label { font-size: 0.7rem; color: #888; margin-bottom: 4px; display: flex; justify-content: space-between; }
+  .slider-track { height: 4px; background: #2a2a3d; border-radius: 2px; position: relative; }
+  .slider-fill { height: 100%; border-radius: 2px; }
+  .slider-thumb { width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 2px solid #4FACFE; position: absolute; top: -4px; }
+
+  /* Procedure list */
+  .proc-item {
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    cursor: pointer;
+    margin-bottom: 3px;
+    transition: background 0.15s;
+  }
+  .proc-item.active { background: rgba(102,126,234,0.2); color: #818cf8; }
+  .proc-item:not(.active) { color: #666; }
+  .proc-item:hover:not(.active) { background: #1e1e2e; color: #999; }
+
+  /* Bottom action items */
+  .bottom-action {
+    font-size: 0.72rem;
+    padding: 5px 12px;
+    border-radius: 6px;
+    background: #252535;
+    color: #aaa;
+    border: 1px solid #333;
+    white-space: nowrap;
+  }
+  .bottom-action.primary { background: linear-gradient(135deg, #4FACFE, #667EEA); color: #fff; border: none; }
+
+  /* Legend note */
+  .note {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 0.5rem;
+    padding: 10px 14px;
+    background: #161620;
+    border-radius: 8px;
+    border-left: 3px solid #667EEA44;
+  }
+  .tag-in-question { color: #f87171; font-size: 0.75rem; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<h2>Funciones del simulador — organizadas por zona (Layout A)</h2>
+<p class="subtitle">Lo que ya está definido en la arquitectura del proyecto, distribuido en el espacio. Las <span class="tag-in-question">rojas</span> son decisiones que aún necesitamos tomar.</p>
+
+<div class="layout-diagram">
+
+  <!-- TOP BAR -->
+  <div class="zone zone-topbar">
+    <div class="zone-label" style="margin:0; margin-right:8px;"><div class="dot dot-gray"></div> Barra superior</div>
+    <div class="top-item active">Paciente: María García</div>
+    <div class="top-item">← Expediente</div>
+    <div class="top-item">Sesión: Rinoplastia #3</div>
+    <div class="top-item">Modo: Quirúrgico</div>
+    <div style="margin-left:auto; display:flex; gap:6px;">
+      <div class="top-item">↩ Deshacer</div>
+      <div class="top-item">↪ Rehacer</div>
+      <div class="top-item">⚙</div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR IZQUIERDO -->
+  <div class="zone zone-left">
+    <div class="zone-label"><div class="dot dot-purple"></div> Panel izquierdo</div>
+
+    <div style="font-size:0.68rem; color:#555; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.06em;">Procedimiento</div>
+    <div class="proc-item active">Rinoplastia</div>
+    <div class="proc-item">Lifting cejas</div>
+    <div class="proc-item">Aumento mentón</div>
+    <div class="proc-item">Aumento labios</div>
+    <div class="proc-item">Lifting cuello</div>
+    <div class="proc-item">Blefaroplastia</div>
+    <div class="proc-item">Suavizado piel</div>
+    <div class="proc-item">Feminización</div>
+
+    <div style="height:1px; background:#222; margin:10px 0;"></div>
+
+    <div style="font-size:0.68rem; color:#555; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.06em;">Técnica</div>
+    <div style="display:flex; gap:4px; flex-wrap:wrap;">
+      <div class="chip chip-purple" style="font-size:0.68rem;">Quirúrgico ✓</div>
+      <div class="chip chip-gray" style="font-size:0.68rem;">Rinomodelación</div>
+      <div class="chip chip-gray" style="font-size:0.68rem;">Endoscópico</div>
+    </div>
+
+    <div style="height:1px; background:#222; margin:10px 0;"></div>
+
+    <div style="font-size:0.68rem; color:#555; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.06em;">Herramientas canvas</div>
+    <div class="chips">
+      <div class="chip chip-blue" style="font-size:0.68rem;">✏ Anotar</div>
+      <div class="chip chip-blue" style="font-size:0.68rem;">📍 Pin</div>
+      <div class="chip chip-amber" style="font-size:0.68rem;">⚖ HUD líneas</div>
+      <div class="chip chip-amber" style="font-size:0.68rem;">📐 Ángulos</div>
+      <div class="chip chip-question" style="font-size:0.68rem;">🖊 Dibujo libre?</div>
+    </div>
+  </div>
+
+  <!-- CANVAS CENTRAL -->
+  <div class="zone zone-canvas">
+    <div class="zone-label" style="margin:8px 8px 0;"><div class="dot dot-blue"></div> Canvas principal</div>
+    <div class="canvas-tools">
+      <div class="tool-btn">🔍 Zoom</div>
+      <div class="tool-btn">✋ Pan</div>
+      <div class="tool-btn">⟳ Reset</div>
+      <div style="margin-left:auto;">
+        <div class="tool-btn" style="color:#4FACFE; border-color:#4FACFE44;">◑ Antes/Después</div>
+      </div>
+    </div>
+    <div class="canvas-area">
+      <div class="hud-line hud-h"></div>
+      <div class="hud-line hud-v"></div>
+      <div class="face-placeholder">
+        <div class="annotation-pin" style="top:25%; left:45%;"></div>
+        <div class="annotation-pin" style="top:55%; left:30%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL DERECHO -->
+  <div class="zone zone-right">
+    <div class="zone-label"><div class="dot dot-violet"></div> Panel de sliders</div>
+
+    <div style="font-size:0.68rem; color:#555; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em;">Rinoplastia — Quirúrgico</div>
+
+    <div class="slider-group">
+      <div class="slider-label"><span>Giba nasal</span><span style="color:#4FACFE;">-32</span></div>
+      <div class="slider-track">
+        <div class="slider-fill" style="width:30%; background: linear-gradient(90deg,#4FACFE,#667EEA);"></div>
+        <div class="slider-thumb" style="left:28%;"></div>
+      </div>
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-label"><span>Proyección punta</span><span style="color:#4FACFE;">+18</span></div>
+      <div class="slider-track">
+        <div class="slider-fill" style="width:65%; background: linear-gradient(90deg,#4FACFE,#667EEA);"></div>
+        <div class="slider-thumb" style="left:63%;"></div>
+      </div>
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-label"><span>Rotación punta</span><span style="color:#4FACFE;">+5</span></div>
+      <div class="slider-track">
+        <div class="slider-fill" style="width:55%; background: linear-gradient(90deg,#4FACFE,#667EEA);"></div>
+        <div class="slider-thumb" style="left:53%;"></div>
+      </div>
+    </div>
+
+    <div style="height:1px; background:#222; margin:12px 0;"></div>
+
+    <div style="font-size:0.68rem; color:#555; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em;">Intensidad global</div>
+    <div class="slider-group">
+      <div class="slider-label"><span>Efecto</span><span style="color:#a78bfa;">70%</span></div>
+      <div class="slider-track">
+        <div class="slider-fill" style="width:70%; background: linear-gradient(90deg,#a78bfa,#667EEA);"></div>
+        <div class="slider-thumb" style="left:68%; border-color:#a78bfa;"></div>
+      </div>
+    </div>
+
+    <div style="height:1px; background:#222; margin:12px 0;"></div>
+
+    <div style="font-size:0.68rem; color:#555; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em;">Notas de la sesión</div>
+    <div style="background:#111118; border-radius:6px; padding:8px; font-size:0.7rem; color:#555; min-height:50px; border:1px solid #222;">
+      Paciente solicita reducción de giba...
+    </div>
+
+    <div style="height:1px; background:#222; margin:12px 0;"></div>
+
+    <div style="font-size:0.68rem; color:#555; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.06em;">Presets</div>
+    <div class="chips">
+      <div class="chip chip-violet" style="font-size:0.68rem;">Natural</div>
+      <div class="chip chip-gray" style="font-size:0.68rem;">Definido</div>
+      <div class="chip chip-gray" style="font-size:0.68rem;">Proyectado</div>
+      <div class="chip chip-question" style="font-size:0.68rem;">+ Nuevo preset?</div>
+    </div>
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div class="zone zone-bottom">
+    <div class="zone-label" style="margin:0; margin-right:8px;"><div class="dot dot-gray"></div></div>
+    <div class="bottom-action">📷 Subir foto</div>
+    <div class="bottom-action">⟳ Reset total</div>
+    <div class="bottom-action">📐 Ver HUD</div>
+    <div style="margin-left:auto; display:flex; gap:8px;">
+      <div class="bottom-action">💾 Guardar sesión</div>
+      <div class="bottom-action">📤 Exportar PDF</div>
+      <div class="bottom-action primary">✓ Guardar resultado</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="note">
+  <strong style="color:#f87171;">Chips rojos = decisiones abiertas:</strong> ¿Se incluye dibujo libre en el canvas (tipo pincel)? ¿El médico puede crear presets propios? Responde en el chat — esto no es para hacer clic, es para revisar y decirme qué agregar, quitar o cambiar.
+</div>
+
+</body>
+</html>

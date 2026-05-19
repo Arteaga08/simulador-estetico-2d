@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador — Funciones por zona v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="../../../.claude/skills/brainstorming/scripts/helper.js" defer></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #f0eef8;
+    padding: 2rem;
+    min-height: 100vh;
+  }
+
+  .page-header { margin-bottom: 1.5rem; }
+  .page-header h2 { font-size: 1.1rem; font-weight: 700; color: #1E1B4B; letter-spacing: -0.01em; }
+  .page-header p { font-size: 0.8rem; color: #6B7280; margin-top: 3px; }
+
+  /* ── App shell ── */
+  .app-shell {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    grid-template-rows: 44px 1fr 52px;
+    height: 640px;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 16px 64px rgba(30,27,75,0.18), 0 2px 8px rgba(30,27,75,0.08);
+    border: 1px solid rgba(30,27,75,0.1);
+  }
+
+  /* ── Top bar ── */
+  .topbar {
+    grid-column: 1 / -1;
+    background: #fff;
+    border-bottom: 1px solid #E9D5FF;
+    display: flex;
+    align-items: center;
+    padding: 0 16px 0 0;
+    gap: 0;
+  }
+  .topbar-logo {
+    width: 220px;
+    height: 100%;
+    background: #1E1B4B;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .logo-mark {
+    width: 22px; height: 22px;
+    background: linear-gradient(135deg, #4FACFE, #667EEA);
+    border-radius: 6px;
+  }
+  .logo-text { font-size: 0.8rem; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
+  .topbar-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 8px;
+  }
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: #6B7280;
+  }
+  .breadcrumb-sep { color: #D1D5DB; }
+  .breadcrumb-current { color: #1E1B4B; font-weight: 600; }
+  .session-badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    background: #EEF2FF;
+    color: #4338CA;
+    font-weight: 600;
+    margin-left: 4px;
+  }
+  .topbar-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .icon-btn {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    border: 1px solid #E9D5FF;
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+    color: #6B7280;
+    cursor: pointer;
+  }
+  .icon-btn:hover { background: #F5F3FF; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    grid-row: 2 / 4;
+    background: #1E1B4B;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-section-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    padding: 16px 14px 6px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.45);
+    cursor: pointer;
+    border-radius: 0;
+    transition: all 0.15s;
+    margin: 1px 8px;
+    border-radius: 8px;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); }
+  .nav-item.active {
+    background: rgba(79,172,254,0.15);
+    color: #4FACFE;
+    font-weight: 600;
+  }
+  .nav-item .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.6;
+    flex-shrink: 0;
+  }
+  .nav-item.active .nav-dot { opacity: 1; }
+
+  .sidebar-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 8px 14px; }
+
+  .technique-group { padding: 0 8px; margin-bottom: 4px; }
+  .technique-label { font-size: 0.62rem; color: rgba(255,255,255,0.3); padding: 4px 6px 6px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; }
+  .technique-pills { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 6px; }
+  .technique-pill {
+    font-size: 0.67rem;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .technique-pill.active {
+    background: rgba(79,172,254,0.2);
+    color: #4FACFE;
+    border: 1px solid rgba(79,172,254,0.3);
+  }
+  .technique-pill:not(.active) {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.35);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .sidebar-tools { padding: 0 8px; margin-top: 4px; }
+  .tool-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 6px;
+    font-size: 0.73rem;
+    color: rgba(255,255,255,0.4);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+  .tool-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.65); }
+  .tool-item.active-tool { background: rgba(251,191,36,0.12); color: #fbbf24; }
+  .tool-icon { width: 18px; height: 18px; background: rgba(255,255,255,0.08); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; flex-shrink: 0; }
+  .tool-item.active-tool .tool-icon { background: rgba(251,191,36,0.15); }
+  .tool-question {
+    font-size: 0.67rem;
+    color: rgba(239,68,68,0.7);
+    background: rgba(239,68,68,0.08);
+    border: 1px dashed rgba(239,68,68,0.25);
+    border-radius: 6px;
+    padding: 4px 6px;
+    margin: 2px 6px;
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  .sidebar-footer { margin-top: auto; padding: 12px 8px; }
+
+  /* ── Canvas area ── */
+  .canvas-area {
+    background: #F5F3FF;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .canvas-toolbar {
+    height: 40px;
+    background: #fff;
+    border-bottom: 1px solid #E9D5FF;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .canvas-tool-btn {
+    height: 26px;
+    padding: 0 10px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: #6B7280;
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .canvas-tool-btn:hover { background: #F5F3FF; border-color: #E9D5FF; }
+  .canvas-tool-btn.active { background: #EEF2FF; color: #4338CA; border-color: #C7D2FE; font-weight: 600; }
+
+  .canvas-workspace {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background:
+      linear-gradient(rgba(102,126,234,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(102,126,234,0.04) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  /* Patient photo placeholder */
+  .photo-frame {
+    position: relative;
+    width: 240px;
+    height: 300px;
+  }
+  .photo-bg {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(160deg, #e8e4f8 0%, #d4d0f0 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(102,126,234,0.15);
+    box-shadow: 0 8px 32px rgba(30,27,75,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Face silhouette */
+  .face-shape {
+    width: 120px;
+    height: 150px;
+    position: relative;
+  }
+  .face-oval {
+    width: 90px;
+    height: 110px;
+    background: linear-gradient(160deg, #c4bfe8, #b0aad8);
+    border-radius: 50% 50% 42% 42%;
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    box-shadow: inset 0 -8px 20px rgba(0,0,0,0.08);
+  }
+  .face-neck {
+    width: 32px; height: 35px;
+    background: linear-gradient(180deg, #b0aad8, #9e98cc);
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    border-radius: 0 0 4px 4px;
+  }
+
+  /* HUD overlay lines */
+  .hud-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .hud-h {
+    position: absolute;
+    left: 12%; right: 12%;
+    height: 1px;
+    background: rgba(79,172,254,0.35);
+    top: 38%;
+  }
+  .hud-h::before, .hud-h::after {
+    content: '';
+    position: absolute;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #4FACFE;
+    top: -2px;
+  }
+  .hud-h::before { left: 0; }
+  .hud-h::after { right: 0; }
+  .hud-v {
+    position: absolute;
+    top: 8%; bottom: 8%;
+    width: 1px;
+    background: rgba(79,172,254,0.25);
+    left: 50%;
+  }
+  .hud-angle {
+    position: absolute;
+    font-size: 9px;
+    color: #4FACFE;
+    font-weight: 600;
+    background: rgba(255,255,255,0.9);
+    padding: 1px 4px;
+    border-radius: 3px;
+    border: 1px solid rgba(79,172,254,0.3);
+  }
+
+  /* Annotation pins */
+  .pin {
+    position: absolute;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #F59E0B;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+  .pin-label {
+    position: absolute;
+    font-size: 8px;
+    font-weight: 600;
+    color: #92400E;
+    background: #FEF3C7;
+    padding: 1px 4px;
+    border-radius: 3px;
+    white-space: nowrap;
+    border: 1px solid #FDE68A;
+    top: -16px;
+    left: 12px;
+  }
+
+  /* Before/after divider */
+  .before-after-handle {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: #667EEA;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Canvas mode toggle */
+  .mode-toggle {
+    position: absolute;
+    top: 10px; right: 10px;
+    display: flex;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid #E9D5FF;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(30,27,75,0.08);
+  }
+  .mode-btn {
+    padding: 4px 10px;
+    font-size: 0.67rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: #9CA3AF;
+  }
+  .mode-btn.active { background: #EEF2FF; color: #4338CA; }
+
+  /* ── Right panel (sliders) ── */
+  .sliders-panel {
+    width: 240px;
+    background: #fff;
+    border-left: 1px solid #E9D5FF;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  /* Canvas + sliders wrapper */
+  .canvas-and-sliders {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .panel-section { padding: 14px 14px 0; }
+  .panel-section + .panel-section { padding-top: 12px; }
+  .panel-divider { height: 1px; background: #F3F4F6; margin: 12px 14px 0; }
+  .panel-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #9CA3AF;
+    margin-bottom: 10px;
+  }
+  .proc-name { font-size: 0.78rem; font-weight: 600; color: #1E1B4B; }
+  .proc-technique {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.67rem;
+    color: #4338CA;
+    background: #EEF2FF;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  /* Sliders */
+  .slider-row { margin-bottom: 14px; }
+  .slider-meta { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+  .slider-name { font-size: 0.73rem; color: #374151; font-weight: 500; }
+  .slider-val { font-size: 0.7rem; font-weight: 700; color: #4338CA; }
+  .slider-track {
+    height: 4px;
+    background: #E9D5FF;
+    border-radius: 2px;
+    position: relative;
+  }
+  .slider-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #4FACFE, #667EEA);
+    position: absolute;
+    top: 0; left: 0;
+  }
+  .slider-thumb {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #667EEA;
+    box-shadow: 0 1px 4px rgba(102,126,234,0.3);
+    position: absolute;
+    top: -5px;
+    transform: translateX(-50%);
+  }
+
+  /* Intensity slider (violet) */
+  .slider-fill.intensity { background: linear-gradient(90deg, #a78bfa, #667EEA); }
+  .slider-thumb.intensity { border-color: #a78bfa; }
+  .slider-val.intensity { color: #7C3AED; }
+
+  /* Presets */
+  .preset-row { display: flex; gap: 5px; flex-wrap: wrap; }
+  .preset-chip {
+    font-size: 0.68rem;
+    padding: 3px 9px;
+    border-radius: 9999px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid;
+  }
+  .preset-chip.active { background: #EEF2FF; color: #4338CA; border-color: #C7D2FE; }
+  .preset-chip:not(.active) { background: transparent; color: #9CA3AF; border-color: #E9D5FF; }
+  .preset-chip.question { color: #EF4444; border-color: #FCA5A5; background: #FFF5F5; border-style: dashed; }
+
+  /* Notes */
+  .notes-area {
+    min-height: 54px;
+    background: #FAFAFA;
+    border: 1px solid #E9D5FF;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 0.72rem;
+    color: #9CA3AF;
+    line-height: 1.5;
+  }
+
+  /* ── Bottom bar ── */
+  .bottombar {
+    background: #fff;
+    border-top: 1px solid #E9D5FF;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    gap: 6px;
+  }
+  .action-btn {
+    height: 30px;
+    padding: 0 12px;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 5px;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+  .action-btn.secondary {
+    background: #fff;
+    color: #374151;
+    border-color: #E9D5FF;
+  }
+  .action-btn.secondary:hover { background: #F9FAFB; }
+  .action-btn.ghost {
+    background: transparent;
+    color: #667EEA;
+    border-color: transparent;
+  }
+  .action-btn.primary {
+    background: #667EEA;
+    color: #fff;
+    border-color: #667EEA;
+  }
+  .action-btn.primary:hover { background: #4338CA; border-color: #4338CA; }
+  .action-btn.danger-ghost {
+    background: transparent;
+    color: #EF4444;
+    border-color: transparent;
+    font-size: 0.7rem;
+  }
+  .spacer { flex: 1; }
+
+  /* Decision flags */
+  .decision-note {
+    margin-top: 1.25rem;
+    padding: 10px 14px;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #E9D5FF;
+    font-size: 0.78rem;
+    color: #374151;
+    line-height: 1.5;
+  }
+  .decision-note strong { color: #EF4444; }
+  .decision-note ul { margin-top: 6px; padding-left: 16px; }
+  .decision-note li { margin-bottom: 3px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h2>Simulador — mapa de funciones por zona (Layout A)</h2>
+  <p>Diseño con tokens reales del proyecto. Chips rojos = decisiones abiertas que definiremos a continuación.</p>
+</div>
+
+<div class="app-shell">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="logo-mark"></div>
+      <span class="logo-text">SimEstético</span>
+    </div>
+    <div class="topbar-content">
+      <div class="breadcrumb">
+        <span>Pacientes</span>
+        <span class="breadcrumb-sep">/</span>
+        <span>García, María</span>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Sesión #3</span>
+      </div>
+      <span class="session-badge">Rinoplastia · Quirúrgico</span>
+    </div>
+    <div class="topbar-actions">
+      <div class="icon-btn" title="Deshacer">↩</div>
+      <div class="icon-btn" title="Rehacer">↪</div>
+      <div class="icon-btn" title="Configuración">⚙</div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <div class="sidebar-section-label">Procedimiento</div>
+    <div class="nav-item active"><div class="nav-dot"></div>Rinoplastia</div>
+    <div class="nav-item"><div class="nav-dot"></div>Lifting de cejas</div>
+    <div class="nav-item"><div class="nav-dot"></div>Aumento de mentón</div>
+    <div class="nav-item"><div class="nav-dot"></div>Aumento de labios</div>
+    <div class="nav-item"><div class="nav-dot"></div>Lifting de cuello</div>
+    <div class="nav-item"><div class="nav-dot"></div>Blefaroplastia</div>
+    <div class="nav-item"><div class="nav-dot"></div>Suavizado de piel</div>
+    <div class="nav-item"><div class="nav-dot"></div>Feminización facial</div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="technique-group">
+      <div class="technique-label">Técnica</div>
+      <div class="technique-pills">
+        <div class="technique-pill active">Quirúrgico</div>
+        <div class="technique-pill">Rinomodelación</div>
+        <div class="technique-pill">Endoscópico</div>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section-label">Herramientas</div>
+    <div class="sidebar-tools">
+      <div class="tool-item active-tool">
+        <div class="tool-icon">📍</div>
+        <span>Pin de anotación</span>
+      </div>
+      <div class="tool-item">
+        <div class="tool-icon">📐</div>
+        <span>Líneas de referencia</span>
+      </div>
+      <div class="tool-item">
+        <div class="tool-icon">🔢</div>
+        <span>Medición de ángulos</span>
+      </div>
+      <div class="tool-question">
+        <span style="font-size:0.65rem;">?</span>
+        <span style="font-size:0.68rem;">¿Dibujo libre?</span>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="nav-item" style="color:rgba(239,68,68,0.5); margin:0;">
+        <span style="font-size:0.85rem;">←</span>
+        <span style="font-size:0.72rem;">Volver al expediente</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CANVAS + SLIDERS -->
+  <div class="canvas-and-sliders">
+
+    <!-- CANVAS -->
+    <div class="canvas-area" style="flex:1;">
+      <div class="canvas-toolbar">
+        <button class="canvas-tool-btn">🔍 Zoom</button>
+        <button class="canvas-tool-btn">✋ Pan</button>
+        <div style="width:1px; height:18px; background:#E9D5FF; margin:0 2px;"></div>
+        <button class="canvas-tool-btn active">◑ Antes / Después</button>
+        <button class="canvas-tool-btn">⊞ Cuadrícula HUD</button>
+        <div style="margin-left:auto; display:flex; gap:4px;">
+          <button class="canvas-tool-btn">📷 Subir foto</button>
+        </div>
+      </div>
+
+      <div class="canvas-workspace">
+
+        <!-- Mode toggle overlay -->
+        <div class="mode-toggle">
+          <div class="mode-btn active">Original</div>
+          <div class="mode-btn">Simulación</div>
+          <div class="mode-btn">Split</div>
+        </div>
+
+        <div class="photo-frame">
+          <div class="photo-bg">
+            <div class="face-shape">
+              <div class="face-oval"></div>
+              <div class="face-neck"></div>
+            </div>
+            <!-- HUD -->
+            <div class="hud-overlay">
+              <div class="hud-h">
+                <span class="hud-angle" style="top:4px; left:40%;">Plano Frankfort</span>
+              </div>
+              <div class="hud-v"></div>
+              <span class="hud-angle" style="top:35%; right:8%; font-size:8px;">∠ 34°</span>
+            </div>
+            <!-- Pins -->
+            <div class="pin" style="top:28%; left:52%; position:absolute;">
+              <div class="pin-label">Giba nasal</div>
+            </div>
+            <div class="pin" style="top:55%; left:58%; position:absolute;"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SLIDERS PANEL -->
+    <div class="sliders-panel">
+
+      <div class="panel-section">
+        <div class="panel-label">Parámetros</div>
+        <div class="proc-name">Rinoplastia</div>
+        <div class="proc-technique">✓ Quirúrgico</div>
+      </div>
+
+      <div class="panel-divider"></div>
+      <div class="panel-section">
+
+        <div class="slider-row">
+          <div class="slider-meta">
+            <span class="slider-name">Giba nasal</span>
+            <span class="slider-val">−32</span>
+          </div>
+          <div class="slider-track">
+            <div class="slider-fill" style="width:30%;"></div>
+            <div class="slider-thumb" style="left:30%;"></div>
+          </div>
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-meta">
+            <span class="slider-name">Proyección de punta</span>
+            <span class="slider-val">+18</span>
+          </div>
+          <div class="slider-track">
+            <div class="slider-fill" style="width:65%;"></div>
+            <div class="slider-thumb" style="left:65%;"></div>
+          </div>
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-meta">
+            <span class="slider-name">Rotación de punta</span>
+            <span class="slider-val">+5°</span>
+          </div>
+          <div class="slider-track">
+            <div class="slider-fill" style="width:55%;"></div>
+            <div class="slider-thumb" style="left:55%;"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="panel-divider"></div>
+      <div class="panel-section">
+        <div class="panel-label">Intensidad global</div>
+        <div class="slider-row" style="margin-bottom:0;">
+          <div class="slider-meta">
+            <span class="slider-name">Efecto</span>
+            <span class="slider-val intensity">70%</span>
+          </div>
+          <div class="slider-track">
+            <div class="slider-fill intensity" style="width:70%;"></div>
+            <div class="slider-thumb intensity" style="left:70%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-divider"></div>
+      <div class="panel-section">
+        <div class="panel-label">Presets</div>
+        <div class="preset-row">
+          <div class="preset-chip active">Natural</div>
+          <div class="preset-chip">Definido</div>
+          <div class="preset-chip">Proyectado</div>
+          <div class="preset-chip question">+ Nuevo?</div>
+        </div>
+      </div>
+
+      <div class="panel-divider"></div>
+      <div class="panel-section" style="padding-bottom:14px;">
+        <div class="panel-label">Notas clínicas</div>
+        <div class="notes-area">Paciente solicita reducción de giba y mayor proyección de punta...</div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div class="bottombar">
+    <button class="action-btn secondary">⟳ Reset total</button>
+    <button class="action-btn ghost">📐 Medir ángulos</button>
+    <div class="spacer"></div>
+    <button class="action-btn secondary">📤 Exportar PDF</button>
+    <button class="action-btn secondary">🔗 Compartir (48h)</button>
+    <button class="action-btn primary">💾 Guardar sesión</button>
+  </div>
+
+</div>
+
+<div class="decision-note">
+  <strong>Decisiones pendientes</strong> (chips en rojo en el sidebar):
+  <ul>
+    <li><strong>¿Dibujo libre?</strong> ¿El médico puede trazar líneas y flechas directamente sobre la foto, o solo usar pins de anotación?</li>
+    <li><strong>¿Presets propios?</strong> ¿El botón "+ Nuevo?" permite al médico guardar la configuración actual de sliders como preset reutilizable?</li>
+  </ul>
+</div>
+
+</body>
+</html>

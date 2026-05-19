@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+/* ─── Design Tokens ─────────────────────────────────────────────────── */
+:root {
+  /* Brand */
+  --blue:          #4FACFE;
+  --blue-dark:     #0A1628;
+  --indigo:        #667EEA;
+  --indigo-dark:   #4338CA;
+  --indigo-light:  #E0E7FF;
+  --indigo-muted:  #EEF2FF;
+
+  /* Gradient — only for badges, sliders, micro-elements. Never on text or buttons. */
+  --gradient-brand: linear-gradient(135deg, #4FACFE 0%, #667EEA 100%);
+
+  /* Text */
+  --text-primary:      #1E1B4B;
+  --text-secondary:    #374151;
+  --text-muted:        #6B7280;
+  --text-placeholder:  #94A3B8;
+
+  /* Surfaces */
+  --bg-page:        #F5F3FF;
+  --bg-surface:     #FFFFFF;
+  --bg-surface-alt: #FAFAF9;
+  --bg-hero-light:  #F4F8FF;
+
+  /* Border */
+  --border: #E9D5FF;
+
+  /* Semantic */
+  --success:     #22C55E;
+  --success-bg:  #DCFCE7;
+  --error:       #EF4444;
+  --error-bg:    #FEE2E2;
+  --warning:     #F59E0B;
+  --warning-bg:  #FEF9C3;
+}
+
+/* ─── Tailwind v4 theme extension ───────────────────────────────────── */
+@theme inline {
+  /* Fonts — set by layout.tsx via next/font variables */
+  --font-sans:    var(--font-inter);
+  --font-display: var(--font-geist);
+  --font-mono:    var(--font-geist-mono);
+
+  /* Brand colors */
+  --color-blue:          #4FACFE;
+  --color-blue-dark:     #0A1628;
+  --color-indigo:        #667EEA;
+  --color-indigo-dark:   #4338CA;
+  --color-indigo-light:  #E0E7FF;
+  --color-indigo-muted:  #EEF2FF;
+
+  /* Text */
+  --color-text-primary:     #1E1B4B;
+  --color-text-secondary:   #374151;
+  --color-text-muted:       #6B7280;
+  --color-text-placeholder: #94A3B8;
+
+  /* Surfaces */
+  --color-bg-page:        #F5F3FF;
+  --color-bg-surface:     #FFFFFF;
+  --color-bg-surface-alt: #FAFAF9;
+  --color-bg-hero-light:  #F4F8FF;
+  --color-border:         #E9D5FF;
+
+  /* Semantic */
+  --color-success:    #22C55E;
+  --color-success-bg: #DCFCE7;
+  --color-error:      #EF4444;
+  --color-error-bg:   #FEE2E2;
+  --color-warning:    #F59E0B;
+  --color-warning-bg: #FEF9C3;
+
+  /* Shadows */
+  --shadow-xs:    0 1px 3px rgba(0,0,0,0.06);
+  --shadow-sm:    0 2px 8px rgba(0,0,0,0.08);
+  --shadow-md:    0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg:    0 8px 28px rgba(0,0,0,0.10);
+  --shadow-xl:    0 16px 48px rgba(0,0,0,0.12);
+  --shadow-brand: 0 8px 40px rgba(79,172,254,0.25);
+
+  /* Border radius */
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius-md:   8px;
+  --radius-lg:   10px;
+  --radius-xl:   12px;
+  --radius-2xl:  14px;
+  --radius-3xl:  16px;
+  --radius-4xl:  20px;
+  --radius-full: 9999px;
+}
+
+/* ─── Base ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-font-smoothing: antialiased; }
+
+body {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  color: var(--text-primary);
+  background: var(--bg-surface);
+}
+
+/* ─── Typography utilities ──────────────────────────────────────────── */
+.text-display {
+  font-family: var(--font-geist), ui-sans-serif, sans-serif;
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.text-h1 {
+  font-family: var(--font-geist), ui-sans-serif, sans-serif;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.text-h2 {
+  font-family: var(--font-geist), ui-sans-serif, sans-serif;
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.text-h3 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+}
+
+.text-h4 {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+
+.text-body-lg { font-size: 16px; font-weight: 400; line-height: 1.7; }
+.text-body-md { font-size: 14px; font-weight: 400; line-height: 1.65; }
+.text-body-sm { font-size: 13px; font-weight: 400; line-height: 1.6; }
+
+.text-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.text-caption { font-size: 11px; font-weight: 400; }
+
+/* ─── Layout utilities ──────────────────────────────────────────────── */
+.container-landing {
+  max-width: 1100px;
+  margin-inline: auto;
+  padding-inline: 48px;
+}
+
+@media (max-width: 768px) {
+  .container-landing { padding-inline: 20px; }
+}
+
+@media (max-width: 480px) {
+  .container-landing { padding-inline: 16px; }
+}
+
+/* ─── Gradient utility (micro-elements only) ────────────────────────── */
+.gradient-brand { background: var(--gradient-brand); }

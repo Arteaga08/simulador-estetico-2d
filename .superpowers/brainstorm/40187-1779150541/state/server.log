@@ -1,0 +1,4 @@
+{"type":"server-started","port":55763,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:55763","screen_dir":"/Users/manuelarteaga/Documents/simulador-estetico-2d/.superpowers/brainstorm/40187-1779150541/content","state_dir":"/Users/manuelarteaga/Documents/simulador-estetico-2d/.superpowers/brainstorm/40187-1779150541/state"}
+{"type":"screen-added","file":"/Users/manuelarteaga/Documents/simulador-estetico-2d/.superpowers/brainstorm/40187-1779150541/content/landing-v2.html"}
+{"type":"screen-added","file":"/Users/manuelarteaga/Documents/simulador-estetico-2d/.superpowers/brainstorm/40187-1779150541/content/landing-v3.html"}
+{"type":"server-stopped","reason":"idle timeout"}

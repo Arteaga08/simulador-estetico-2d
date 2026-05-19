@@ -1,0 +1,216 @@
+<h2>Header — opciones de contraste</h2>
+<p class="subtitle">El logo "SimEstético" se perdía. ¿Cuál de estas dos soluciones prefieres?</p>
+
+<style>
+  .options { margin-top: 24px; }
+
+  .option {
+    border-radius: 16px;
+    border: 2px solid #E2E8F0;
+    overflow: hidden;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .option:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.12); transform: translateY(-2px); }
+  .option.selected { border-color: #4FACFE; box-shadow: 0 0 0 4px rgba(79,172,254,0.2); }
+
+  .option-label {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #E2E8F0;
+    background: #F8FAFC;
+  }
+  .letter {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #4FACFE;
+    color: white;
+    font-size: 13px;
+    font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .option-meta { flex: 1; }
+  .option-title { font-size: 14px; font-weight: 700; color: #1E1B4B; }
+  .option-desc { font-size: 12px; color: #6B7280; margin-top: 2px; }
+
+  .preview-wrap { padding: 20px; background: #F0F2F5; }
+
+  /* NAV A — Blanco */
+  .nav-a {
+    background: white;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 10px 10px 0 0;
+    border-bottom: 1px solid #E9D5FF;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .logo-a {
+    font-size: 16px;
+    font-weight: 800;
+    color: #1E1B4B;
+    letter-spacing: -0.02em;
+  }
+  .logo-a span { color: #4FACFE; }
+
+  /* NAV B — Gradient */
+  .nav-b {
+    background: linear-gradient(135deg, #4FACFE 0%, #667EEA 100%);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 10px 10px 0 0;
+  }
+  .logo-b {
+    font-size: 16px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.02em;
+  }
+  .logo-b span { color: rgba(255,255,255,0.75); font-weight: 400; }
+
+  /* Botones */
+  .btn-solid {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 8px;
+    background: #667EEA;
+    color: white;
+    border: none;
+    cursor: default;
+  }
+  .btn-ghost-dark {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 8px;
+    color: #667EEA;
+    border: 1px solid #667EEA;
+    background: transparent;
+    cursor: default;
+    margin-right: 8px;
+  }
+  .btn-ghost-white {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 8px;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.5);
+    background: transparent;
+    cursor: default;
+    margin-right: 8px;
+  }
+  .btn-solid-white {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 8px;
+    background: white;
+    color: #667EEA;
+    border: none;
+    cursor: default;
+  }
+
+  /* Body del mock */
+  .mock-body {
+    background: #F5F3FF;
+    border-radius: 0 0 10px 10px;
+    padding: 16px;
+    border: 1px solid #E9D5FF;
+    border-top: none;
+  }
+  .mock-hero {
+    background: linear-gradient(135deg, #4FACFE 0%, #667EEA 100%);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+  .mock-hero-title { font-size: 13px; font-weight: 800; color: white; margin-bottom: 3px; }
+  .mock-hero-sub { font-size: 10px; color: rgba(255,255,255,0.8); margin-bottom: 10px; }
+  .mock-hero-btn {
+    font-size: 10px; font-weight: 700; padding: 5px 14px;
+    border-radius: 7px; background: white; color: #667EEA; border: none; cursor: default;
+  }
+  .mock-card {
+    background: white; border-radius: 10px; padding: 12px;
+    border: 1px solid #E9D5FF; margin-bottom: 8px;
+  }
+  .mock-card-title { font-size: 11px; font-weight: 700; color: #1E1B4B; margin-bottom: 2px; }
+  .mock-card-sub { font-size: 10px; color: #6B7280; }
+</style>
+
+<div class="options">
+
+  <!-- Opción A: Nav blanca -->
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="option-label">
+      <div class="letter">A</div>
+      <div class="option-meta">
+        <div class="option-title">Navbar blanca — logo oscuro</div>
+        <div class="option-desc">El nav se separa visualmente del hero. Look profesional, máximo contraste. Estándar en SaaS.</div>
+      </div>
+    </div>
+    <div class="preview-wrap">
+      <div class="nav-a">
+        <span class="logo-a">Sim<span>Estético</span></span>
+        <div>
+          <button class="btn-ghost-dark">Pacientes</button>
+          <button class="btn-solid">Nueva Sesión</button>
+        </div>
+      </div>
+      <div class="mock-body">
+        <div class="mock-hero">
+          <div class="mock-hero-title">Simulador de Rinoplastia</div>
+          <div class="mock-hero-sub">Sesión activa · Dr. Arteaga</div>
+          <button class="mock-hero-btn">Cargar Imagen →</button>
+        </div>
+        <div class="mock-card">
+          <div class="mock-card-title">María González, 34 años</div>
+          <div class="mock-card-sub">Rinoplastia · Última sesión hace 2 días</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Opción B: Nav con gradiente, texto blanco -->
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="option-label">
+      <div class="letter">B</div>
+      <div class="option-meta">
+        <div class="option-title">Navbar con gradiente — logo blanco</div>
+        <div class="option-desc">El nav usa el gradiente de marca. Logo y botones en blanco. Look más bold y distintivo.</div>
+      </div>
+    </div>
+    <div class="preview-wrap">
+      <div class="nav-b">
+        <span class="logo-b">Sim<span>Estético</span></span>
+        <div>
+          <button class="btn-ghost-white">Pacientes</button>
+          <button class="btn-solid-white">Nueva Sesión</button>
+        </div>
+      </div>
+      <div class="mock-body">
+        <div class="mock-hero">
+          <div class="mock-hero-title">Simulador de Rinoplastia</div>
+          <div class="mock-hero-sub">Sesión activa · Dr. Arteaga</div>
+          <button class="mock-hero-btn">Cargar Imagen →</button>
+        </div>
+        <div class="mock-card">
+          <div class="mock-card-title">María González, 34 años</div>
+          <div class="mock-card-sub">Rinoplastia · Última sesión hace 2 días</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

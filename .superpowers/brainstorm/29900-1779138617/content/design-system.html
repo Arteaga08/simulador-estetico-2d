@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Design System — SimEstético</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #F5F3FF; color: #1E1B4B; }
+
+  /* Layout */
+  .page { max-width: 1100px; margin: 0 auto; padding: 48px 32px 80px; }
+  .page-title { font-size: 28px; font-weight: 800; color: #1E1B4B; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .page-sub { font-size: 14px; color: #6B7280; margin-bottom: 48px; }
+
+  .section { margin-bottom: 56px; }
+  .section-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #4FACFE;
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 24px; padding-bottom: 12px;
+    border-bottom: 1px solid #E9D5FF;
+  }
+  .section-label::before { content: ''; width: 16px; height: 2px; background: #4FACFE; display: block; }
+
+  .card {
+    background: white; border-radius: 16px;
+    border: 1px solid #E9D5FF;
+    padding: 28px; margin-bottom: 16px;
+  }
+  .card-title { font-size: 12px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 20px; }
+
+  /* ── TIPOGRAFÍA ── */
+  .type-row { display: flex; align-items: baseline; gap: 24px; padding: 12px 0; border-bottom: 1px solid #F5F3FF; }
+  .type-row:last-child { border: none; }
+  .type-meta { width: 160px; flex-shrink: 0; }
+  .type-name { font-size: 11px; font-weight: 700; color: #94A3B8; }
+  .type-spec { font-size: 10px; color: #CBD5E1; margin-top: 2px; font-family: monospace; }
+  .type-sample { flex: 1; color: #1E1B4B; }
+
+  /* ── ESPACIADO ── */
+  .spacing-grid { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+  .space-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .space-bar { background: linear-gradient(135deg, #4FACFE, #667EEA); border-radius: 4px; width: 36px; }
+  .space-label { font-size: 10px; font-weight: 700; color: #1E1B4B; }
+  .space-px { font-size: 9px; color: #94A3B8; font-family: monospace; }
+
+  /* ── BORDER RADIUS ── */
+  .radius-grid { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+  .radius-item { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .radius-box { width: 64px; height: 64px; background: linear-gradient(135deg, #4FACFE, #667EEA); }
+  .radius-label { font-size: 10px; font-weight: 700; color: #1E1B4B; }
+  .radius-val { font-size: 9px; color: #94A3B8; font-family: monospace; }
+
+  /* ── SOMBRAS ── */
+  .shadow-grid { display: flex; gap: 24px; flex-wrap: wrap; }
+  .shadow-item { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .shadow-box { width: 80px; height: 80px; background: white; border-radius: 12px; }
+  .shadow-label { font-size: 10px; font-weight: 700; color: #1E1B4B; }
+  .shadow-val { font-size: 9px; color: #94A3B8; font-family: monospace; text-align: center; max-width: 100px; }
+
+  /* ── COLORES (tokens) ── */
+  .color-grid { display: flex; gap: 12px; flex-wrap: wrap; }
+  .color-item { display: flex; flex-direction: column; gap: 6px; }
+  .color-swatch { width: 72px; height: 72px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.06); }
+  .color-name { font-size: 10px; font-weight: 700; color: #1E1B4B; }
+  .color-hex { font-size: 9px; color: #94A3B8; font-family: monospace; }
+
+  /* ── BOTONES ── */
+  .btn-grid { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .btn { font-family: 'Inter', sans-serif; cursor: default; font-weight: 600; border: none; display: inline-flex; align-items: center; gap: 6px; }
+
+  /* Variantes */
+  .btn-primary { background: #667EEA; color: white; }
+  .btn-secondary { background: #E0E7FF; color: #4338CA; }
+  .btn-outline { background: transparent; color: #667EEA; border: 1.5px solid #667EEA; }
+  .btn-ghost { background: transparent; color: #667EEA; }
+  .btn-danger { background: #FEE2E2; color: #DC2626; }
+  .btn-white { background: white; color: #667EEA; border: 1px solid #E9D5FF; }
+
+  /* Tamaños */
+  .btn-sm { font-size: 12px; padding: 6px 14px; border-radius: 8px; }
+  .btn-md { font-size: 13px; padding: 9px 18px; border-radius: 9px; }
+  .btn-lg { font-size: 14px; padding: 12px 24px; border-radius: 10px; }
+  .btn-xl { font-size: 15px; padding: 14px 28px; border-radius: 11px; font-weight: 700; }
+
+  /* ── INPUTS ── */
+  .input-grid { display: flex; flex-direction: column; gap: 16px; }
+  .input-wrap { display: flex; flex-direction: column; gap: 6px; max-width: 360px; }
+  .input-label { font-size: 12px; font-weight: 600; color: #374151; }
+  .input-field {
+    font-family: 'Inter', sans-serif; font-size: 14px; color: #1E1B4B;
+    padding: 10px 14px; border-radius: 10px; outline: none; width: 100%;
+    transition: border-color 0.15s;
+  }
+  .input-default { border: 1.5px solid #E9D5FF; background: white; }
+  .input-focus { border: 1.5px solid #667EEA; background: white; box-shadow: 0 0 0 3px rgba(102,126,234,0.12); }
+  .input-error { border: 1.5px solid #EF4444; background: #FFF5F5; }
+  .input-hint { font-size: 11px; color: #94A3B8; }
+  .input-error-msg { font-size: 11px; color: #EF4444; }
+
+  /* ── BADGES ── */
+  .badge-grid { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .badge { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .badge-blue { background: #EEF2FF; color: #4338CA; }
+  .badge-gradient { background: linear-gradient(135deg, #4FACFE, #667EEA); color: white; }
+  .badge-green { background: #DCFCE7; color: #16A34A; }
+  .badge-yellow { background: #FEF9C3; color: #CA8A04; }
+  .badge-red { background: #FEE2E2; color: #DC2626; }
+  .badge-gray { background: #F3F4F6; color: #6B7280; }
+
+  /* ── CARDS ── */
+  .example-card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .ex-card { background: white; border: 1px solid #E9D5FF; border-radius: 14px; overflow: hidden; }
+  .ex-card-header { background: linear-gradient(135deg, #4FACFE, #667EEA); padding: 20px; }
+  .ex-card-header-title { font-size: 14px; font-weight: 700; color: white; margin-bottom: 4px; }
+  .ex-card-header-sub { font-size: 11px; color: rgba(255,255,255,0.7); }
+  .ex-card-body { padding: 18px; }
+  .ex-card-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .ex-card-row:last-child { margin: 0; }
+  .ex-card-key { font-size: 12px; color: #6B7280; }
+  .ex-card-val { font-size: 12px; font-weight: 600; color: #1E1B4B; }
+
+  .ex-card-flat { background: white; border: 1px solid #E9D5FF; border-radius: 14px; padding: 20px; }
+  .ex-card-flat-title { font-size: 14px; font-weight: 700; color: #1E1B4B; margin-bottom: 4px; }
+  .ex-card-flat-sub { font-size: 12px; color: #94A3B8; margin-bottom: 14px; }
+  .ex-card-flat-footer { display: flex; align-items: center; justify-content: space-between; }
+
+  .ex-card-stat { background: #F5F3FF; border: 1px solid #E9D5FF; border-radius: 14px; padding: 20px; }
+  .ex-card-stat-num { font-size: 32px; font-weight: 800; color: #1E1B4B; letter-spacing: -0.03em; line-height: 1; margin-bottom: 4px; }
+  .ex-card-stat-num em { font-style: normal; color: #4FACFE; }
+  .ex-card-stat-label { font-size: 12px; color: #6B7280; }
+
+  /* ── DIVIDER ── */
+  hr { border: none; border-top: 1px solid #E9D5FF; margin: 32px 0; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-title">Design System — SimEstético</div>
+  <div class="page-sub">Tokens visuales del producto. Tipografía Inter · Paleta Índigo · Light mode</div>
+
+  <!-- COLORES -->
+  <div class="section">
+    <div class="section-label">Paleta de Color</div>
+    <div class="card">
+      <div class="card-title">Brand</div>
+      <div class="color-grid">
+        <div class="color-item">
+          <div class="color-swatch" style="background:linear-gradient(135deg,#4FACFE,#667EEA)"></div>
+          <div class="color-name">Gradient</div>
+          <div class="color-hex">Primary</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#4FACFE"></div>
+          <div class="color-name">Blue 400</div>
+          <div class="color-hex">#4FACFE</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#667EEA"></div>
+          <div class="color-name">Indigo 400</div>
+          <div class="color-hex">#667EEA</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#4338CA"></div>
+          <div class="color-name">Indigo 700</div>
+          <div class="color-hex">#4338CA</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#E0E7FF"></div>
+          <div class="color-name">Indigo 100</div>
+          <div class="color-hex">#E0E7FF</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#EEF2FF"></div>
+          <div class="color-name">Indigo 50</div>
+          <div class="color-hex">#EEF2FF</div>
+        </div>
+      </div>
+      <hr>
+      <div class="card-title">Neutros</div>
+      <div class="color-grid">
+        <div class="color-item">
+          <div class="color-swatch" style="background:#1E1B4B"></div>
+          <div class="color-name">Text Primary</div>
+          <div class="color-hex">#1E1B4B</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#374151"></div>
+          <div class="color-name">Text Secondary</div>
+          <div class="color-hex">#374151</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#6B7280"></div>
+          <div class="color-name">Text Muted</div>
+          <div class="color-hex">#6B7280</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#94A3B8"></div>
+          <div class="color-name">Text Placeholder</div>
+          <div class="color-hex">#94A3B8</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#E9D5FF;border:1px solid #ddd"></div>
+          <div class="color-name">Border</div>
+          <div class="color-hex">#E9D5FF</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#F5F3FF;border:1px solid #ddd"></div>
+          <div class="color-name">Background</div>
+          <div class="color-hex">#F5F3FF</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#FAFAF9;border:1px solid #ddd"></div>
+          <div class="color-name">Surface Alt</div>
+          <div class="color-hex">#FAFAF9</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#FFFFFF;border:1px solid #ddd"></div>
+          <div class="color-name">Surface</div>
+          <div class="color-hex">#FFFFFF</div>
+        </div>
+      </div>
+      <hr>
+      <div class="card-title">Semánticos</div>
+      <div class="color-grid">
+        <div class="color-item">
+          <div class="color-swatch" style="background:#22C55E"></div>
+          <div class="color-name">Success</div>
+          <div class="color-hex">#22C55E</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#DCFCE7"></div>
+          <div class="color-name">Success Light</div>
+          <div class="color-hex">#DCFCE7</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#EF4444"></div>
+          <div class="color-name">Error</div>
+          <div class="color-hex">#EF4444</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#FEE2E2"></div>
+          <div class="color-name">Error Light</div>
+          <div class="color-hex">#FEE2E2</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#F59E0B"></div>
+          <div class="color-name">Warning</div>
+          <div class="color-hex">#F59E0B</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#FEF9C3"></div>
+          <div class="color-name">Warning Light</div>
+          <div class="color-hex">#FEF9C3</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIPOGRAFÍA -->
+  <div class="section">
+    <div class="section-label">Tipografía — Inter</div>
+    <div class="card">
+      <div class="type-row">
+        <div class="type-meta"><div class="type-name">Display</div><div class="type-spec">56px / 800 / -0.03em</div></div>
+        <div class="type-sample" style="font-size:56px;font-weight:800;letter-spacing:-0.03em;line-height:1.05">SimEstético</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><div class="type-name">H1</div><div class="type-spec">44px / 800 / -0.025em</div></div>
+        <div class="type-sample" style="font-size:44px;font-weight:800;letter-spacing:-0.025em;line-height:1.1">Simula el resultado</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><div class="type-name">H2</div><div class="type-spec">32px / 800 / -0.02em</div></div>
+        <div class="type-sample" style="font-size:32px;font-weight:800;letter-spacing:-0.02em;line-height:1.2">Características del sistema</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><div class="type-name">H3</div><div class="type-spec">22px / 700 / -0.015em</div></div>
+        <div class="type-sample" style="font-size:22px;font-weight:700;letter-spacing:-0.015em;line-height:1.3">Simulación en tiempo real</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><div class="type-name">H4</div><div class="type-spec">17px / 700 / -0.01em</div></div>
+        <div class="type-sample" style="font-size:17px;font-weight:700;letter-spacing:-0.01em;line-height:1.4">Gestión de pacientes</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><div class="type-name">Body LG</div><div class="type-spec">16px / 400 / 0 / lh 1.7</div></div>
+        <div class="type-sample" style="font-size:16px;font-weight:400;line-height:1.7;color:#374151">Para cirujanos que exigen precisión en cada detalle. Muestra el resultado antes de la cirugía.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><div class="type-name">Body MD</div><div class="type-spec">14px / 400 / 0 / lh 1.65</div></div>
+        <div class="type-sample" style="font-size:14px;font-weight:400;line-height:1.65;color:#374151">Nuestro motor de canvas calcula deformaciones con interpolación bilineal a 60 fps. El cirujano ajusta los puntos de control y el paciente ve el resultado en tiempo real.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><div class="type-name">Body SM</div><div class="type-spec">13px / 400 / 0 / lh 1.6</div></div>
+        <div class="type-sample" style="font-size:13px;font-weight:400;line-height:1.6;color:#6B7280">Imágenes encriptadas en Cloudinary. Firma de consentimiento digital inmutable.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><div class="type-name">Label</div><div class="type-spec">11px / 700 / 0.08em / UC</div></div>
+        <div class="type-sample" style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#4FACFE">01 — Características del sistema</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><div class="type-name">Caption</div><div class="type-spec">11px / 400 / 0</div></div>
+        <div class="type-sample" style="font-size:11px;font-weight:400;color:#94A3B8">Última sesión hace 2 días · Rinoplastia</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ESPACIADO -->
+  <div class="section">
+    <div class="section-label">Escala de Espaciado — Base 4px</div>
+    <div class="card">
+      <div class="spacing-grid">
+        <div class="space-item"><div class="space-bar" style="height:4px"></div><div class="space-label">xs</div><div class="space-px">4px</div></div>
+        <div class="space-item"><div class="space-bar" style="height:8px"></div><div class="space-label">sm</div><div class="space-px">8px</div></div>
+        <div class="space-item"><div class="space-bar" style="height:12px"></div><div class="space-label">md</div><div class="space-px">12px</div></div>
+        <div class="space-item"><div class="space-bar" style="height:16px"></div><div class="space-label">lg</div><div class="space-px">16px</div></div>
+        <div class="space-item"><div class="space-bar" style="height:20px"></div><div class="space-label">xl</div><div class="space-px">20px</div></div>
+        <div class="space-item"><div class="space-bar" style="height:24px"></div><div class="space-label">2xl</div><div class="space-px">24px</div></div>
+        <div class="space-item"><div class="space-bar" style="height:32px"></div><div class="space-label">3xl</div><div class="space-px">32px</div></div>
+        <div class="space-item"><div class="space-bar" style="height:40px"></div><div class="space-label">4xl</div><div class="space-px">40px</div></div>
+        <div class="space-item"><div class="space-bar" style="height:48px"></div><div class="space-label">5xl</div><div class="space-px">48px</div></div>
+        <div class="space-item"><div class="space-bar" style="height:64px"></div><div class="space-label">6xl</div><div class="space-px">64px</div></div>
+        <div class="space-item"><div class="space-bar" style="height:80px"></div><div class="space-label">7xl</div><div class="space-px">80px</div></div>
+        <div class="space-item"><div class="space-bar" style="height:96px"></div><div class="space-label">8xl</div><div class="space-px">96px</div></div>
+      </div>
+      <hr>
+      <div class="card-title">Usos comunes</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;color:#6B7280">
+        <div>Gap entre elementos inline → <strong style="color:#1E1B4B">8px</strong></div>
+        <div>Padding interno de card → <strong style="color:#1E1B4B">24px</strong></div>
+        <div>Gap entre cards en grid → <strong style="color:#1E1B4B">16–20px</strong></div>
+        <div>Padding de sección landing → <strong style="color:#1E1B4B">72–80px</strong></div>
+        <div>Padding horizontal contenedor → <strong style="color:#1E1B4B">48px</strong></div>
+        <div>Max-width contenido → <strong style="color:#1E1B4B">1100px</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BORDER RADIUS -->
+  <div class="section">
+    <div class="section-label">Border Radius</div>
+    <div class="card">
+      <div class="radius-grid">
+        <div class="radius-item"><div class="radius-box" style="border-radius:4px"></div><div class="radius-label">xs</div><div class="radius-val">4px — tags</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:6px"></div><div class="radius-label">sm</div><div class="radius-val">6px — badges</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:8px"></div><div class="radius-label">md</div><div class="radius-val">8px — btn sm</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:10px"></div><div class="radius-label">lg</div><div class="radius-val">10px — btn md</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:12px"></div><div class="radius-label">xl</div><div class="radius-val">12px — inputs</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:14px"></div><div class="radius-label">2xl</div><div class="radius-val">14px — cards</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:16px"></div><div class="radius-label">3xl</div><div class="radius-val">16px — modals</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:20px"></div><div class="radius-label">4xl</div><div class="radius-val">20px — hero visual</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:9999px;width:64px;height:30px"></div><div class="radius-label">full</div><div class="radius-val">9999px — pills</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOMBRAS -->
+  <div class="section">
+    <div class="section-label">Sombras</div>
+    <div class="card">
+      <div class="shadow-grid">
+        <div class="shadow-item">
+          <div class="shadow-box" style="box-shadow:0 1px 3px rgba(0,0,0,0.06)"></div>
+          <div class="shadow-label">xs</div>
+          <div class="shadow-val">0 1px 3px rgba(0,0,0,0.06)</div>
+        </div>
+        <div class="shadow-item">
+          <div class="shadow-box" style="box-shadow:0 2px 8px rgba(0,0,0,0.08)"></div>
+          <div class="shadow-label">sm</div>
+          <div class="shadow-val">0 2px 8px rgba(0,0,0,0.08)</div>
+        </div>
+        <div class="shadow-item">
+          <div class="shadow-box" style="box-shadow:0 4px 16px rgba(0,0,0,0.08)"></div>
+          <div class="shadow-label">md</div>
+          <div class="shadow-val">0 4px 16px rgba(0,0,0,0.08) — cards</div>
+        </div>
+        <div class="shadow-item">
+          <div class="shadow-box" style="box-shadow:0 8px 28px rgba(0,0,0,0.1)"></div>
+          <div class="shadow-label">lg</div>
+          <div class="shadow-val">0 8px 28px rgba(0,0,0,0.10) — hover</div>
+        </div>
+        <div class="shadow-item">
+          <div class="shadow-box" style="box-shadow:0 16px 48px rgba(0,0,0,0.12)"></div>
+          <div class="shadow-label">xl</div>
+          <div class="shadow-val">0 16px 48px rgba(0,0,0,0.12) — modals</div>
+        </div>
+        <div class="shadow-item">
+          <div class="shadow-box" style="box-shadow:0 8px 40px rgba(102,126,234,0.2)"></div>
+          <div class="shadow-label">brand</div>
+          <div class="shadow-val">0 8px 40px rgba(102,126,234,0.20) — CTAs</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTONES -->
+  <div class="section">
+    <div class="section-label">Botones</div>
+    <div class="card">
+      <div class="card-title">Variantes</div>
+      <div class="btn-grid" style="margin-bottom:24px">
+        <button class="btn btn-primary btn-md">Primary</button>
+        <button class="btn btn-secondary btn-md">Secondary</button>
+        <button class="btn btn-outline btn-md">Outline</button>
+        <button class="btn btn-ghost btn-md">Ghost</button>
+        <button class="btn btn-danger btn-md">Danger</button>
+        <button class="btn btn-white btn-md">White</button>
+      </div>
+      <div class="card-title">Tamaños</div>
+      <div class="btn-grid" style="margin-bottom:24px">
+        <button class="btn btn-primary btn-sm">Small</button>
+        <button class="btn btn-primary btn-md">Medium</button>
+        <button class="btn btn-primary btn-lg">Large</button>
+        <button class="btn btn-primary btn-xl">XLarge →</button>
+      </div>
+      <div class="card-title">Con ícono</div>
+      <div class="btn-grid">
+        <button class="btn btn-primary btn-md">✦ Nueva Sesión</button>
+        <button class="btn btn-outline btn-md">Ver demo →</button>
+        <button class="btn btn-ghost btn-md">← Volver</button>
+        <button class="btn btn-secondary btn-sm">+ Paciente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INPUTS -->
+  <div class="section">
+    <div class="section-label">Campos de Formulario</div>
+    <div class="card">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+        <div class="input-wrap">
+          <div class="input-label">Nombre del paciente</div>
+          <input class="input-field input-default" placeholder="María González" readonly>
+          <div class="input-hint">Estado normal</div>
+        </div>
+        <div class="input-wrap">
+          <div class="input-label">Correo electrónico</div>
+          <input class="input-field input-focus" value="maria@email.com" readonly>
+          <div class="input-hint">Estado focus — ring indigo</div>
+        </div>
+        <div class="input-wrap">
+          <div class="input-label">Fecha de nacimiento</div>
+          <input class="input-field input-error" value="31/02/1990" readonly>
+          <div class="input-error-msg">Fecha inválida</div>
+        </div>
+        <div class="input-wrap">
+          <div class="input-label">Procedimiento</div>
+          <select class="input-field input-default" style="appearance:none;cursor:default">
+            <option>Rinoplastia</option>
+          </select>
+          <div class="input-hint">Select</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BADGES -->
+  <div class="section">
+    <div class="section-label">Badges y Estados</div>
+    <div class="card">
+      <div class="badge-grid">
+        <span class="badge badge-gradient">Activo</span>
+        <span class="badge badge-blue">Pendiente</span>
+        <span class="badge badge-green">Completado</span>
+        <span class="badge badge-yellow">En revisión</span>
+        <span class="badge badge-red">Cancelado</span>
+        <span class="badge badge-gray">Archivado</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARDS -->
+  <div class="section">
+    <div class="section-label">Cards</div>
+    <div class="example-card-grid">
+      <div class="ex-card">
+        <div class="ex-card-header">
+          <div class="ex-card-header-title">María González</div>
+          <div class="ex-card-header-sub">Rinoplastia · Sesión #3</div>
+        </div>
+        <div class="ex-card-body">
+          <div class="ex-card-row"><span class="ex-card-key">Edad</span><span class="ex-card-val">34 años</span></div>
+          <div class="ex-card-row"><span class="ex-card-key">Última sesión</span><span class="ex-card-val">Hace 2 días</span></div>
+          <div class="ex-card-row"><span class="ex-card-key">Estado</span><span class="badge badge-gradient" style="font-size:10px">Activo</span></div>
+        </div>
+      </div>
+      <div class="ex-card-flat">
+        <div class="ex-card-flat-title">Simulador de Rinoplastia</div>
+        <div class="ex-card-flat-sub">Motor a 60fps · 4 puntos de control</div>
+        <div class="ex-card-flat-footer">
+          <span class="badge badge-blue">Sesión activa</span>
+          <button class="btn btn-primary btn-sm">Abrir →</button>
+        </div>
+      </div>
+      <div class="ex-card-stat">
+        <div class="ex-card-stat-num">118<em>°</em></div>
+        <div class="ex-card-stat-label">Ángulo nasolabial actual</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

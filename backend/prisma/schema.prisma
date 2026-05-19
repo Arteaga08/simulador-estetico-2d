@@ -1,0 +1,167 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── USUARIOS Y AUTH ──────────────────────────────────────────────────────────
+
+model User {
+  id               String     @id @default(cuid())
+  email            String     @unique
+  passwordHash     String
+  role             Role       @default(SURGEON)
+  clinicId         String?
+  twoFactorSecret  String?
+  twoFactorEnabled Boolean    @default(false)
+  recoveryCodes    String[]
+  auditLogs        AuditLog[]
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+}
+
+enum Role {
+  ADMIN
+  SURGEON
+}
+
+// ─── EXPEDIENTES MÉDICOS ──────────────────────────────────────────────────────
+
+model Patient {
+  id              String    @id @default(cuid())
+  nombre          String
+  email           String    @unique
+  telefono        String?
+  fechaNacimiento DateTime?
+  clinicId        String?
+  sessions        Session[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Session {
+  id            String             @id @default(cuid())
+  patientId     String
+  patient       Patient            @relation(fields: [patientId], references: [id])
+  procedimiento Procedimiento      @default(RINOPLASTIA)
+  modo          TecnicaSesion      @default(QUIRURGICO)
+  notas         String?
+  results       SimulationResult[]
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+}
+
+model SimulationResult {
+  id                 String               @id @default(cuid())
+  sessionId          String
+  session            Session              @relation(fields: [sessionId], references: [id])
+  cloudinaryPublicId String
+  cloudinaryUrl      String
+  sliderConfig       Json
+  angulos            Json?
+  pins               AnnotationPin[]
+  shareToken         String?              @unique
+  shareExpiresAt     DateTime?
+  firma              ConsentimientoFirma?
+  createdAt          DateTime             @default(now())
+}
+
+model AnnotationPin {
+  id                 String           @id @default(cuid())
+  simulationResultId String
+  simulationResult   SimulationResult @relation(fields: [simulationResultId], references: [id])
+  x                  Float
+  y                  Float
+  numero             Int
+  nota               String
+  createdAt          DateTime         @default(now())
+}
+
+model Preset {
+  id            String         @id @default(cuid())
+  nombre        String
+  descripcion   String?
+  procedimiento Procedimiento?
+  sliderConfig  Json
+  createdAt     DateTime       @default(now())
+}
+
+model ConsentimientoFirma {
+  id                 String           @id @default(cuid())
+  simulationResultId String           @unique
+  simulationResult   SimulationResult @relation(fields: [simulationResultId], references: [id])
+  firmadoAt          DateTime
+  ipAddress          String?
+  signatureDataUrl   String
+  createdAt          DateTime         @default(now())
+}
+
+// ─── AUDIT LOG INMUTABLE ──────────────────────────────────────────────────────
+
+model AuditLog {
+  id         String      @id @default(cuid())
+  userId     String
+  user       User        @relation(fields: [userId], references: [id])
+  action     AuditAction
+  resource   String
+  resourceId String
+  metadata   Json?
+  ipAddress  String
+  userAgent  String?
+  createdAt  DateTime    @default(now())
+
+  @@index([userId])
+  @@index([resourceId])
+  @@index([createdAt])
+}
+
+// ─── PROCEDIMIENTOS Y TÉCNICAS ────────────────────────────────────────────────
+
+enum Procedimiento {
+  RINOPLASTIA
+  LIFTING_CEJAS
+  AUMENTO_MENTON
+  AUMENTO_LABIOS
+  LIFTING_CUELLO
+  BLEFAROPLASTIA
+  SUAVIZADO_PIEL
+  FEMINIZACION_FACIAL
+}
+
+enum TecnicaSesion {
+  QUIRURGICO
+  RINOMODELACION
+  ENDOSCOPICO
+  IMPLANTE
+  FILLER
+  LIPOSUCCION
+  SUPERIOR
+  INFERIOR
+  COMPLETO
+  LASER
+  MICRONEEDLING
+}
+
+enum AuditAction {
+  PATIENT_VIEWED
+  PATIENT_CREATED
+  PATIENT_UPDATED
+  PATIENT_DELETED
+  SESSION_CREATED
+  SIMULATION_VIEWED
+  SIMULATION_EXPORTED
+  IMAGE_UPLOADED
+  IMAGE_DELIVERED
+  IMAGE_PROXY_ACCESSED
+  SHARE_CREATED
+  SHARE_ACCESSED
+  PDF_GENERATED
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  TWO_FACTOR_SUCCESS
+  TWO_FACTOR_FAILED
+  TWO_FACTOR_SETUP
+}

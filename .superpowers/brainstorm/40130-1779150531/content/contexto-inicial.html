@@ -1,0 +1,38 @@
+<h2>Sistema de Visualización Clínico</h2>
+<p class="subtitle">Primera pregunta de diseño — empecemos por entender el alcance exacto de esta pantalla</p>
+
+<div class="section">
+  <p style="margin-bottom: 1.5rem;">Ya tenemos el backend, el diseño del canvas engine (liquify), y el design system definido. Ahora necesitamos diseñar la <strong>interfaz principal de visualización</strong>.</p>
+  <p>Antes de arrancar, necesito entender qué comprende exactamente el "sistema de visualización clínico". ¿Cuál de estas describe mejor lo que quieres diseñar?</p>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>El simulador principal completo</h3>
+      <p>La pantalla donde el cirujano abre una foto del paciente, manipula el canvas con sliders, activa anotaciones y ve el HUD en tiempo real. La vista de trabajo del médico.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Vista de presentación para el paciente</h3>
+      <p>Una pantalla especial (modo presentación o pantalla secundaria) donde el paciente ve el resultado — limpia, sin controles, enfocada en el antes/después. El médico opera en otra pantalla.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>El expediente con historial de simulaciones</h3>
+      <p>La vista del paciente que muestra su historial de sesiones, resultados guardados, anotaciones y evolución — el "dashboard clínico" del expediente.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="d" onclick="toggleSelect(this)">
+    <div class="letter">D</div>
+    <div class="content">
+      <h3>Todo lo anterior — la sesión completa</h3>
+      <p>El flujo completo de una consulta: desde abrir el expediente del paciente → cargar foto → simular → anotar → guardar resultado → compartir.</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,343 @@
+<h2>Paleta B — Índigo (refinada)</h2>
+<p class="subtitle">Gradientes solo en fondos, botones y elementos gráficos. Textos siempre en color sólido.</p>
+
+<style>
+  .main-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+  .panel {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+  .panel-header {
+    padding: 14px 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #64748B;
+    border-bottom: 1px solid #E2E8F0;
+  }
+  .panel-body {
+    padding: 20px;
+  }
+
+  /* Swatches */
+  .swatch-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .swatch-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .swatch-box {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+  .swatch-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #1E1B4B;
+    text-align: center;
+  }
+  .swatch-hex {
+    font-size: 9px;
+    color: #94A3B8;
+    font-family: monospace;
+  }
+
+  /* Gradient uses */
+  .gradient-uses {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .use-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: #475569;
+  }
+  .use-icon {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .use-ok { background: #22C55E; }
+  .use-no { background: #EF4444; }
+
+  /* App mockup */
+  .app-mock {
+    background: #F5F3FF;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #E9D5FF;
+  }
+  .mock-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #E9D5FF;
+  }
+  .mock-logo {
+    font-size: 13px;
+    font-weight: 800;
+    color: #1E1B4B;
+    letter-spacing: -0.02em;
+  }
+  .mock-logo span {
+    color: #4FACFE;
+  }
+  .mock-btn-primary {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 7px;
+    color: white;
+    border: none;
+    background: linear-gradient(135deg, #4FACFE 0%, #667EEA 100%);
+    cursor: default;
+  }
+  .mock-btn-ghost {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 7px;
+    color: #667EEA;
+    border: 1px solid #667EEA;
+    background: transparent;
+    cursor: default;
+    margin-right: 6px;
+  }
+  .mock-card {
+    background: white;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid #E9D5FF;
+  }
+  .mock-card-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1E1B4B;
+    margin-bottom: 2px;
+  }
+  .mock-card-sub {
+    font-size: 10px;
+    color: #6B7280;
+    margin-bottom: 8px;
+  }
+  .mock-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #4FACFE, #667EEA);
+    color: white;
+  }
+  .mock-badge-ghost {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: #F5F3FF;
+    color: #667EEA;
+    border: 1px solid #E9D5FF;
+  }
+  .mock-hero {
+    background: linear-gradient(135deg, #4FACFE 0%, #667EEA 100%);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 10px;
+    color: white;
+  }
+  .mock-hero-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 4px;
+  }
+  .mock-hero-sub {
+    font-size: 10px;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 10px;
+  }
+  .mock-hero-btn {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 7px;
+    background: white;
+    color: #4FACFE;
+    border: none;
+    cursor: default;
+  }
+
+  /* Comparison: text approaches */
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .comp-box {
+    border-radius: 10px;
+    padding: 14px;
+    border: 2px solid transparent;
+  }
+  .comp-box.bad {
+    background: #FFF1F2;
+    border-color: #FECDD3;
+  }
+  .comp-box.good {
+    background: #F0FDF4;
+    border-color: #BBF7D0;
+  }
+  .comp-label {
+    font-size: 10px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .comp-label.bad-label { color: #EF4444; }
+  .comp-label.good-label { color: #22C55E; }
+</style>
+
+<!-- Fila superior: paleta + reglas de uso -->
+<div class="main-layout">
+
+  <div class="panel">
+    <div class="panel-header">Paleta de Color</div>
+    <div class="panel-body">
+      <div class="swatch-row">
+        <div class="swatch-item">
+          <div class="swatch-box" style="background:linear-gradient(135deg,#4FACFE,#667EEA)"></div>
+          <span class="swatch-label">Gradient</span>
+          <span class="swatch-hex">Primary</span>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch-box" style="background:#4FACFE"></div>
+          <span class="swatch-label">Blue</span>
+          <span class="swatch-hex">#4FACFE</span>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch-box" style="background:#667EEA"></div>
+          <span class="swatch-label">Indigo</span>
+          <span class="swatch-hex">#667EEA</span>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch-box" style="background:#7C3AED"></div>
+          <span class="swatch-label">Accent</span>
+          <span class="swatch-hex">#7C3AED</span>
+        </div>
+      </div>
+      <div class="swatch-row">
+        <div class="swatch-item">
+          <div class="swatch-box" style="background:#1E1B4B"></div>
+          <span class="swatch-label">Texto</span>
+          <span class="swatch-hex">#1E1B4B</span>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch-box" style="background:#6B7280"></div>
+          <span class="swatch-label">Secundario</span>
+          <span class="swatch-hex">#6B7280</span>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch-box" style="background:#F5F3FF;border:1px solid #E9D5FF"></div>
+          <span class="swatch-label">Fondo</span>
+          <span class="swatch-hex">#F5F3FF</span>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch-box" style="background:#FFFFFF;border:1px solid #E9D5FF"></div>
+          <span class="swatch-label">Surface</span>
+          <span class="swatch-hex">#FFFFFF</span>
+        </div>
+      </div>
+
+      <div class="panel-header" style="padding:0;margin-bottom:12px;border:none">El gradiente va en:</div>
+      <div class="gradient-uses">
+        <div class="use-row"><div class="use-icon use-ok"></div>Fondos de hero / secciones destacadas</div>
+        <div class="use-row"><div class="use-icon use-ok"></div>Botones primarios</div>
+        <div class="use-row"><div class="use-icon use-ok"></div>Badges / etiquetas de estado</div>
+        <div class="use-row"><div class="use-icon use-ok"></div>Barras de progreso / sliders</div>
+        <div class="use-row"><div class="use-icon use-ok"></div>Iconos y elementos gráficos</div>
+        <div class="use-row"><div class="use-icon use-no"></div>Texto (siempre sólido: #1E1B4B o #4FACFE)</div>
+        <div class="use-row"><div class="use-icon use-no"></div>Logos con texto</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">Preview UI — App privada</div>
+    <div class="panel-body">
+      <div class="app-mock">
+        <div class="mock-nav">
+          <span class="mock-logo">Sim<span>Estético</span></span>
+          <div>
+            <button class="mock-btn-ghost">Pacientes</button>
+            <button class="mock-btn-primary">Nueva Sesión</button>
+          </div>
+        </div>
+        <div class="mock-hero">
+          <div class="mock-hero-title">Simulador de Rinoplastia</div>
+          <div class="mock-hero-sub">Sesión activa · Dr. Arteaga</div>
+          <button class="mock-hero-btn">Cargar Imagen →</button>
+        </div>
+        <div class="mock-card">
+          <div class="mock-card-title">María González, 34 años</div>
+          <div class="mock-card-sub">Rinoplastia · Última sesión hace 2 días</div>
+          <span class="mock-badge">Activo</span>
+          &nbsp;
+          <span class="mock-badge-ghost">Ver historial</span>
+        </div>
+        <div class="mock-card">
+          <div class="mock-card-title">Ana Ramírez, 28 años</div>
+          <div class="mock-card-sub">Lifting de cejas · Nueva paciente</div>
+          <span class="mock-badge-ghost">Pendiente</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Fila inferior: comparación texto -->
+<div class="panel" style="margin-top:24px">
+  <div class="panel-header">Tratamiento de texto — antes vs ahora</div>
+  <div class="panel-body">
+    <div class="comparison">
+      <div class="comp-box bad">
+        <div class="comp-label bad-label">✗ Descartado — Texto con gradiente</div>
+        <p style="font-size:18px;font-weight:800;background:linear-gradient(135deg,#4FACFE,#667EEA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:0 0 6px">SimEstético</p>
+        <p style="font-size:12px;background:linear-gradient(135deg,#4FACFE,#667EEA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:0">Simulador de precisión quirúrgica</p>
+      </div>
+      <div class="comp-box good">
+        <div class="comp-label good-label">✓ Aprobado — Texto sólido</div>
+        <p style="font-size:18px;font-weight:800;color:#1E1B4B;margin:0 0 6px">Sim<span style="color:#4FACFE">Estético</span></p>
+        <p style="font-size:12px;color:#6B7280;margin:0">Simulador de precisión quirúrgica</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p style="text-align:center;color:#94A3B8;font-size:12px;margin-top:20px">¿Todo bien con esta paleta? — Siguiente paso: tipografía</p>

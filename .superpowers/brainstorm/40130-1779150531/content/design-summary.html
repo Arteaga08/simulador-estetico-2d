@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resumen de diseño</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="../../../.claude/skills/brainstorming/scripts/helper.js" defer></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #F5F3FF; padding: 2rem; }
+
+  h2 { font-size: 1.1rem; font-weight: 700; color: #1E1B4B; margin-bottom: 4px; }
+  .subtitle { font-size: 0.8rem; color: #6B7280; margin-bottom: 1.75rem; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .card {
+    background: #fff;
+    border: 1px solid #E9D5FF;
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .card-title {
+    font-size: 0.67rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #9CA3AF; margin-bottom: 12px;
+  }
+
+  .decision-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid #F3F4F6;
+    font-size: 0.78rem;
+  }
+  .decision-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .check { color: #22C55E; font-size: 0.85rem; flex-shrink: 0; margin-top: 1px; }
+  .decision-label { color: #6B7280; flex: 1; }
+  .decision-value { color: #1E1B4B; font-weight: 600; text-align: right; }
+
+  /* Zone diagram */
+  .zone-diagram {
+    display: grid;
+    grid-template-columns: 100px 1fr 110px;
+    grid-template-rows: 28px 140px 32px;
+    gap: 4px;
+    grid-column: 1 / -1;
+  }
+  .z {
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; font-weight: 600; text-align: center;
+    padding: 4px;
+  }
+  .z-top { grid-column: 1/-1; background: #fff; border: 1px solid #E9D5FF; color: #6B7280; }
+  .z-left { background: #1E1B4B; color: rgba(255,255,255,0.7); line-height: 1.4; }
+  .z-canvas { background: #EEF2FF; color: #4338CA; border: 1px dashed #C7D2FE; }
+  .z-right { background: #F8F6FF; color: #7C3AED; border: 1px solid #E9D5FF; line-height: 1.4; }
+  .z-bottom { grid-column: 1/-1; background: #fff; border: 1px solid #E9D5FF; color: #6B7280; }
+
+  .flow {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .flow-step {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 0.72rem; color: #374151;
+    background: #fff; border: 1px solid #E9D5FF;
+    padding: 4px 10px; border-radius: 9999px;
+    font-weight: 500;
+  }
+  .flow-step .num {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: linear-gradient(135deg, #4FACFE, #667EEA);
+    color: #fff; font-size: 0.6rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .flow-arrow { color: #C7D2FE; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<h2>Resumen del diseño — Simulador principal</h2>
+<p class="subtitle">Todas las decisiones tomadas. Si estás de acuerdo, escribimos el spec completo.</p>
+
+<div class="grid">
+
+  <!-- Zona diagram -->
+  <div class="card" style="grid-column: 1 / -1; padding: 16px;">
+    <div class="card-title">Distribución de zonas</div>
+    <div class="zone-diagram">
+      <div class="z z-top">Topbar — Logo · Breadcrumb (Paciente / Sesión) · Deshacer / Rehacer · Config</div>
+      <div class="z z-left">Sidebar 220px<br/>#1E1B4B<br/>─<br/>Procedimientos<br/>Técnica<br/>Herramientas</div>
+      <div class="z z-canvas">Canvas central<br/>Toolbar · Zoom · Pan<br/>Modo: Original / Simulación / Split<br/>HUD overlay · Pins · Dibujo libre</div>
+      <div class="z z-right">Panel sliders 240px<br/>─<br/>Tabs por proc.<br/>Sliders<br/>Intensidad<br/>Presets<br/>Notas clínicas</div>
+      <div class="z z-bottom">Bottombar — Reset · Ángulos · [spacer] · Exportar PDF · Compartir (48h) · Guardar sesión</div>
+    </div>
+  </div>
+
+  <!-- Decisiones de layout -->
+  <div class="card">
+    <div class="card-title">Layout y estructura</div>
+    <div class="decision-row">
+      <span class="check">✓</span>
+      <span class="decision-label">Patrón de layout</span>
+      <span class="decision-value">Sidebar izq + Canvas + Panel der</span>
+    </div>
+    <div class="decision-row">
+      <span class="check">✓</span>
+      <span class="decision-label">Sidebar ancho</span>
+      <span class="decision-value">220px · fondo #1E1B4B</span>
+    </div>
+    <div class="decision-row">
+      <span class="check">✓</span>
+      <span class="decision-label">Panel sliders ancho</span>
+      <span class="decision-value">240px · fondo #fff</span>
+    </div>
+    <div class="decision-row">
+      <span class="check">✓</span>
+      <span class="decision-label">Multi-procedimiento</span>
+      <span class="decision-value">Tabs en panel derecho</span>
+    </div>
+    <div class="decision-row">
+      <span class="check">✓</span>
+      <span class="decision-label">Modo de comparación</span>
+      <span class="decision-value">Toggle: Original / Simulación / Split</span>
+    </div>
+  </div>
+
+  <!-- Decisiones de funciones -->
+  <div class="card">
+    <div class="card-title">Funciones confirmadas</div>
+    <div class="decision-row">
+      <span class="check">✓</span>
+      <span class="decision-label">8 procedimientos</span>
+      <span class="decision-value">Nav en sidebar izquierda</span>
+    </div>
+    <div class="decision-row">
+      <span class="check">✓</span>
+      <span class="decision-label">Técnica quirúrgica</span>
+      <span class="decision-value">Pills bajo procedimiento activo</span>
+    </div>
+    <div class="decision-row">
+      <span class="check">✓</span>
+      <span class="decision-label">HUD + ángulos</span>
+      <span class="decision-value">Overlay sobre canvas, toggle</span>
+    </div>
+    <div class="decision-row">
+      <span class="check">✓</span>
+      <span class="decision-label">Pins de anotación</span>
+      <span class="decision-value">Amarillo, etiquetados</span>
+    </div>
+    <div class="decision-row">
+      <span class="check">✓</span>
+      <span class="decision-label">Dibujo libre</span>
+      <span class="decision-value">Herramienta en sidebar izquierda</span>
+    </div>
+    <div class="decision-row">
+      <span class="check">✓</span>
+      <span class="decision-label">Presets propios</span>
+      <span class="decision-value">"+ Nuevo preset" en panel sliders</span>
+    </div>
+    <div class="decision-row">
+      <span class="check">✓</span>
+      <span class="decision-label">Notas clínicas</span>
+      <span class="decision-value">Textarea al pie del panel der</span>
+    </div>
+    <div class="decision-row">
+      <span class="check">✓</span>
+      <span class="decision-label">Exportar PDF · Compartir</span>
+      <span class="decision-value">Bottombar, siempre visibles</span>
+    </div>
+  </div>
+
+  <!-- Flujo de usuario -->
+  <div class="card" style="grid-column: 1 / -1;">
+    <div class="card-title">Flujo de la consulta</div>
+    <div class="flow">
+      <div class="flow-step"><span class="num">1</span> Abrir sesión desde expediente</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><span class="num">2</span> Subir foto del paciente</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><span class="num">3</span> Elegir procedimiento(s)</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><span class="num">4</span> Ajustar sliders + técnica</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><span class="num">5</span> Anotar / HUD / dibujo</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><span class="num">6</span> Mostrar Split al paciente</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><span class="num">7</span> Guardar sesión / PDF / Compartir</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

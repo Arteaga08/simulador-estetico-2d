@@ -1,0 +1,291 @@
+<h2>Paletas de Color</h2>
+<p class="subtitle">Elige la dirección visual para el Simulador Estético 2D — color principal: <strong>#4FACFE</strong></p>
+
+<style>
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 24px;
+  }
+  .palette-card {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #fff;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+  .palette-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.14);
+  }
+  .palette-card.selected {
+    border-color: #4FACFE;
+    box-shadow: 0 0 0 4px rgba(79,172,254,0.25);
+  }
+  .gradient-hero {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: 0.05em;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .palette-body {
+    padding: 20px;
+    background: white;
+  }
+  .palette-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 4px;
+  }
+  .palette-desc {
+    font-size: 12px;
+    color: #64748B;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .swatches {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .swatch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .swatch-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+  .swatch-hex {
+    font-size: 9px;
+    color: #94A3B8;
+    font-family: monospace;
+  }
+  .preview-ui {
+    background: #F8FAFC;
+    border-radius: 10px;
+    padding: 12px;
+    border: 1px solid #E2E8F0;
+  }
+  .preview-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .preview-logo {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+  .preview-btn {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    color: white;
+    border: none;
+  }
+  .preview-card {
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 8px;
+    background: white;
+    border: 1px solid #E2E8F0;
+  }
+  .preview-card-title {
+    font-size: 10px;
+    font-weight: 600;
+    color: #1E293B;
+    margin-bottom: 3px;
+  }
+  .preview-card-sub {
+    font-size: 9px;
+    color: #94A3B8;
+    margin-bottom: 8px;
+  }
+  .preview-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: white;
+  }
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-right: 4px;
+    margin-bottom: 8px;
+  }
+</style>
+
+<div class="palette-grid">
+
+  <!-- OPCIÓN A: Sky -->
+  <div class="palette-card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="gradient-hero" style="background: linear-gradient(135deg, #4FACFE 0%, #00F2FE 100%);">
+      #4FACFE → #00F2FE
+    </div>
+    <div class="palette-body">
+      <div class="palette-name">A — Sky</div>
+      <div class="palette-desc">Azul a Cian. Tecnológico, limpio, médico-moderno. Proyecta confianza y precisión.</div>
+      <div class="swatches">
+        <div class="swatch">
+          <div class="swatch-circle" style="background:linear-gradient(135deg,#4FACFE,#00F2FE)"></div>
+          <span class="swatch-hex">gradient</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-circle" style="background:#0F172A"></div>
+          <span class="swatch-hex">#0F172A</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-circle" style="background:#475569"></div>
+          <span class="swatch-hex">#475569</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-circle" style="background:#F8FAFC;border:1px solid #E2E8F0"></div>
+          <span class="swatch-hex">#F8FAFC</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-circle" style="background:#0EA5E9"></div>
+          <span class="swatch-hex">#0EA5E9</span>
+        </div>
+      </div>
+      <div class="preview-ui">
+        <div class="preview-nav">
+          <span class="preview-logo" style="background:linear-gradient(135deg,#4FACFE,#00F2FE);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SimEstético</span>
+          <button class="preview-btn" style="background:linear-gradient(135deg,#4FACFE,#00F2FE)">Iniciar Sesión</button>
+        </div>
+        <div class="preview-card">
+          <div class="preview-card-title">Paciente: María González</div>
+          <div class="preview-card-sub">Rinoplastia · Sesión #3</div>
+          <span class="preview-badge" style="background:linear-gradient(135deg,#4FACFE,#00F2FE)">Activo</span>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <span class="tag" style="background:#EFF6FF;color:#0EA5E9">Profesional</span>
+        <span class="tag" style="background:#EFF6FF;color:#0EA5E9">Clínico</span>
+        <span class="tag" style="background:#EFF6FF;color:#0EA5E9">Tecnológico</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPCIÓN B: Blue-Purple -->
+  <div class="palette-card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="gradient-hero" style="background: linear-gradient(135deg, #4FACFE 0%, #667EEA 100%);">
+      #4FACFE → #667EEA
+    </div>
+    <div class="palette-body">
+      <div class="palette-name">B — Índigo</div>
+      <div class="palette-desc">Azul a Índigo. Premium, estético, sofisticado. Más asociado a lujo y alta gama.</div>
+      <div class="swatches">
+        <div class="swatch">
+          <div class="swatch-circle" style="background:linear-gradient(135deg,#4FACFE,#667EEA)"></div>
+          <span class="swatch-hex">gradient</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-circle" style="background:#1E1B4B"></div>
+          <span class="swatch-hex">#1E1B4B</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-circle" style="background:#6B7280"></div>
+          <span class="swatch-hex">#6B7280</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-circle" style="background:#F5F3FF;border:1px solid #E9D5FF"></div>
+          <span class="swatch-hex">#F5F3FF</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-circle" style="background:#7C3AED"></div>
+          <span class="swatch-hex">#7C3AED</span>
+        </div>
+      </div>
+      <div class="preview-ui" style="background:#F5F3FF;border-color:#E9D5FF">
+        <div class="preview-nav">
+          <span class="preview-logo" style="background:linear-gradient(135deg,#4FACFE,#667EEA);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SimEstético</span>
+          <button class="preview-btn" style="background:linear-gradient(135deg,#4FACFE,#667EEA)">Iniciar Sesión</button>
+        </div>
+        <div class="preview-card" style="background:white">
+          <div class="preview-card-title" style="color:#1E1B4B">Paciente: María González</div>
+          <div class="preview-card-sub">Rinoplastia · Sesión #3</div>
+          <span class="preview-badge" style="background:linear-gradient(135deg,#4FACFE,#667EEA)">Activo</span>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <span class="tag" style="background:#F5F3FF;color:#7C3AED">Premium</span>
+        <span class="tag" style="background:#F5F3FF;color:#7C3AED">Sofisticado</span>
+        <span class="tag" style="background:#F5F3FF;color:#7C3AED">Lujo</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPCIÓN C: Blue-Rose -->
+  <div class="palette-card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="gradient-hero" style="background: linear-gradient(135deg, #4FACFE 0%, #F093FB 100%);">
+      #4FACFE → #F093FB
+    </div>
+    <div class="palette-body">
+      <div class="palette-name">C — Rose</div>
+      <div class="palette-desc">Azul a Rosa-Violeta. Suave, elegante, femenino. Común en clínicas estéticas de alto nivel.</div>
+      <div class="swatches">
+        <div class="swatch">
+          <div class="swatch-circle" style="background:linear-gradient(135deg,#4FACFE,#F093FB)"></div>
+          <span class="swatch-hex">gradient</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-circle" style="background:#1F2937"></div>
+          <span class="swatch-hex">#1F2937</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-circle" style="background:#6B7280"></div>
+          <span class="swatch-hex">#6B7280</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-circle" style="background:#FDF2F8;border:1px solid #FBCFE8"></div>
+          <span class="swatch-hex">#FDF2F8</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-circle" style="background:#EC4899"></div>
+          <span class="swatch-hex">#EC4899</span>
+        </div>
+      </div>
+      <div class="preview-ui" style="background:#FDF2F8;border-color:#FBCFE8">
+        <div class="preview-nav">
+          <span class="preview-logo" style="background:linear-gradient(135deg,#4FACFE,#F093FB);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SimEstético</span>
+          <button class="preview-btn" style="background:linear-gradient(135deg,#4FACFE,#F093FB)">Iniciar Sesión</button>
+        </div>
+        <div class="preview-card" style="background:white">
+          <div class="preview-card-title" style="color:#1F2937">Paciente: María González</div>
+          <div class="preview-card-sub">Rinoplastia · Sesión #3</div>
+          <span class="preview-badge" style="background:linear-gradient(135deg,#4FACFE,#F093FB)">Activo</span>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <span class="tag" style="background:#FDF2F8;color:#EC4899">Elegante</span>
+        <span class="tag" style="background:#FDF2F8;color:#EC4899">Femenino</span>
+        <span class="tag" style="background:#FDF2F8;color:#EC4899">Estético</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p style="text-align:center;color:#94A3B8;font-size:12px;margin-top:20px">Haz clic en una tarjeta para seleccionarla · Puedes combinar elementos de diferentes opciones</p>

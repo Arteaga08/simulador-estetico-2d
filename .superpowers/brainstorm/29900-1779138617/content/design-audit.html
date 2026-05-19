@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Auditoría de Diseño — Impeccable</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #0F0E1A; color: #E8E6F0; }
+  .page { max-width: 960px; margin: 0 auto; padding: 56px 32px 80px; }
+
+  .audit-title { font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #667EEA; margin-bottom: 10px; }
+  .audit-headline { font-size: 36px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.15; color: #F0EEFF; margin-bottom: 16px; }
+  .audit-sub { font-size: 15px; color: #8B87A8; line-height: 1.65; margin-bottom: 56px; max-width: 600px; }
+
+  /* Issues */
+  .issue-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 56px; }
+  .issue {
+    border-radius: 14px; padding: 24px; display: grid;
+    grid-template-columns: 40px 1fr; gap: 16px; align-items: start;
+  }
+  .issue.critical { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); }
+  .issue.warning { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); }
+  .issue.info { background: rgba(102,126,234,0.08); border: 1px solid rgba(102,126,234,0.2); }
+
+  .issue-icon { font-size: 22px; padding-top: 2px; }
+  .issue-title { font-size: 14px; font-weight: 700; color: #F0EEFF; margin-bottom: 6px; }
+  .issue-desc { font-size: 13px; color: #8B87A8; line-height: 1.6; }
+  .issue-tag {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 4px; margin-right: 6px; margin-top: 8px;
+  }
+  .tag-slop { background: rgba(239,68,68,0.15); color: #F87171; }
+  .tag-ban { background: rgba(239,68,68,0.25); color: #EF4444; }
+  .tag-template { background: rgba(245,158,11,0.15); color: #FCD34D; }
+  .tag-fix { background: rgba(102,126,234,0.15); color: #A5B4FC; }
+
+  /* Divider */
+  .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 48px 0; }
+
+  /* Fixes */
+  .fixes-title { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: #F0EEFF; margin-bottom: 32px; }
+  .fix-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .fix-card {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px; padding: 22px;
+  }
+  .fix-num { font-size: 11px; font-weight: 700; color: #4FACFE; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+  .fix-title { font-size: 15px; font-weight: 700; color: #F0EEFF; margin-bottom: 8px; }
+  .fix-desc { font-size: 13px; color: #8B87A8; line-height: 1.6; }
+  .fix-example { margin-top: 14px; font-size: 12px; padding: 10px 14px; border-radius: 8px; background: rgba(79,172,254,0.06); border: 1px solid rgba(79,172,254,0.15); color: #A5B4FC; font-family: monospace; line-height: 1.5; }
+
+  /* Before/after type comparison */
+  .type-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+  .compare-box { border-radius: 12px; padding: 20px; }
+  .compare-box.before { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.15); }
+  .compare-box.after { background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.15); }
+  .compare-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+  .compare-label.before-label { color: #F87171; }
+  .compare-label.after-label { color: #4ADE80; }
+
+  .sep { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 24px 0; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="audit-title">Auditoría — Impeccable Skill</div>
+  <div class="audit-headline">Lo que tenemos bien,<br>y lo que nos hace genéricos.</div>
+  <div class="audit-sub">El skill "impeccable" tiene una lista explícita de patrones prohibidos para landing pages. Revisamos nuestras decisiones contra esa lista.</div>
+
+  <!-- PROBLEMAS -->
+  <div class="issue-list">
+
+    <div class="issue critical">
+      <div class="issue-icon">🚫</div>
+      <div>
+        <div class="issue-title">Inter está en la lista de rechazo de reflejos</div>
+        <div class="issue-desc">Inter aparece explícitamente en el "reflex-reject list" de tipografías para superficies de marca (landing pages). Es la fuente más usada en SaaS de 2024-2026. Usarla en la landing hace que el diseño se vea como template de AI, no como marca propia. <strong style="color:#F0EEFF">Para la app privada está bien. Para la landing, no.</strong></div>
+        <span class="issue-tag tag-ban">BAN explícito</span>
+        <span class="issue-tag tag-slop">AI slop</span>
+      </div>
+    </div>
+
+    <div class="issue critical">
+      <div class="issue-icon">🚫</div>
+      <div>
+        <div class="issue-title">El gradiente azul→índigo es "AI slop" explícito</div>
+        <div class="issue-desc">El bolder.md dice textualmente: "Avoid the purple-blue gradient AI slop." Nuestro #4FACFE → #667EEA es exactamente eso. En 2026 hay millones de landing pages con este gradiente. <strong style="color:#F0EEFF">El color base #4FACFE puede quedarse. El gradiente como elemento identitario necesita evolucionar.</strong></div>
+        <span class="issue-tag tag-ban">BAN explícito</span>
+        <span class="issue-tag tag-slop">AI slop</span>
+      </div>
+    </div>
+
+    <div class="issue critical">
+      <div class="issue-icon">🚫</div>
+      <div>
+        <div class="issue-title">Sección de stats = "hero-metric template" prohibido</div>
+        <div class="issue-desc">Número grande + label pequeño + acento de gradiente. El skill lo llama explícitamente "SaaS cliché" y prohíbe usarlo. Nuestra sección de stats (60fps, 8+, 100%, 48h) es textbook de este patrón.</div>
+        <span class="issue-tag tag-ban">BAN absoluto</span>
+      </div>
+    </div>
+
+    <div class="issue critical">
+      <div class="issue-icon">🚫</div>
+      <div>
+        <div class="issue-title">6 cards idénticas en Features = patrón prohibido</div>
+        <div class="issue-desc">"Identical card grids. Same-sized cards with icon + heading + text, repeated endlessly." — prohibición absoluta. Nuestra sección de características tiene exactamente esto: 6 cards del mismo tamaño, icon + título + descripción.</div>
+        <span class="issue-tag tag-ban">BAN absoluto</span>
+        <span class="issue-tag tag-template">Template</span>
+      </div>
+    </div>
+
+    <div class="issue warning">
+      <div class="issue-icon">⚠️</div>
+      <div>
+        <div class="issue-title">Labels "01 —" repetidos en cada sección = scaffolding de AI</div>
+        <div class="issue-desc">"Repeated tiny uppercase tracked labels above every section heading. A single strong kicker can be voice; repeating it as section grammar is AI scaffolding." Está bien tener uno o dos, pero en cada sección se convierte en template.</div>
+        <span class="issue-tag tag-template">Template</span>
+      </div>
+    </div>
+
+    <div class="issue warning">
+      <div class="issue-icon">⚠️</div>
+      <div>
+        <div class="issue-title">Layout centrado en stack vertical = sin diseño</div>
+        <div class="issue-desc">Todo centrado, columnas balanceadas, padding uniforme. El skill lo llama "splitting the difference into a generic centered stack." La landing necesita asimetría intencional, layouts 70/30, elementos que rompan el grid.</div>
+        <span class="issue-tag tag-template">Template</span>
+      </div>
+    </div>
+
+    <div class="issue info">
+      <div class="issue-icon">💡</div>
+      <div>
+        <div class="issue-title">Sin imagen real en el hero</div>
+        <div class="issue-desc">Para superficies de marca, el skill dice que "Zero images is a bug, not a design choice." Nuestro hero visual es un mock de UI, lo cual sí es válido para SaaS (product screenshot = imagery), pero necesita verse real y polished, no como un diagrama.</div>
+        <span class="issue-tag tag-fix">Por mejorar</span>
+      </div>
+    </div>
+
+    <div class="issue info">
+      <div class="issue-icon">💡</div>
+      <div>
+        <div class="issue-title">Sin motion ni animaciones de entrada</div>
+        <div class="issue-desc">Una landing de marca puede tener "ambitious first-load motion, reveals, scroll-triggered transitions, typographic choreography." Actualmente todo es estático. En 2026, una landing sin ninguna animación se siente como un documento, no como un producto.</div>
+        <span class="issue-tag tag-fix">Por agregar</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- FIXES PROPUESTOS -->
+  <div class="fixes-title">Qué cambiamos y cómo</div>
+  <div class="fix-grid">
+
+    <div class="fix-card">
+      <div class="fix-num">Fix 01 — Tipografía</div>
+      <div class="fix-title">Landing: Geist + Geist Mono</div>
+      <div class="fix-desc">Geist es la fuente de Vercel: no está en el reflex-reject list, tiene personalidad técnica-premium, tiene variable weight, y ya está disponible en Next.js como <code>next/font/google</code>. Aplicamos Geist para headlines de la landing. Para la app privada, Inter sigue siendo perfecto.</div>
+      <div class="fix-example">
+        Landing headlines → Geist 800<br>
+        App UI → Inter 400–700<br>
+        Código/HUD → Geist Mono
+      </div>
+    </div>
+
+    <div class="fix-card">
+      <div class="fix-num">Fix 02 — Color</div>
+      <div class="fix-title">Estrategia "Committed" con #4FACFE</div>
+      <div class="fix-desc">#4FACFE como color dominante único (60% del hero), con neutros tintados hacia el azul. En lugar del gradiente azul→índigo como identidad, usamos #4FACFE sólido en grandes áreas y reservamos el gradiente solo para micro-elementos específicos.</div>
+      <div class="fix-example">
+        Hero bg → #4FACFE sólido (drenched)<br>
+        Texto sobre hero → #0A1628 (neutro tintado)<br>
+        Gradiente → solo badges y sliders
+      </div>
+    </div>
+
+    <div class="fix-card">
+      <div class="fix-num">Fix 03 — Features</div>
+      <div class="fix-title">Layout alternado, no grid de cards</div>
+      <div class="fix-desc">En lugar de 6 cards idénticas, usamos 2-3 features grandes en layout alternado (texto izquierda + visual derecha, luego invertido), más una fila de 3 features menores. Cada feature tiene su propio tratamiento visual.</div>
+      <div class="fix-example">
+        Feature principal → full-width alternado<br>
+        Features secundarias → lista con icono<br>
+        Sin cards idénticas
+      </div>
+    </div>
+
+    <div class="fix-card">
+      <div class="fix-num">Fix 04 — Stats</div>
+      <div class="fix-title">Reemplazar métricas por prueba social narrativa</div>
+      <div class="fix-desc">En lugar de "60fps / 8+ / 100%", comunicamos los mismos datos como afirmaciones de valor: una franja de texto prominente con las ventajas en formato conversacional, no como dashboard de números.</div>
+      <div class="fix-example">
+        "Deformación fluida a 60fps — sin<br>
+        pixelización, sin lag, sin Photoshop."<br><br>
+        Datos como prosa, no como métricas.
+      </div>
+    </div>
+
+    <div class="fix-card">
+      <div class="fix-num">Fix 05 — Layout</div>
+      <div class="fix-title">Asimetría intencional, hero 60/40</div>
+      <div class="fix-desc">Hero con proporción 60/40: texto grande a la izquierda sin container centrado, visual del simulador a la derecha que rompe el grid. Algunas secciones sin container (full-bleed). Espaciado variado para crear ritmo.</div>
+      <div class="fix-example">
+        Hero → 60/40, texto left-aligned<br>
+        CTA section → full-bleed gradient<br>
+        Espaciado variado: 48px / 80px / 120px
+      </div>
+    </div>
+
+    <div class="fix-card">
+      <div class="fix-num">Fix 06 — Motion</div>
+      <div class="fix-title">Scroll reveals + entrada del hero</div>
+      <div class="fix-desc">Animación de entrada del hero (título aparece letra a letra o por líneas), secciones con fade-in al hacer scroll, el simulador mock con animación de los sliders moviendose. Ease-out-quart, sin bounce.</div>
+      <div class="fix-example">
+        Hero title → stagger por línea (300ms)<br>
+        Secciones → fade + translateY(20px)<br>
+        Simulador → sliders animated loop
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="font-size:13px;color:#8B87A8;line-height:1.7;max-width:600px;">
+    <strong style="color:#F0EEFF">Lo que NO cambia:</strong> #4FACFE como color principal, la paleta índigo para la app, Phosphor Icons, la estructura de 9 secciones de contenido, la navbar con gradiente, Inter para la app privada. Solo evolucionamos la <em>expresión</em> visual de la landing para que no se parezca a 10,000 otras landing pages de SaaS.
+  </div>
+
+</div>
+</body>
+</html>

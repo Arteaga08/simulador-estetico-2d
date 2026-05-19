@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estilo Visual — SimEstético</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #F5F3FF;
+    color: #1E1B4B;
+  }
+
+  /* ─── NAVBAR ─── */
+  .navbar {
+    background: linear-gradient(135deg, #4FACFE 0%, #667EEA 100%);
+    padding: 0 48px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-logo {
+    font-size: 18px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.03em;
+  }
+  .nav-logo span { color: rgba(255,255,255,0.65); font-weight: 400; }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    letter-spacing: 0.01em;
+  }
+  .nav-cta {
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 20px;
+    border-radius: 8px;
+    background: white;
+    color: #667EEA;
+    border: none;
+    cursor: pointer;
+  }
+
+  /* ─── LANDING: HERO ─── */
+  .hero {
+    background: white;
+    padding: 100px 80px 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    border-bottom: 1px solid #E9D5FF;
+  }
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #4FACFE;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: #4FACFE;
+  }
+  .hero-title {
+    font-size: 48px;
+    font-weight: 800;
+    color: #1E1B4B;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+  }
+  .hero-title em {
+    font-style: normal;
+    color: #667EEA;
+  }
+  .hero-sub {
+    font-size: 16px;
+    color: #6B7280;
+    line-height: 1.7;
+    margin-bottom: 40px;
+    max-width: 420px;
+  }
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .btn-primary-lg {
+    font-size: 14px;
+    font-weight: 700;
+    padding: 14px 28px;
+    border-radius: 10px;
+    background: #667EEA;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #667EEA;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .arrow { font-size: 16px; }
+
+  /* Hero visual */
+  .hero-visual {
+    background: linear-gradient(135deg, #4FACFE 0%, #667EEA 100%);
+    border-radius: 20px;
+    height: 340px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-visual-inner {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 14px;
+    width: 260px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+  }
+  .hud-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 6px;
+  }
+  .hud-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: white;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .hud-sub {
+    font-size: 10px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 16px;
+  }
+  .hud-bar-track {
+    background: rgba(255,255,255,0.15);
+    border-radius: 4px;
+    height: 4px;
+    margin-bottom: 12px;
+  }
+  .hud-bar-fill {
+    background: white;
+    border-radius: 4px;
+    height: 4px;
+    width: 68%;
+  }
+  .hud-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .hud-key { font-size: 9px; color: rgba(255,255,255,0.6); }
+  .hud-val { font-size: 9px; font-weight: 600; color: white; }
+
+  /* Stats row */
+  .stats {
+    background: white;
+    border-bottom: 1px solid #E9D5FF;
+    padding: 40px 80px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+  }
+  .stat-item {
+    padding: 0 40px;
+    border-right: 1px solid #E9D5FF;
+  }
+  .stat-item:first-child { padding-left: 0; }
+  .stat-item:last-child { border-right: none; }
+  .stat-number {
+    font-size: 36px;
+    font-weight: 800;
+    color: #1E1B4B;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-number span { color: #4FACFE; }
+  .stat-label {
+    font-size: 12px;
+    color: #6B7280;
+    line-height: 1.4;
+  }
+
+  /* ─── SECCIONES NUMERADAS (estilo Palladio) ─── */
+  .section {
+    background: white;
+    padding: 80px;
+    border-bottom: 1px solid #E9D5FF;
+    display: grid;
+    grid-template-columns: 120px 1fr 1fr;
+    gap: 60px;
+    align-items: start;
+  }
+  .section-number {
+    font-size: 13px;
+    font-weight: 700;
+    color: #C7D2FE;
+    letter-spacing: 0.05em;
+    padding-top: 6px;
+  }
+  .section-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1E1B4B;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .section-body {
+    font-size: 14px;
+    color: #6B7280;
+    line-height: 1.75;
+  }
+  .section-body strong { color: #1E1B4B; }
+  .section-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #667EEA;
+    margin-top: 20px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  /* Feature cards */
+  .feature-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .feature-card {
+    background: #F5F3FF;
+    border: 1px solid #E9D5FF;
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .feature-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #4FACFE, #667EEA);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .feature-title { font-size: 13px; font-weight: 700; color: #1E1B4B; margin-bottom: 3px; }
+  .feature-desc { font-size: 11px; color: #6B7280; line-height: 1.5; }
+
+  /* ─── CTA SECTION ─── */
+  .cta-section {
+    background: linear-gradient(135deg, #4FACFE 0%, #667EEA 100%);
+    padding: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 60px;
+  }
+  .cta-title {
+    font-size: 36px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    max-width: 480px;
+  }
+  .cta-title span { color: rgba(255,255,255,0.65); font-weight: 400; }
+  .cta-actions { display: flex; gap: 12px; flex-shrink: 0; }
+  .cta-btn-white {
+    font-size: 14px;
+    font-weight: 700;
+    padding: 14px 28px;
+    border-radius: 10px;
+    background: white;
+    color: #667EEA;
+    border: none;
+    cursor: pointer;
+  }
+  .cta-btn-ghost {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 14px 28px;
+    border-radius: 10px;
+    background: transparent;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.4);
+    cursor: pointer;
+  }
+
+  /* ─── APP: SIDEBAR LAYOUT ─── */
+  .app-preview {
+    background: #F5F3FF;
+    padding: 32px 80px;
+  }
+  .app-preview-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #94A3B8;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .app-preview-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #E9D5FF;
+  }
+  .app-shell {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #E9D5FF;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 380px;
+    box-shadow: 0 8px 40px rgba(102,126,234,0.12);
+  }
+  .sidebar {
+    background: #1E1B4B;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-brand {
+    padding: 20px 20px 16px;
+    font-size: 14px;
+    font-weight: 800;
+    color: white;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-brand span { color: #4FACFE; }
+  .sidebar-nav {
+    padding: 16px 12px;
+    flex: 1;
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    margin-bottom: 2px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.55);
+    cursor: pointer;
+  }
+  .sidebar-item.active {
+    background: rgba(79,172,254,0.15);
+    color: #4FACFE;
+    font-weight: 600;
+  }
+  .sidebar-item-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+  .sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+  }
+  .main-content {
+    padding: 24px;
+    background: #FAFAF9;
+  }
+  .content-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .content-title { font-size: 18px; font-weight: 800; color: #1E1B4B; letter-spacing: -0.02em; }
+  .content-sub { font-size: 12px; color: #94A3B8; margin-top: 2px; }
+  .app-btn {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 7px 16px;
+    border-radius: 8px;
+    background: #667EEA;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  .patient-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .patient-card {
+    background: white;
+    border: 1px solid #E9D5FF;
+    border-radius: 10px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .patient-card:hover { border-color: #4FACFE; box-shadow: 0 4px 16px rgba(79,172,254,0.12); }
+  .patient-name { font-size: 13px; font-weight: 700; color: #1E1B4B; margin-bottom: 3px; }
+  .patient-info { font-size: 11px; color: #94A3B8; margin-bottom: 10px; }
+  .patient-footer { display: flex; align-items: center; justify-content: space-between; }
+  .badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #4FACFE, #667EEA);
+    color: white;
+  }
+  .badge-pending {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: #F5F3FF;
+    color: #667EEA;
+    border: 1px solid #E9D5FF;
+  }
+  .patient-sessions { font-size: 10px; color: #94A3B8; }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-logo">Sim<span>Estético</span></div>
+  <ul class="nav-links">
+    <li><a href="#">Inicio</a></li>
+    <li><a href="#">Procedimientos</a></li>
+    <li><a href="#">Precios</a></li>
+    <li><a href="#">Contacto</a></li>
+  </ul>
+  <button class="nav-cta">Iniciar Sesión →</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <div class="hero-eyebrow">Tecnología Médica</div>
+    <h1 class="hero-title">Visualiza el<br>resultado<br><em>antes</em> de operar</h1>
+    <p class="hero-sub">Simulador estético 2D de precisión quirúrgica. Muestra a tus pacientes el resultado esperado en tiempo real.</p>
+    <div class="hero-actions">
+      <button class="btn-primary-lg">Ver demo <span class="arrow">→</span></button>
+      <button class="btn-text">Conocer más <span class="arrow">↓</span></button>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-visual-inner">
+      <div class="hud-label">Ángulo Nasolabial</div>
+      <div class="hud-value">118°</div>
+      <div class="hud-sub">Objetivo: 120–135° / Actual: 118°</div>
+      <div class="hud-bar-track"><div class="hud-bar-fill"></div></div>
+      <div class="hud-row"><span class="hud-key">Proyección tip</span><span class="hud-val">+4.2 mm</span></div>
+      <div class="hud-row"><span class="hud-key">Rotación</span><span class="hud-val">6°</span></div>
+      <div class="hud-row"><span class="hud-key">Reducción giba</span><span class="hud-val">2.8 mm</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat-item">
+    <div class="stat-number">8<span>+</span></div>
+    <div class="stat-label">Procedimientos estéticos disponibles</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">60<span>fps</span></div>
+    <div class="stat-label">Deformación en tiempo real</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">100<span>%</span></div>
+    <div class="stat-label">Privacidad HIPAA — imágenes encriptadas</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">48<span>h</span></div>
+    <div class="stat-label">Expiración de links compartidos</div>
+  </div>
+</div>
+
+<!-- SECCIÓN 01 — estilo Palladio -->
+<section class="section">
+  <div class="section-number">01</div>
+  <div>
+    <div class="section-title">Simulación quirúrgica de precisión</div>
+    <div class="section-body">
+      Nuestro motor de canvas calcula deformaciones con <strong>interpolación bilineal</strong> a 60 fps. El cirujano ajusta los puntos de control y el paciente ve el resultado en tiempo real — sin comprometer la imagen original.
+    </div>
+    <button class="section-cta">Ver cómo funciona <span>→</span></button>
+  </div>
+  <div class="feature-cards">
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <div>
+        <div class="feature-title">HUD de métricas</div>
+        <div class="feature-desc">Ángulo nasolabial, proyección del tip y reducción de giba en tiempo real.</div>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📍</div>
+      <div>
+        <div class="feature-title">Anotaciones quirúrgicas</div>
+        <div class="feature-desc">Pins numerados sobre la imagen con notas del cirujano exportables a PDF.</div>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔐</div>
+      <div>
+        <div class="feature-title">Firma de consentimiento</div>
+        <div class="feature-desc">El paciente firma digitalmente el resultado. Queda inmutable en el historial.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA SECTION -->
+<div class="cta-section">
+  <div class="cta-title">
+    Eleva la confianza de tus pacientes.<br>
+    <span>Muéstrales el futuro antes de la cirugía.</span>
+  </div>
+  <div class="cta-actions">
+    <button class="cta-btn-white">Solicitar acceso →</button>
+    <button class="cta-btn-ghost">Ver precios</button>
+  </div>
+</div>
+
+<!-- APP PREVIEW -->
+<div class="app-preview">
+  <div class="app-preview-label">Vista del sistema privado</div>
+  <div class="app-shell">
+    <div class="sidebar">
+      <div class="sidebar-brand">Sim<span>Estético</span></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-item active"><div class="sidebar-item-dot"></div>Pacientes</div>
+        <div class="sidebar-item"><div class="sidebar-item-dot"></div>Simulador</div>
+        <div class="sidebar-item"><div class="sidebar-item-dot"></div>Historial</div>
+        <div class="sidebar-item"><div class="sidebar-item-dot"></div>Presets</div>
+        <div class="sidebar-item"><div class="sidebar-item-dot"></div>Reportes</div>
+      </div>
+      <div class="sidebar-footer">Dr. Manuel Arteaga</div>
+    </div>
+    <div class="main-content">
+      <div class="content-header">
+        <div>
+          <div class="content-title">Mis Pacientes</div>
+          <div class="content-sub">4 pacientes activos</div>
+        </div>
+        <button class="app-btn">+ Nueva Sesión</button>
+      </div>
+      <div class="patient-grid">
+        <div class="patient-card">
+          <div class="patient-name">María González</div>
+          <div class="patient-info">34 años · Rinoplastia</div>
+          <div class="patient-footer">
+            <span class="badge">Activo</span>
+            <span class="patient-sessions">3 sesiones</span>
+          </div>
+        </div>
+        <div class="patient-card">
+          <div class="patient-name">Ana Ramírez</div>
+          <div class="patient-info">28 años · Lifting cejas</div>
+          <div class="patient-footer">
+            <span class="badge-pending">Pendiente</span>
+            <span class="patient-sessions">1 sesión</span>
+          </div>
+        </div>
+        <div class="patient-card">
+          <div class="patient-name">Laura Méndez</div>
+          <div class="patient-info">41 años · Blefaroplastia</div>
+          <div class="patient-footer">
+            <span class="badge">Activo</span>
+            <span class="patient-sessions">2 sesiones</span>
+          </div>
+        </div>
+        <div class="patient-card">
+          <div class="patient-name">Sofía Torres</div>
+          <div class="patient-info">29 años · Aumento mentón</div>
+          <div class="patient-footer">
+            <span class="badge-pending">Nueva</span>
+            <span class="patient-sessions">0 sesiones</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

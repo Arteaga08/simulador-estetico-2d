@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>SimEstético — Landing v3 (Design System)</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    /* Brand */
+    --blue:        #4FACFE;
+    --blue-dark:   #0A1628;
+    --blue-mid:    #1A3A6B;
+    --indigo:      #667EEA;
+    /* Text */
+    --text-on-blue: #D4EEFF;
+    --text-primary:   #0A1628;
+    --text-secondary: #374151;
+    --text-muted:     #6B7280;
+    /* Surfaces */
+    --white:    #FAFCFF;
+    --surface:  #FFFFFF;
+    --bg-alt:   #F4F8FF;
+    --border:   #E4EEF9;
+    /* Fonts */
+    --font-display: 'Geist', sans-serif;
+    --font-body:    'Inter', sans-serif;
+    --font-mono:    'Geist Mono', monospace;
+    /* Spacing — base 4px */
+    --sp-xs:  4px;
+    --sp-sm:  8px;
+    --sp-md:  12px;
+    --sp-lg:  16px;
+    --sp-xl:  20px;
+    --sp-2xl: 24px;
+    --sp-3xl: 32px;
+    --sp-4xl: 40px;
+    --sp-5xl: 48px;
+    --sp-6xl: 64px;
+    --sp-7xl: 80px;
+    --sp-8xl: 96px;
+    /* Shadows */
+    --shadow-md:    0 4px 16px rgba(0,0,0,0.08);
+    --shadow-lg:    0 8px 28px rgba(0,0,0,0.10);
+    --shadow-xl:    0 16px 48px rgba(0,0,0,0.12);
+    --shadow-brand: 0 8px 40px rgba(79,172,254,0.25);
+  }
+
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-body); background: var(--white); color: var(--text-primary); overflow-x: hidden; line-height: 1; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp  { from { opacity:0; transform:translateY(32px) } to { opacity:1; transform:translateY(0) } }
+  @keyframes fadeIn  { from { opacity:0 } to { opacity:1 } }
+  @keyframes sliderA { 0%,100%{width:42%} 50%{width:74%} }
+  @keyframes sliderB { 0%,100%{width:66%} 50%{width:28%} }
+  @keyframes sliderC { 0%,100%{width:52%} 50%{width:80%} }
+  @keyframes pinBob  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+
+  .anim-1 { animation: fadeUp .7s cubic-bezier(.16,1,.3,1) .1s both }
+  .anim-2 { animation: fadeUp .7s cubic-bezier(.16,1,.3,1) .22s both }
+  .anim-3 { animation: fadeUp .7s cubic-bezier(.16,1,.3,1) .34s both }
+  .anim-4 { animation: fadeUp .6s cubic-bezier(.16,1,.3,1) .46s both }
+  .anim-5 { animation: fadeUp .6s cubic-bezier(.16,1,.3,1) .56s both }
+  .anim-vis { animation: fadeIn .9s cubic-bezier(.16,1,.3,1) .25s both }
+
+  /* ─────────────────────────────────────
+     NAVBAR
+  ───────────────────────────────────── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--blue);
+    padding: 0 var(--sp-5xl);
+    height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 18px; font-weight: 800; color: white; letter-spacing: -0.03em;
+  }
+  .nav-logo span { color: rgba(255,255,255,0.55); font-weight: 400; }
+  .nav-links { display: flex; gap: var(--sp-3xl); list-style: none; }
+  .nav-links a { font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.75); text-decoration: none; }
+  .nav-btn {
+    font-family: var(--font-body); font-size: 14px; font-weight: 700;
+    padding: 9px 20px; border-radius: 9px;
+    background: var(--blue-dark); color: white; border: none; cursor: pointer;
+  }
+
+  /* ─────────────────────────────────────
+     HERO
+  ───────────────────────────────────── */
+  .hero {
+    background: var(--blue);
+    padding: var(--sp-8xl) var(--sp-5xl) 0;
+    display: grid;
+    grid-template-columns: 1fr 500px;
+    gap: var(--sp-6xl);
+    align-items: flex-end;
+    min-height: 620px;
+    overflow: hidden;
+  }
+
+  .hero-left { padding-bottom: var(--sp-8xl); }
+
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: var(--sp-sm);
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 9999px;
+    padding: 6px 16px;
+    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    color: rgba(255,255,255,0.85); letter-spacing: 0.04em;
+    margin-bottom: var(--sp-3xl);
+  }
+  .eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ADE80; flex-shrink: 0; }
+
+  /* H1 — Display 62px */
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(48px, 5.5vw, 64px);
+    font-weight: 900; line-height: 1.0; letter-spacing: -0.04em;
+    color: white; margin-bottom: var(--sp-2xl);
+  }
+  .hero-title .accent { color: var(--blue-dark); }
+
+  /* Body LG — 17px */
+  .hero-sub {
+    font-size: 17px; line-height: 1.7; font-weight: 400;
+    color: var(--text-on-blue);
+    max-width: 440px; margin-bottom: var(--sp-5xl);
+  }
+
+  .hero-actions { display: flex; align-items: center; gap: var(--sp-lg); }
+  .btn-lg {
+    font-family: var(--font-body); font-size: 15px; font-weight: 700;
+    padding: 14px 28px; border-radius: 11px;
+    background: var(--blue-dark); color: white;
+    border: none; cursor: pointer;
+  }
+  .btn-lg-ghost {
+    font-family: var(--font-body); font-size: 15px; font-weight: 600;
+    padding: 14px 28px; border-radius: 11px;
+    background: transparent; color: white;
+    border: 1.5px solid rgba(255,255,255,0.35); cursor: pointer;
+  }
+
+  .hero-trust { display: flex; align-items: center; gap: 12px; margin-top: var(--sp-3xl); }
+  .t-avatars { display: flex; }
+  .t-av {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 2.5px solid var(--blue);
+    background: var(--blue-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--blue);
+    margin-left: -10px;
+  }
+  .t-av:first-child { margin-left: 0; }
+  .trust-txt { font-size: 13px; color: rgba(255,255,255,0.65); }
+  .trust-txt strong { color: white; font-weight: 600; }
+
+  /* ── Hero visual ── */
+  .hero-visual { align-self: flex-end; }
+  .sim-window {
+    background: var(--blue-dark);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -12px 56px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.07);
+    overflow: hidden;
+  }
+  .sim-bar {
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding: 12px 18px;
+    display: flex; align-items: center; gap: var(--sp-md);
+  }
+  .sim-dots { display: flex; gap: 6px; }
+  .sdot { width: 10px; height: 10px; border-radius: 50%; }
+  .sd-r{background:rgba(255,80,80,.5)} .sd-y{background:rgba(255,190,50,.5)} .sd-g{background:rgba(50,205,100,.5)}
+  .sim-tab {
+    font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.05); padding: 4px 14px; border-radius: 6px;
+  }
+  .sim-tab.active { color: white; background: rgba(79,172,254,0.14); }
+
+  .sim-body { display: grid; grid-template-columns: 1fr 150px; }
+
+  .sim-canvas {
+    position: relative; height: 300px;
+    background: #0C1B2E;
+    border-right: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+  }
+  .canvas-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(79,172,254,0.04) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(79,172,254,0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .face-svg { position: relative; z-index: 1; width: 150px; height: 210px; }
+  .face-svg svg { width: 100%; height: 100%; }
+
+  .pin {
+    position: absolute; z-index: 2;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--blue); border: 2.5px solid white;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: white;
+    box-shadow: 0 2px 10px rgba(79,172,254,0.5);
+  }
+  .p1 { top: 22%; left: 43%; animation: pinBob 3.2s ease-in-out infinite 0s; }
+  .p2 { top: 48%; left: 56%; animation: pinBob 3.2s ease-in-out infinite .9s; }
+  .p3 { top: 64%; left: 37%; animation: pinBob 3.2s ease-in-out infinite 1.8s; }
+
+  .hud-overlay {
+    position: absolute; top: 12px; right: 12px; z-index: 3;
+    background: rgba(8,18,32,0.88);
+    border: 1px solid rgba(79,172,254,0.22);
+    border-radius: 10px; padding: 12px 16px;
+    backdrop-filter: blur(8px); min-width: 140px;
+  }
+  .hud-row { margin-bottom: 10px; }
+  .hud-row:last-child { margin: 0; }
+  .hud-k { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.38); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+  .hud-v { font-family: var(--font-mono); font-size: 18px; font-weight: 600; color: var(--blue); letter-spacing: -0.01em; }
+
+  .sim-controls { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+  .ctrl-k { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,0.35); margin-bottom: 8px; }
+  .ctrl-track { background: rgba(255,255,255,0.09); border-radius: 3px; height: 4px; }
+  .ctrl-fill { height: 4px; border-radius: 3px; background: var(--blue); }
+  .s1{animation:sliderA 4s ease-in-out infinite}
+  .s2{animation:sliderB 5s ease-in-out infinite}
+  .s3{animation:sliderC 6s ease-in-out infinite}
+  .ctrl-val { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.38); text-align: right; margin-top: 5px; }
+
+  .sim-footer {
+    padding: 12px 18px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .sim-footer-label { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.28); }
+  .sim-save { font-family: var(--font-mono); font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: 6px; background: var(--blue); color: white; border: none; cursor: pointer; }
+
+  /* ─────────────────────────────────────
+     LOGOS
+  ───────────────────────────────────── */
+  .logos {
+    background: var(--blue-dark);
+    padding: 26px var(--sp-5xl);
+    display: flex; align-items: center; gap: var(--sp-5xl);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .logos-label { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.28); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
+  .logos-sep { width: 1px; height: 22px; background: rgba(255,255,255,0.08); }
+  .logos-row { display: flex; gap: var(--sp-5xl); align-items: center; }
+  .clinic-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.32); letter-spacing: -0.01em; }
+
+  /* ─────────────────────────────────────
+     NARRATIVE (reemplaza stats)
+  ───────────────────────────────────── */
+  .narrative { background: var(--surface); border-bottom: 1px solid var(--border); padding: var(--sp-7xl) var(--sp-5xl); }
+  .narrative-wrap { max-width: 820px; }
+  .narrative-txt {
+    font-family: var(--font-display);
+    font-size: clamp(24px, 3vw, 36px);
+    font-weight: 700; line-height: 1.28; letter-spacing: -0.025em;
+    color: var(--text-primary);
+  }
+  .narrative-txt .hl { color: var(--blue); }
+  .narrative-pills { display: flex; gap: var(--sp-lg); flex-wrap: wrap; margin-top: var(--sp-3xl); }
+  .pill {
+    display: inline-flex; align-items: center; gap: var(--sp-sm);
+    background: var(--bg-alt); border: 1px solid var(--border);
+    border-radius: 9999px; padding: 8px 18px;
+    font-size: 13px; color: var(--text-secondary); font-weight: 500;
+  }
+  .pill-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); flex-shrink: 0; }
+
+  /* ─────────────────────────────────────
+     FEATURES ALTERNADAS
+  ───────────────────────────────────── */
+  .features { background: var(--surface); }
+
+  .feat {
+    max-width: 1100px; margin: 0 auto;
+    padding: var(--sp-8xl) var(--sp-5xl);
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: var(--sp-7xl); align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .feat:last-child { border: none; }
+  .feat.rev .feat-text { order: 2; }
+  .feat.rev .feat-panel { order: 1; }
+
+  .feat-num { font-family: var(--font-mono); font-size: 13px; color: var(--blue); letter-spacing: 0.06em; margin-bottom: var(--sp-lg); }
+
+  /* H2 — 32px */
+  .feat-title {
+    font-family: var(--font-display); font-size: 32px; font-weight: 800;
+    letter-spacing: -0.025em; line-height: 1.15;
+    color: var(--text-primary); margin-bottom: var(--sp-lg);
+  }
+
+  /* Body MD — 15px */
+  .feat-body { font-size: 15px; line-height: 1.7; color: var(--text-secondary); margin-bottom: var(--sp-2xl); }
+
+  .feat-list { display: flex; flex-direction: column; gap: 12px; }
+  .feat-item { display: flex; gap: 12px; align-items: flex-start; }
+  .feat-arrow { color: var(--blue); font-size: 16px; flex-shrink: 0; margin-top: 2px; font-weight: 700; }
+  /* Body SM — 14px */
+  .feat-item-txt { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
+  .feat-cta { display: inline-flex; align-items: center; gap: 8px; margin-top: var(--sp-2xl); font-size: 14px; font-weight: 700; color: var(--blue); cursor: pointer; text-decoration: none; }
+
+  /* Feature panel — dark */
+  .feat-panel { display: flex; align-items: center; justify-content: center; }
+  .dark-panel {
+    background: var(--blue-dark);
+    border-radius: 16px; padding: var(--sp-2xl); width: 100%;
+    border: 1px solid rgba(79,172,254,0.1);
+    box-shadow: var(--shadow-brand);
+  }
+  .dp-label { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: var(--sp-lg); }
+
+  /* HUD panel */
+  .hud-big { text-align: center; padding: var(--sp-xl) 0; }
+  .hud-big-num { font-family: var(--font-mono); font-size: 64px; font-weight: 600; color: var(--blue); line-height: 1; letter-spacing: -0.02em; }
+  .hud-big-sub { font-size: 13px; color: rgba(255,255,255,0.38); margin-top: 6px; }
+  .hud-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; margin-top: var(--sp-lg); }
+  .hud-cell { background: rgba(255,255,255,0.03); padding: 14px 10px; text-align: center; }
+  .hud-cell-num { font-family: var(--font-mono); font-size: 18px; font-weight: 600; color: white; }
+  .hud-cell-key { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.32); margin-top: 4px; }
+
+  /* Annotation panel */
+  .ann-list { display: flex; flex-direction: column; gap: var(--sp-md); }
+  .ann-item {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px; padding: 14px 16px;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .ann-num {
+    width: 24px; height: 24px; border-radius: 50%; background: var(--blue);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: white;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .ann-main { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.5; margin-bottom: 4px; }
+  .ann-meta { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.3); }
+
+  /* Share panel */
+  .share-box { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; margin-bottom: var(--sp-lg); }
+  .share-head { background: var(--blue); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; }
+  .share-head-title { font-size: 13px; font-weight: 600; color: white; }
+  .share-badge { font-family: var(--font-mono); font-size: 11px; background: rgba(255,255,255,0.18); color: white; padding: 3px 10px; border-radius: 6px; }
+  .share-body { padding: 16px; }
+  .share-key { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .share-url { font-family: var(--font-mono); font-size: 13px; color: var(--blue); }
+  .consent-row { display: flex; align-items: center; gap: 10px; margin-top: var(--sp-lg); padding-top: var(--sp-lg); border-top: 1px solid rgba(255,255,255,0.06); }
+  .consent-check { width: 18px; height: 18px; border-radius: 5px; background: var(--blue); display: flex; align-items: center; justify-content: center; font-size: 11px; color: white; flex-shrink: 0; }
+  .consent-txt { font-size: 13px; color: rgba(255,255,255,0.55); }
+
+  /* ─────────────────────────────────────
+     CÓMO FUNCIONA
+  ───────────────────────────────────── */
+  .how { background: var(--bg-alt); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: var(--sp-8xl) var(--sp-5xl); }
+  .how-inner { max-width: 1100px; margin: 0 auto; }
+  .how-head { margin-bottom: var(--sp-7xl); }
+  .section-kicker { font-family: var(--font-mono); font-size: 12px; color: var(--blue); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; }
+
+  /* H2 — 36px */
+  .section-h2 { font-family: var(--font-display); font-size: 36px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.15; color: var(--text-primary); }
+
+  .how-steps { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; position: relative; }
+  .how-steps::after { content:''; position:absolute; top:22px; left:12%; right:12%; height:1px; background:linear-gradient(90deg,transparent,var(--blue),transparent); z-index:0; }
+  .how-step { position: relative; z-index: 1; padding: 0 var(--sp-xl); text-align: center; }
+  .step-num {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--blue);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: white;
+    margin: 0 auto var(--sp-xl);
+    border: 3px solid var(--bg-alt);
+    box-shadow: 0 0 0 1px var(--blue);
+  }
+  /* H4 — 16px */
+  .step-title { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: var(--sp-sm); }
+  /* Body SM — 14px */
+  .step-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+  /* ─────────────────────────────────────
+     EVIDENCIA
+  ───────────────────────────────────── */
+  .evidence { background: var(--surface); padding: var(--sp-8xl) var(--sp-5xl); border-bottom: 1px solid var(--border); }
+  .evidence-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-7xl); align-items: start; }
+  .ev-cards { display: flex; flex-direction: column; gap: var(--sp-lg); }
+  .ev-card { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 14px; padding: var(--sp-2xl); }
+
+  /* Display stat — 52px */
+  .ev-stat { font-family: var(--font-display); font-size: 52px; font-weight: 900; letter-spacing: -0.03em; color: var(--blue); line-height: 1; margin-bottom: 12px; }
+
+  /* Body MD — 15px */
+  .ev-quote { font-size: 15px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+  .ev-source { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+
+  /* ─────────────────────────────────────
+     PRICING
+  ───────────────────────────────────── */
+  .pricing { background: var(--blue-dark); padding: var(--sp-8xl) var(--sp-5xl); }
+  .pricing-inner { max-width: 1100px; margin: 0 auto; }
+  .pricing-head { margin-bottom: var(--sp-5xl); }
+  .pricing-kicker { font-family: var(--font-mono); font-size: 12px; color: var(--blue); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; }
+  .pricing-h2 { font-family: var(--font-display); font-size: 36px; font-weight: 800; letter-spacing: -0.025em; color: white; margin-bottom: 8px; }
+  .pricing-sub { font-size: 15px; color: rgba(255,255,255,0.45); }
+
+  .pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: var(--sp-lg); }
+  .pr-card { border-radius: 16px; padding: var(--sp-3xl); border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); }
+  .pr-card.featured { background: var(--blue); border-color: transparent; position: relative; }
+  .pr-pop-tag { position: absolute; top: -13px; left: var(--sp-3xl); background: white; color: var(--blue-dark); font-size: 11px; font-weight: 700; padding: 3px 14px; border-radius: 9999px; letter-spacing: 0.04em; }
+
+  .pr-plan-name { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: var(--sp-lg); }
+  .pr-card:not(.featured) .pr-plan-name { color: rgba(255,255,255,0.4); }
+  .pr-card.featured .pr-plan-name { color: rgba(255,255,255,0.7); }
+
+  /* Price — 44px */
+  .pr-amount { font-family: var(--font-display); font-size: 44px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; color: white; margin-bottom: 6px; }
+  .pr-amount span { font-size: 16px; font-weight: 400; }
+  .pr-card:not(.featured) .pr-amount span { color: rgba(255,255,255,0.4); }
+  .pr-card.featured .pr-amount span { color: rgba(255,255,255,0.65); }
+
+  .pr-tagline { font-size: 13px; margin-bottom: var(--sp-xl); }
+  .pr-card:not(.featured) .pr-tagline { color: rgba(255,255,255,0.38); }
+  .pr-card.featured .pr-tagline { color: rgba(255,255,255,0.75); }
+
+  .pr-divider { height: 1px; background: rgba(255,255,255,0.08); margin-bottom: var(--sp-xl); }
+  .pr-card.featured .pr-divider { background: rgba(255,255,255,0.2); }
+
+  .pr-item { font-size: 13px; margin-bottom: 10px; display: flex; gap: 10px; align-items: flex-start; }
+  .pr-card:not(.featured) .pr-item { color: rgba(255,255,255,0.6); }
+  .pr-card.featured .pr-item { color: rgba(255,255,255,0.9); }
+  .pr-ck { flex-shrink: 0; }
+  .pr-card:not(.featured) .pr-ck { color: var(--blue); }
+  .pr-card.featured .pr-ck { color: white; }
+  .pr-item .off { color: rgba(255,255,255,0.2); }
+
+  .pr-btn {
+    display: block; width: 100%; text-align: center;
+    font-family: var(--font-body); font-size: 14px; font-weight: 700;
+    padding: 13px; border-radius: 10px; border: none; cursor: pointer;
+    margin-top: var(--sp-xl);
+  }
+  .pr-card:not(.featured) .pr-btn { background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.12); }
+  .pr-card.featured .pr-btn { background: var(--blue-dark); color: white; }
+
+  /* ─────────────────────────────────────
+     TESTIMONIOS
+  ───────────────────────────────────── */
+  .testi { background: var(--bg-alt); padding: var(--sp-8xl) var(--sp-5xl); border-top: 1px solid var(--border); }
+  .testi-inner { max-width: 1100px; margin: 0 auto; }
+  .testi-head { margin-bottom: var(--sp-5xl); }
+  .testi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: var(--sp-xl); }
+  .testi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: var(--sp-2xl); }
+  .testi-stars { display: flex; gap: 3px; margin-bottom: var(--sp-lg); }
+  .star { color: #F59E0B; font-size: 15px; }
+
+  /* Body MD — 15px */
+  .testi-quote { font-size: 15px; color: var(--text-secondary); line-height: 1.7; margin-bottom: var(--sp-xl); font-style: italic; }
+
+  .testi-author { display: flex; align-items: center; gap: var(--sp-md); }
+  .testi-av { width: 40px; height: 40px; border-radius: 50%; background: var(--blue-dark); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--blue); flex-shrink: 0; }
+  .testi-name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+  .testi-role { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ─────────────────────────────────────
+     FAQ
+  ───────────────────────────────────── */
+  .faq { background: var(--surface); padding: var(--sp-8xl) var(--sp-5xl); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .faq-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 300px 1fr; gap: var(--sp-7xl); }
+  .faq-items { display: flex; flex-direction: column; }
+  .faq-item { padding: var(--sp-xl) 0; border-bottom: 1px solid var(--border); }
+  .faq-q { font-size: 15px; font-weight: 600; color: var(--text-primary); display: flex; justify-content: space-between; align-items: center; cursor: pointer; gap: var(--sp-lg); }
+  .faq-plus { color: var(--blue); font-size: 22px; font-weight: 300; flex-shrink: 0; }
+  .faq-a { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-top: 12px; }
+
+  /* ─────────────────────────────────────
+     FINAL CTA
+  ───────────────────────────────────── */
+  .final-cta { background: var(--blue); padding: var(--sp-8xl) var(--sp-5xl); text-align: center; }
+  .cta-kicker { font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,0.6); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: var(--sp-lg); }
+
+  /* H1 — 52px */
+  .cta-h1 { font-family: var(--font-display); font-size: clamp(36px, 4.5vw, 52px); font-weight: 900; letter-spacing: -0.035em; color: white; margin-bottom: 16px; line-height: 1.05; }
+  .cta-sub { font-size: 17px; color: rgba(255,255,255,0.72); margin-bottom: var(--sp-5xl); line-height: 1.6; }
+  .cta-row { display: flex; justify-content: center; gap: var(--sp-md); }
+  .cta-btn-dark { font-family: var(--font-body); font-size: 15px; font-weight: 700; padding: 14px 30px; border-radius: 11px; background: var(--blue-dark); color: white; border: none; cursor: pointer; }
+  .cta-btn-ghost { font-family: var(--font-body); font-size: 15px; font-weight: 600; padding: 14px 30px; border-radius: 11px; background: transparent; color: white; border: 1.5px solid rgba(255,255,255,0.35); cursor: pointer; }
+  .cta-fine { font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,0.42); margin-top: var(--sp-xl); }
+
+  /* ─────────────────────────────────────
+     FOOTER
+  ───────────────────────────────────── */
+  footer { background: var(--blue-dark); padding: var(--sp-7xl) var(--sp-5xl); display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: var(--sp-5xl); border-top: 1px solid rgba(255,255,255,0.06); }
+  .footer-brand { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: white; letter-spacing: -0.025em; margin-bottom: var(--sp-md); }
+  .footer-brand span { color: var(--blue); }
+  .footer-desc { font-size: 14px; color: rgba(255,255,255,0.32); line-height: 1.65; max-width: 240px; }
+  .footer-col h4 { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: var(--sp-lg); }
+  .footer-col a { display: block; font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 10px; text-decoration: none; }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.06); padding-top: var(--sp-2xl); margin-top: var(--sp-4xl); display: flex; justify-content: space-between; grid-column: 1/-1; }
+  .footer-copy { font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,0.22); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Sim<span>Estético</span></div>
+  <ul class="nav-links">
+    <li><a href="#">Características</a></li>
+    <li><a href="#">Cómo funciona</a></li>
+    <li><a href="#">Precios</a></li>
+    <li><a href="#">Testimonios</a></li>
+  </ul>
+  <button class="nav-btn">Iniciar sesión →</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow anim-1"><span class="eyebrow-dot"></span>Simulador estético 2D &nbsp;·&nbsp; Disponible ahora</div>
+    <h1 class="hero-title">
+      <div class="anim-1">Muestra el</div>
+      <div class="anim-2">resultado</div>
+      <div class="anim-3"><em class="accent">antes</em> de operar.</div>
+    </h1>
+    <p class="hero-sub anim-4">Simulación quirúrgica en tiempo real para cirujanos estéticos. Tu paciente ve el cambio antes de decidir.</p>
+    <div class="hero-actions anim-5">
+      <button class="btn-lg">Solicitar demo →</button>
+      <button class="btn-lg-ghost">Ver cómo funciona</button>
+    </div>
+    <div class="hero-trust anim-5">
+      <div class="t-avatars"><div class="t-av">RA</div><div class="t-av">LM</div><div class="t-av">CP</div></div>
+      <span class="trust-txt"><strong>+50 cirujanos</strong> ya usan SimEstético</span>
+    </div>
+  </div>
+
+  <div class="hero-visual anim-vis">
+    <div class="sim-window">
+      <div class="sim-bar">
+        <div class="sim-dots"><div class="sdot sd-r"></div><div class="sdot sd-y"></div><div class="sdot sd-g"></div></div>
+        <div class="sim-tab active">Rinoplastia — María G.</div>
+        <div class="sim-tab">Sesión #3</div>
+      </div>
+      <div class="sim-body">
+        <div class="sim-canvas">
+          <div class="canvas-grid"></div>
+          <div class="face-svg">
+            <svg viewBox="0 0 150 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="75" cy="90" rx="52" ry="66" fill="rgba(79,172,254,0.07)" stroke="rgba(79,172,254,0.22)" stroke-width="1.2"/>
+              <path d="M53 117 Q75 134 97 117" stroke="rgba(79,172,254,0.28)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+              <ellipse cx="58" cy="84" rx="9" ry="6" fill="none" stroke="rgba(79,172,254,0.18)" stroke-width="1"/>
+              <ellipse cx="92" cy="84" rx="9" ry="6" fill="none" stroke="rgba(79,172,254,0.18)" stroke-width="1"/>
+              <path d="M68 95 L75 110 L82 95" stroke="rgba(79,172,254,0.32)" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+              <path d="M42 64 Q75 22 108 64" stroke="rgba(79,172,254,0.12)" stroke-width="1" fill="none"/>
+            </svg>
+          </div>
+          <div class="pin p1">1</div>
+          <div class="pin p2">2</div>
+          <div class="pin p3">3</div>
+          <div class="hud-overlay">
+            <div class="hud-row"><div class="hud-k">Nasolabial</div><div class="hud-v">118°</div></div>
+            <div class="hud-row"><div class="hud-k">Proyección</div><div class="hud-v">+4.2mm</div></div>
+          </div>
+        </div>
+        <div class="sim-controls">
+          <div><div class="ctrl-k">Giba nasal</div><div class="ctrl-track"><div class="ctrl-fill s1" style="width:42%"></div></div><div class="ctrl-val">−2.8mm</div></div>
+          <div><div class="ctrl-k">Tip proj.</div><div class="ctrl-track"><div class="ctrl-fill s2" style="width:66%"></div></div><div class="ctrl-val">+4.2mm</div></div>
+          <div><div class="ctrl-k">Rotación</div><div class="ctrl-track"><div class="ctrl-fill s3" style="width:52%"></div></div><div class="ctrl-val">6°</div></div>
+          <div><div class="ctrl-k">Base alar</div><div class="ctrl-track"><div class="ctrl-fill" style="width:28%"></div></div><div class="ctrl-val">−1.4mm</div></div>
+        </div>
+      </div>
+      <div class="sim-footer">
+        <span class="sim-footer-label">60fps &nbsp;·&nbsp; Cloudinary enc.</span>
+        <button class="sim-save">Guardar sesión</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGOS -->
+<div class="logos">
+  <span class="logos-label">Usado en</span>
+  <div class="logos-sep"></div>
+  <div class="logos-row">
+    <span class="clinic-name">Clínica Bella</span>
+    <span class="clinic-name">Centro Facial MX</span>
+    <span class="clinic-name">Estética Integral</span>
+    <span class="clinic-name">Dr. Paredes</span>
+    <span class="clinic-name">MedEsthetics</span>
+  </div>
+</div>
+
+<!-- NARRATIVE -->
+<div class="narrative">
+  <div class="narrative-wrap">
+    <p class="narrative-txt">Deformación canvas a <span class="hl">60fps sin lag</span>. Ocho procedimientos. Imágenes encriptadas. El paciente firma digitalmente. <span class="hl">Todo en el navegador,</span> sin instalar nada.</p>
+    <div class="narrative-pills">
+      <div class="pill"><div class="pill-dot"></div>Rinoplastia, lifting, blefaroplastia y más</div>
+      <div class="pill"><div class="pill-dot"></div>HIPAA-compliant por diseño</div>
+      <div class="pill"><div class="pill-dot"></div>Links con expiración de 48h</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES ALTERNADAS -->
+<div class="features">
+
+  <!-- 01 HUD -->
+  <div class="feat">
+    <div class="feat-text">
+      <div class="feat-num">— 01</div>
+      <h2 class="feat-title">Métricas quirúrgicas en tiempo real</h2>
+      <p class="feat-body">El HUD calcula automáticamente ángulo nasolabial, proyección del tip y rotación mientras ajustas los controles. No más estimaciones a ojo.</p>
+      <div class="feat-list">
+        <div class="feat-item"><span class="feat-arrow">→</span><span class="feat-item-txt">Ángulo nasolabial con rango objetivo visible (120–135°)</span></div>
+        <div class="feat-item"><span class="feat-arrow">→</span><span class="feat-item-txt">Proyección del tip en milímetros, actualizada en tiempo real</span></div>
+        <div class="feat-item"><span class="feat-arrow">→</span><span class="feat-item-txt">Reducción de giba calculada automáticamente en mm</span></div>
+      </div>
+      <a class="feat-cta">Ver demo del HUD →</a>
+    </div>
+    <div class="feat-panel">
+      <div class="dark-panel">
+        <div class="dp-label">HUD — Rinoplastia activa</div>
+        <div class="hud-big">
+          <div class="hud-big-num">118°</div>
+          <div class="hud-big-sub">Ángulo nasolabial &nbsp;·&nbsp; Objetivo: 120–135°</div>
+        </div>
+        <div class="hud-grid">
+          <div class="hud-cell"><div class="hud-cell-num">+4.2</div><div class="hud-cell-key">Proy. mm</div></div>
+          <div class="hud-cell"><div class="hud-cell-num">6°</div><div class="hud-cell-key">Rotación</div></div>
+          <div class="hud-cell"><div class="hud-cell-num">−2.8</div><div class="hud-cell-key">Giba mm</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 Anotaciones (reverse) -->
+  <div class="feat rev">
+    <div class="feat-text">
+      <div class="feat-num">— 02</div>
+      <h2 class="feat-title">Anotaciones quirúrgicas sobre la imagen</h2>
+      <p class="feat-body">Coloca pins numerados directamente sobre la simulación. Escribe notas por punto de intervención. Exporta a PDF con el resultado y todas las anotaciones.</p>
+      <div class="feat-list">
+        <div class="feat-item"><span class="feat-arrow">→</span><span class="feat-item-txt">Pins arrastrables con número y nota de texto libre</span></div>
+        <div class="feat-item"><span class="feat-arrow">→</span><span class="feat-item-txt">PDF profesional con antes/después e historial</span></div>
+        <div class="feat-item"><span class="feat-arrow">→</span><span class="feat-item-txt">Registro inmutable por sesión en el expediente</span></div>
+      </div>
+    </div>
+    <div class="feat-panel">
+      <div class="dark-panel">
+        <div class="dp-label">Anotaciones — Sesión #3</div>
+        <div class="ann-list">
+          <div class="ann-item"><div class="ann-num">1</div><div><div class="ann-main">Reducción de giba nasal superior</div><div class="ann-meta">Punto crítico · 2.8mm estimado</div></div></div>
+          <div class="ann-item"><div class="ann-num">2</div><div><div class="ann-main">Proyección y rotación del tip</div><div class="ann-meta">+4.2mm proyección · 6° rotación</div></div></div>
+          <div class="ann-item"><div class="ann-num">3</div><div><div class="ann-main">Ancho de la base alar</div><div class="ann-meta">Reducción simétrica bilateral</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 Share/Consent -->
+  <div class="feat">
+    <div class="feat-text">
+      <div class="feat-num">— 03</div>
+      <h2 class="feat-title">Comparte el resultado y obtén el consentimiento</h2>
+      <p class="feat-body">Genera un link seguro con expiración de 48 horas. El paciente lo abre desde su celular, ve el antes/después y firma digitalmente sin necesidad de instalar nada.</p>
+      <div class="feat-list">
+        <div class="feat-item"><span class="feat-arrow">→</span><span class="feat-item-txt">Link encriptado con expiración automática a 48 horas</span></div>
+        <div class="feat-item"><span class="feat-arrow">→</span><span class="feat-item-txt">Firma digital con IP, timestamp e identificación inmutable</span></div>
+        <div class="feat-item"><span class="feat-arrow">→</span><span class="feat-item-txt">Consentimiento almacenado en el historial del expediente</span></div>
+      </div>
+    </div>
+    <div class="feat-panel">
+      <div class="dark-panel">
+        <div class="dp-label">Compartir resultado</div>
+        <div class="share-box">
+          <div class="share-head"><span class="share-head-title">María González — Rinoplastia</span><span class="share-badge">48h</span></div>
+          <div class="share-body">
+            <div class="share-key">Link seguro</div>
+            <div class="share-url">simest.io/s/a7x9k2...</div>
+            <div class="consent-row">
+              <div class="consent-check">✓</div>
+              <span class="consent-txt">Firmado digitalmente · 18 May 2026, 14:32</span>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.22);font-family:var(--font-mono);text-align:center">IP registrada · Inmutable · HIPAA-compliant</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CÓMO FUNCIONA -->
+<section class="how">
+  <div class="how-inner">
+    <div class="how-head">
+      <div class="section-kicker">02 — Proceso</div>
+      <h2 class="section-h2">De la consulta al consentimiento<br>en menos de 5 minutos.</h2>
+    </div>
+    <div class="how-steps">
+      <div class="how-step"><div class="step-num">1</div><div class="step-title">Crea el expediente</div><div class="step-desc">Registra al paciente y el procedimiento objetivo en segundos.</div></div>
+      <div class="how-step"><div class="step-num">2</div><div class="step-title">Carga la fotografía</div><div class="step-desc">La imagen se encripta y sube a Cloudinary directamente desde la consulta.</div></div>
+      <div class="how-step"><div class="step-num">3</div><div class="step-title">Simula en vivo</div><div class="step-desc">El paciente ve el resultado al instante mientras ajustas los controles.</div></div>
+      <div class="how-step"><div class="step-num">4</div><div class="step-title">Firma y guarda</div><div class="step-desc">PDF + link de compartir + consentimiento digital quedan en el expediente.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- EVIDENCIA -->
+<section class="evidence">
+  <div class="evidence-inner">
+    <div>
+      <div class="section-kicker">03 — Evidencia</div>
+      <h2 class="section-h2">La ciencia respalda la simulación preoperatoria.</h2>
+    </div>
+    <div class="ev-cards">
+      <div class="ev-card"><div class="ev-stat">63%</div><p class="ev-quote">"El 63% de los cirujanos plásticos faciales usan software de imagen computarizada como parte de su consulta preoperatoria."</p><div class="ev-source">Facial Plastic Surgery & Aesthetic Medicine, 2022</div></div>
+      <div class="ev-card"><div class="ev-stat">↑89%</div><p class="ev-quote">"Los pacientes que reciben simulación preoperatoria reportan significativamente mayor satisfacción en el proceso de decisión."</p><div class="ev-source">Journal of Plastic and Reconstructive Surgery, 2021</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing">
+  <div class="pricing-inner">
+    <div class="pricing-head">
+      <div class="pricing-kicker">04 — Precios</div>
+      <div class="pricing-h2">Planes claros. Sin sorpresas.</div>
+      <div class="pricing-sub">Cancela cuando quieras. Sin contratos anuales forzosos.</div>
+    </div>
+    <div class="pricing-grid">
+      <div class="pr-card">
+        <div class="pr-plan-name">Starter</div>
+        <div class="pr-amount">$99<span>/mes</span></div>
+        <div class="pr-tagline">Para cirujanos independientes</div>
+        <div class="pr-divider"></div>
+        <div class="pr-item"><span class="pr-ck">✓</span> 1 cirujano</div>
+        <div class="pr-item"><span class="pr-ck">✓</span> Hasta 30 pacientes activos</div>
+        <div class="pr-item"><span class="pr-ck">✓</span> 4 procedimientos</div>
+        <div class="pr-item"><span class="pr-ck">✓</span> PDF y links de compartir</div>
+        <div class="pr-item"><span class="off">✗</span> <span style="opacity:.4">Anotaciones quirúrgicas</span></div>
+        <div class="pr-item"><span class="off">✗</span> <span style="opacity:.4">Firma de consentimiento</span></div>
+        <button class="pr-btn">14 días gratis →</button>
+      </div>
+      <div class="pr-card featured">
+        <div class="pr-pop-tag">Más popular</div>
+        <div class="pr-plan-name">Pro</div>
+        <div class="pr-amount">$199<span>/mes</span></div>
+        <div class="pr-tagline">Para clínicas en crecimiento</div>
+        <div class="pr-divider"></div>
+        <div class="pr-item"><span class="pr-ck">✓</span> Hasta 3 cirujanos</div>
+        <div class="pr-item"><span class="pr-ck">✓</span> Pacientes ilimitados</div>
+        <div class="pr-item"><span class="pr-ck">✓</span> 8+ procedimientos</div>
+        <div class="pr-item"><span class="pr-ck">✓</span> Anotaciones quirúrgicas</div>
+        <div class="pr-item"><span class="pr-ck">✓</span> Firma de consentimiento</div>
+        <div class="pr-item"><span class="pr-ck">✓</span> Soporte prioritario</div>
+        <button class="pr-btn">Solicitar demo →</button>
+      </div>
+      <div class="pr-card">
+        <div class="pr-plan-name">Enterprise</div>
+        <div class="pr-amount" style="font-size:32px;line-height:1.1;margin-bottom:10px">A medida</div>
+        <div class="pr-tagline">Hospitales y grupos de clínicas</div>
+        <div class="pr-divider"></div>
+        <div class="pr-item"><span class="pr-ck">✓</span> Usuarios ilimitados</div>
+        <div class="pr-item"><span class="pr-ck">✓</span> Integración HIS/EMR</div>
+        <div class="pr-item"><span class="pr-ck">✓</span> White label disponible</div>
+        <div class="pr-item"><span class="pr-ck">✓</span> SLA garantizado</div>
+        <div class="pr-item"><span class="pr-ck">✓</span> Onboarding dedicado</div>
+        <button class="pr-btn">Hablar con ventas →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIOS -->
+<section class="testi">
+  <div class="testi-inner">
+    <div class="testi-head">
+      <div class="section-kicker">05 — Testimonios</div>
+      <h2 class="section-h2">Lo que dicen los cirujanos.</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card"><div class="testi-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div><p class="testi-quote">"Mis pacientes de rinoplastia llegan a la cirugía con expectativas mucho más realistas. Las cancelaciones de última hora bajaron un 40%."</p><div class="testi-author"><div class="testi-av">RA</div><div><div class="testi-name">Dr. Roberto Arteaga</div><div class="testi-role">Cirujano facial · Monterrey</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div><p class="testi-quote">"La firma de consentimiento digital fue decisiva. Ahora tengo respaldo legal de cada simulación que le muestro a un paciente."</p><div class="testi-author"><div class="testi-av">LM</div><div><div class="testi-name">Dra. Laura Méndez</div><div class="testi-role">Cirujana estética · CDMX</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div><p class="testi-quote">"Antes usábamos Photoshop. SimEstético hace lo mismo en 2 minutos y con métricas quirúrgicas reales. No hay comparación."</p><div class="testi-author"><div class="testi-av">CP</div><div><div class="testi-name">Dr. Carlos Paredes</div><div class="testi-role">Rinoplastia especializada · Bogotá</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="faq-inner">
+    <div>
+      <div class="section-kicker">06 — FAQ</div>
+      <h2 class="section-h2">Preguntas<br>frecuentes.</h2>
+    </div>
+    <div class="faq-items">
+      <div class="faq-item"><div class="faq-q">¿Necesito instalar algo? <span class="faq-plus">+</span></div><div class="faq-a">No. SimEstético es 100% basado en navegador. Funciona en Mac, Windows y iPad sin instalaciones adicionales.</div></div>
+      <div class="faq-item"><div class="faq-q">¿Qué procedimientos soporta? <span class="faq-plus">+</span></div><div class="faq-a">Rinoplastia, lifting de cejas, aumento de mentón, labios, blefaroplastia, cuello, suavizado de piel y feminización facial. Más de 8 procedimientos en total.</div></div>
+      <div class="faq-item"><div class="faq-q">¿Las imágenes de mis pacientes son seguras? <span class="faq-plus">+</span></div><div class="faq-a">Sí. Todas las imágenes se encriptan en Cloudinary con URLs firmadas. Nadie fuera de tu cuenta puede acceder a ellas.</div></div>
+      <div class="faq-item"><div class="faq-q">¿Puedo cancelar en cualquier momento? <span class="faq-plus">+</span></div><div class="faq-a">Sí, sin penalizaciones ni contratos. Tu acceso se mantiene activo hasta el fin del período pagado.</div></div>
+      <div class="faq-item"><div class="faq-q">¿Tiene prueba gratuita? <span class="faq-plus">+</span></div><div class="faq-a">14 días gratis en el plan Starter, sin tarjeta de crédito requerida. Para Pro y Enterprise ofrecemos una demo personalizada.</div></div>
+      <div class="faq-item"><div class="faq-q">¿Funciona para cirugías no faciales? <span class="faq-plus">+</span></div><div class="faq-a">Por ahora está optimizado para procedimientos faciales. La simulación corporal está en el roadmap del producto.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<div class="final-cta">
+  <div class="cta-kicker">Empieza hoy</div>
+  <h2 class="cta-h1">Simula. Convence. Opera.</h2>
+  <p class="cta-sub">14 días gratis. Sin tarjeta de crédito.<br>Cancela cuando quieras.</p>
+  <div class="cta-row">
+    <button class="cta-btn-dark">Solicitar demo gratuita →</button>
+    <button class="cta-btn-ghost">Ver precios</button>
+  </div>
+  <div class="cta-fine">Sin contratos anuales &nbsp;·&nbsp; Onboarding incluido &nbsp;·&nbsp; Soporte en español</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-brand">Sim<span>Estético</span></div>
+    <div class="footer-desc">Simulador estético 2D de precisión quirúrgica para cirujanos y clínicas de estética facial.</div>
+  </div>
+  <div class="footer-col"><h4>Producto</h4><a href="#">Características</a><a href="#">Precios</a><a href="#">Demo</a><a href="#">Changelog</a></div>
+  <div class="footer-col"><h4>Legal</h4><a href="#">Privacidad</a><a href="#">Términos</a><a href="#">HIPAA</a></div>
+  <div class="footer-col"><h4>Contacto</h4><a href="#">hola@simestético.com</a><a href="#">WhatsApp</a><a href="#">Soporte</a></div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2026 SimEstético. Todos los derechos reservados.</span>
+    <span class="footer-copy">Hecho con precisión quirúrgica.</span>
+  </div>
+</footer>
+
+</body>
+</html>
