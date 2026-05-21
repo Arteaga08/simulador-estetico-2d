@@ -10,6 +10,7 @@ import {
   Crosshair,
   Ruler,
   PencilSimple,
+  PaintBrush,
   Drop,
   Eye,
   Sparkle,
@@ -31,11 +32,12 @@ const PROCEDURE_ICONS: Record<Procedimiento, React.ElementType> = {
   FEMINIZACION_FACIAL: Syringe,
 }
 
-const TOOLS: Array<{ id: SimulatorState['activeTool']; label: string; Icon: React.ElementType }> = [
+const TOOLS: Array<{ id: SimulatorState['activeTool']; label: string; Icon: React.ElementType; accent?: 'blue' }> = [
   { id: 'pin',   label: 'Anotación',   Icon: PushPin },
   { id: 'hud',   label: 'Referencia',  Icon: Crosshair },
   { id: 'angle', label: 'Ángulos',     Icon: Ruler },
   { id: 'draw',  label: 'Dibujo',      Icon: PencilSimple },
+  { id: 'broca', label: 'Broca',       Icon: PaintBrush, accent: 'blue' },
 ]
 
 export function ProcedureSidebar() {
@@ -65,12 +67,12 @@ export function ProcedureSidebar() {
           className="w-5 h-5 rounded-md shrink-0"
           style={{ background: 'linear-gradient(135deg, #4FACFE, #667EEA)' }}
         />
-        <span className="text-[0.8rem] font-bold text-white tracking-[-0.01em]">LuminaMD</span>
+        <span className="text-sm font-bold text-white tracking-[-0.01em]">LuminaMD</span>
       </div>
 
       {/* Procedures */}
       <p
-        className="text-[0.6rem] font-bold tracking-widest uppercase px-4 pt-4 pb-2"
+        className="text-[11px] font-bold tracking-widest uppercase px-4 pt-4 pb-2"
         style={{ color: 'rgba(255,255,255,0.28)' }}
       >
         Procedimientos
@@ -84,7 +86,7 @@ export function ProcedureSidebar() {
             <button
               key={proc}
               onClick={() => toggleProcedure(proc)}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[0.75rem] text-left mb-0.5 group"
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] text-left mb-0.5 group"
               style={{
                 background: isActive ? 'rgba(79,172,254,0.12)' : 'transparent',
                 color: isActive ? '#4FACFE' : 'rgba(255,255,255,0.42)',
@@ -120,23 +122,25 @@ export function ProcedureSidebar() {
 
       {/* Tools */}
       <p
-        className="text-[0.6rem] font-bold tracking-widest uppercase px-4 pb-2"
+        className="text-[11px] font-bold tracking-widest uppercase px-4 pb-2"
         style={{ color: 'rgba(255,255,255,0.28)' }}
       >
         Herramientas
       </p>
 
       <div className="px-2">
-        {TOOLS.map(({ id, label, Icon }) => {
+        {TOOLS.map(({ id, label, Icon, accent }) => {
           const isActive = activeTool === id
+          const activeColor = accent === 'blue' ? '#4FACFE' : '#fbbf24'
+          const activeBg    = accent === 'blue' ? 'rgba(79,172,254,0.12)' : 'rgba(251,191,36,0.1)'
           return (
             <button
               key={id}
               onClick={() => setActiveTool(isActive ? 'none' : id)}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[0.75rem] text-left mb-0.5"
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] text-left mb-0.5"
               style={{
-                background: isActive ? 'rgba(251,191,36,0.1)' : 'transparent',
-                color: isActive ? '#fbbf24' : 'rgba(255,255,255,0.38)',
+                background: isActive ? activeBg : 'transparent',
+                color: isActive ? activeColor : 'rgba(255,255,255,0.38)',
                 fontWeight: isActive ? 600 : 400,
                 transition: 'background 150ms var(--ease-out), color 150ms var(--ease-out)',
               }}
@@ -169,7 +173,7 @@ export function ProcedureSidebar() {
         <div className="h-px mx-2 mb-3" style={{ background: 'rgba(255,255,255,0.07)' }} />
         <a
           href="/patients"
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[0.72rem]"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[13px]"
           style={{
             color: 'rgba(255,100,100,0.45)',
             transition: 'color 150ms var(--ease-out)',

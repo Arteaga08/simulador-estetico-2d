@@ -24,9 +24,16 @@ export const TECHNIQUES_BY_PROCEDURE: Record<Procedimiento, TecnicaSesion[]> = {
 
 export const SLIDERS_BY_PROCEDURE: Record<Procedimiento, SliderDef[]> = {
   RINOPLASTIA: [
-    { id: 'giba-nasal',       label: 'Giba nasal',          min: -60, max: 0,  step: 1, defaultValue: 0, blockedNegativeInRinomodelacion: true },
-    { id: 'proyeccion-punta', label: 'Proyección de punta', min: -20, max: 40, step: 1, defaultValue: 0 },
-    { id: 'rotacion-punta',   label: 'Rotación de punta',   min: -15, max: 15, step: 1, defaultValue: 0 },
+    // Perfil + ¾: primitivas dependientes del eje sagital
+    { id: 'giba-nasal',       label: 'Giba nasal',          min: -60, max: 30, step: 1, defaultValue: 0, blockedNegativeInRinomodelacion: true, validInViews: ['perfil', 'tres-cuartos'] },
+    { id: 'proyeccion-punta', label: 'Proyección de punta', min: -20, max: 40, step: 1, defaultValue: 0, validInViews: ['perfil', 'tres-cuartos'] },
+    { id: 'rotacion-punta',   label: 'Rotación de punta',   min: -15, max: 15, step: 1, defaultValue: 0, validInViews: ['perfil', 'tres-cuartos', 'frontal'] },
+    // Frontal + ¾: primitivas en el plano coronal — rangos simétricos para
+    // permitir tanto reducir como aumentar (las primitivas soportan factor > 1).
+    { id: 'reduccion-global', label: 'Reducción global',    min: -30, max: 15, step: 1, defaultValue: 0, validInViews: ['frontal', 'tres-cuartos'] },
+    { id: 'adelgazar-dorso',  label: 'Osteotomía lateral',  min: -20, max: 15, step: 1, defaultValue: 0, validInViews: ['frontal', 'tres-cuartos'] },
+    { id: 'reseccion-alar',   label: 'Resección alar',      min: -20, max: 15, step: 1, defaultValue: 0, validInViews: ['frontal', 'tres-cuartos'] },
+    { id: 'refinamiento-punta', label: 'Refinamiento de punta', min: -20, max: 15, step: 1, defaultValue: 0, validInViews: ['frontal', 'tres-cuartos'] },
   ],
   LIFTING_CEJAS: [
     { id: 'altura-ceja-int', label: 'Altura ceja interna', min: -10, max: 20, step: 1, defaultValue: 0 },

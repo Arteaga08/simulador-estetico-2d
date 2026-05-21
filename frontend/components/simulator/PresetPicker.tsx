@@ -1,18 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { useSimulator } from './SimulatorContext'
 import type { Procedimiento } from './types'
-
-const SYSTEM_PRESETS: Record<string, string[]> = {
-  RINOPLASTIA: ['Natural', 'Definido', 'Proyectado'],
-  LIFTING_CEJAS: ['Sutil', 'Expresivo'],
-  AUMENTO_MENTON: ['Natural', 'Proyectado'],
-  AUMENTO_LABIOS: ['Natural', 'Voluminoso'],
-  LIFTING_CUELLO: ['Natural', 'Tenso'],
-  BLEFAROPLASTIA: ['Sutil', 'Marcado'],
-  SUAVIZADO_PIEL: ['Leve', 'Intenso'],
-  FEMINIZACION_FACIAL: ['Sutil', 'Marcado'],
-}
+import { getPresetsForView, type RhinoplastyPreset } from '@/lib/rhinoplastyPresets'
 
 interface PresetPickerProps {
   procedimiento: Procedimiento
@@ -20,11 +11,16 @@ interface PresetPickerProps {
 }
 
 export function PresetPicker({ procedimiento, activePresetId }: PresetPickerProps) {
+  const { state, applyPreset } = useSimulator()
   const [customPresets, setCustomPresets] = useState<string[]>([])
   const [naming, setNaming] = useState(false)
   const [newName, setNewName] = useState('')
 
-  const systemPresets = SYSTEM_PRESETS[procedimiento] ?? []
+  // Hoy sólo Rinoplastia tiene presets harmonizados curados. Para otros
+  // procedimientos no mostramos chips de sistema (la UI sigue permitiendo
+  // crear presets propios con +).
+  const systemPresets: RhinoplastyPreset[] =
+    procedimiento === 'RINOPLASTIA' ? getPresetsForView(state.currentView) : []
 
   function handleSavePreset() {
     const name = newName.trim()
@@ -36,16 +32,18 @@ export function PresetPicker({ procedimiento, activePresetId }: PresetPickerProp
 
   return (
     <div className="flex flex-wrap gap-1.5">
-      {systemPresets.map(name => (
+      {systemPresets.map(preset => (
         <button
-          key={name}
+          key={preset.id}
+          onClick={() => applyPreset(preset.id, preset.values)}
+          title={preset.rationale}
           className={`text-[0.68rem] font-medium px-2.5 py-1 rounded-full border transition-colors ${
-            activePresetId === name
+            activePresetId === preset.id
               ? 'bg-indigo-muted text-indigo-dark border-[#C7D2FE]'
               : 'bg-transparent text-[#9CA3AF] border-border hover:bg-[#F9FAFB]'
           }`}
         >
-          {name}
+          {preset.label}
         </button>
       ))}
 

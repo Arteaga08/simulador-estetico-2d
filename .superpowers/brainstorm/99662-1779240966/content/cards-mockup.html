@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NarrativeSection — Cards Mockup</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #f0f4f8;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    padding: 32px 24px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    background: white;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 64px 56px;
+    border-radius: 16px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.06);
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #4FACFE;
+    margin-bottom: 20px;
+  }
+
+  .headline {
+    font-size: 26px;
+    font-weight: 500;
+    color: #1e293b;
+    line-height: 1.35;
+    max-width: 560px;
+    margin-bottom: 6px;
+  }
+
+  .headline .accent { color: #4FACFE; font-weight: 600; }
+
+  .subline {
+    font-size: 14px;
+    color: #94a3b8;
+    margin-top: 10px;
+    font-style: italic;
+  }
+
+  /* ── CARDS GRID ── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 48px;
+  }
+
+  .feature-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    cursor: default;
+  }
+
+  .feature-card:hover {
+    box-shadow: 0 8px 32px rgba(79,172,254,0.12);
+    transform: translateY(-2px);
+  }
+
+  /* Image placeholder */
+  .card-image {
+    width: 100%;
+    aspect-ratio: 16/10;
+    background: linear-gradient(135deg, #e8f4ff 0%, #dbeeff 50%, #ede9fe 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-image::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234FACFE' fill-opacity='0.08'%3E%3Cpath d='M0 0h40v40H0z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .card-image-icon {
+    width: 44px;
+    height: 44px;
+    background: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(79,172,254,0.2);
+    position: relative;
+    z-index: 1;
+  }
+
+  .card-image-icon svg {
+    width: 22px;
+    height: 22px;
+    color: #4FACFE;
+  }
+
+  /* Variante oscura para la primera card */
+  .feature-card.dark .card-image {
+    background: linear-gradient(135deg, #0a1628 0%, #1a2d50 100%);
+  }
+
+  .feature-card.dark .card-image-icon {
+    background: rgba(79,172,254,0.15);
+    box-shadow: 0 4px 16px rgba(79,172,254,0.3);
+  }
+
+  .card-body {
+    padding: 20px 20px 22px;
+  }
+
+  .card-tag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #4FACFE;
+    margin-bottom: 8px;
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .card-text {
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: #64748b;
+  }
+
+  .card-text strong { color: #1e293b; font-weight: 600; }
+
+  /* ── VARIANTES ── */
+  .variant-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    text-align: center;
+    margin: 40px 0 16px;
+  }
+
+  /* Split layout: texto izq + cards der */
+  .split-section {
+    background: white;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 64px 56px;
+    border-radius: 16px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.06);
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 56px;
+    align-items: start;
+  }
+
+  .split-left { padding-top: 4px; }
+
+  /* Selección interactiva */
+  .option-wrapper {
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 16px;
+    transition: border-color 0.15s;
+    padding: 4px;
+  }
+  .option-wrapper.selected { border-color: #4FACFE; }
+  .option-wrapper:hover { border-color: #bfdbfe; }
+
+  .choice-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    background: #eff6ff;
+    color: #2563eb;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+    letter-spacing: 0.05em;
+  }
+</style>
+<script>
+  function select(el) {
+    document.querySelectorAll('.option-wrapper').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+    const choice = el.dataset.choice;
+    try {
+      fetch('/__select', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({choice, text: el.querySelector('.choice-label')?.textContent}) });
+    } catch(e) {}
+  }
+</script>
+</head>
+<body>
+
+<p class="page-label">NarrativeSection — Propuestas de rediseño con cards</p>
+
+<!-- OPCIÓN 1: Headline + 3 cards en fila -->
+<div class="option-wrapper" data-choice="opcion-1" onclick="select(this)">
+  <span class="choice-label">Opción 1 — Fila completa</span>
+  <div class="section">
+    <p class="eyebrow">El estándar LuminaMD</p>
+    <p class="headline">
+      El paciente que no visualiza <span class="accent">duda</span>.
+      El cirujano que no puede mostrarlo <span class="accent">pierde la consulta</span>.
+    </p>
+    <p class="subline">LuminaMD cambia esa dinámica.</p>
+
+    <div class="cards-grid">
+      <!-- Card 1 -->
+      <div class="feature-card dark">
+        <div class="card-image">
+          <div class="card-image-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#4FACFE" stroke-width="2" stroke-linecap="round">
+              <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-tag">Precisión Vectorial</p>
+          <h3 class="card-title">Deformación a 60 FPS</h3>
+          <p class="card-text">Motor local sin latencia. <strong>Cefalometría en tiempo real</strong> sin depender de la nube.</p>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="feature-card">
+        <div class="card-image">
+          <div class="card-image-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#4FACFE" stroke-width="2" stroke-linecap="round">
+              <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-tag">Zero-Trust Clínico</p>
+          <h3 class="card-title">Cifrado por defecto</h3>
+          <p class="card-text">Expedientes <strong>privados y sin metadatos</strong>. Cumplimiento normativo médico internacional.</p>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="feature-card">
+        <div class="card-image">
+          <div class="card-image-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#4FACFE" stroke-width="2" stroke-linecap="round">
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.7 12.5a19.79 19.79 0 01-3.07-8.67A2 2 0 012.81 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 9.91a16 16 0 006 6l.97-.97a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 17z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-tag">Acelerador de Cierre</p>
+          <h3 class="card-title">Links de 48 horas</h3>
+          <p class="card-text">El paciente visualiza su simulación <strong>desde su propio móvil</strong>. Sin login, sin app.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="variant-label">— o —</p>
+
+<!-- OPCIÓN 2: Layout split izquierda/derecha -->
+<div class="option-wrapper" data-choice="opcion-2" onclick="select(this)">
+  <span class="choice-label">Opción 2 — Split (texto izq + cards der)</span>
+  <div class="split-section">
+    <div class="split-left">
+      <p class="eyebrow">El estándar LuminaMD</p>
+      <p class="headline" style="font-size:22px; max-width:none;">
+        El paciente que no visualiza <span class="accent">duda</span>.
+        El cirujano que no puede mostrarlo <span class="accent">pierde la consulta</span>.
+      </p>
+      <p class="subline" style="font-size:13px; margin-top:14px;">LuminaMD cambia esa dinámica.</p>
+    </div>
+    <div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="feature-card" style="display:grid; grid-template-columns:120px 1fr; border-radius:10px;">
+          <div class="card-image" style="aspect-ratio:auto; min-height:80px; border-radius:10px 0 0 10px;">
+            <div class="card-image-icon" style="width:32px; height:32px; border-radius:8px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#4FACFE" stroke-width="2" stroke-linecap="round" style="width:16px; height:16px;"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/></svg>
+            </div>
+          </div>
+          <div class="card-body" style="padding:14px 16px;">
+            <p class="card-tag">Precisión Vectorial</p>
+            <h3 class="card-title" style="font-size:13px;">Deformación a 60 FPS</h3>
+            <p class="card-text" style="font-size:12px;">Motor local, cefalometría en tiempo real.</p>
+          </div>
+        </div>
+        <div class="feature-card" style="display:grid; grid-template-columns:120px 1fr; border-radius:10px;">
+          <div class="card-image" style="aspect-ratio:auto; min-height:80px; border-radius:10px 0 0 10px;">
+            <div class="card-image-icon" style="width:32px; height:32px; border-radius:8px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#4FACFE" stroke-width="2" stroke-linecap="round" style="width:16px; height:16px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            </div>
+          </div>
+          <div class="card-body" style="padding:14px 16px;">
+            <p class="card-tag">Zero-Trust Clínico</p>
+            <h3 class="card-title" style="font-size:13px;">Cifrado por defecto</h3>
+            <p class="card-text" style="font-size:12px;">Privado, sin metadatos, normativa médica.</p>
+          </div>
+        </div>
+        <div class="feature-card" style="display:grid; grid-template-columns:120px 1fr; border-radius:10px;">
+          <div class="card-image" style="aspect-ratio:auto; min-height:80px; border-radius:10px 0 0 10px;">
+            <div class="card-image-icon" style="width:32px; height:32px; border-radius:8px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#4FACFE" stroke-width="2" stroke-linecap="round" style="width:16px; height:16px;"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.7 12.5a19.79 19.79 0 01-3.07-8.67A2 2 0 012.81 2h3a2 2 0 012 1.72"/></svg>
+            </div>
+          </div>
+          <div class="card-body" style="padding:14px 16px;">
+            <p class="card-tag">Acelerador de Cierre</p>
+            <h3 class="card-title" style="font-size:13px;">Links de 48 horas</h3>
+            <p class="card-text" style="font-size:12px;">El paciente ve su simulación desde el móvil.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

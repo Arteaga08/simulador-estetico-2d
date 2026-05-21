@@ -7,6 +7,8 @@ interface SliderControlProps {
   value: number
   onChange: (value: number) => void
   disabled?: boolean
+  /** Tooltip mostrado al hover sobre el slider (útil para explicar por qué está disabled). */
+  disabledReason?: string
   accent?: 'primary' | 'intensity'
 }
 
@@ -17,7 +19,7 @@ function formatValue(v: number): string {
 }
 
 export function SliderControl({
-  id, label, min, max, step, value, onChange, disabled = false, accent = 'primary',
+  id, label, min, max, step, value, onChange, disabled = false, disabledReason, accent = 'primary',
 }: SliderControlProps) {
   const pct = ((value - min) / (max - min)) * 100
 
@@ -32,14 +34,18 @@ export function SliderControl({
     : '0 0 0 3px rgba(102,126,234,0.18), 0 1px 4px rgba(102,126,234,0.25)'
 
   return (
-    <div className="mb-3.5">
+    <div
+      className="mb-3.5"
+      style={{ opacity: disabled ? 0.45 : 1 }}
+      title={disabled ? disabledReason : undefined}
+    >
       <div className="flex justify-between items-baseline mb-1.5">
-        <label htmlFor={id} className="text-[0.73rem] text-text-secondary font-medium">
+        <label htmlFor={id} className="text-[13px] text-text-secondary font-medium">
           {label}
         </label>
         <span
           style={{ color: valColor, fontVariantNumeric: 'tabular-nums' }}
-          className="text-[0.68rem] font-bold font-mono"
+          className="text-[11px] font-bold font-mono"
           aria-live="polite"
         >
           {formatValue(value)}

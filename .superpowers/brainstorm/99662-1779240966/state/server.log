@@ -1,0 +1,6 @@
+{"type":"server-started","port":57221,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:57221","screen_dir":"/Users/manuelarteaga/Documents/simulador-estetico-2d/.superpowers/brainstorm/99662-1779240966/content","state_dir":"/Users/manuelarteaga/Documents/simulador-estetico-2d/.superpowers/brainstorm/99662-1779240966/state"}
+{"type":"screen-added","file":"/Users/manuelarteaga/Documents/simulador-estetico-2d/.superpowers/brainstorm/99662-1779240966/content/headline-variants.html"}
+{"type":"screen-added","file":"/Users/manuelarteaga/Documents/simulador-estetico-2d/.superpowers/brainstorm/99662-1779240966/content/cards-mockup.html"}
+{"type":"screen-added","file":"/Users/manuelarteaga/Documents/simulador-estetico-2d/.superpowers/brainstorm/99662-1779240966/content/cards-centered-v2.html"}
+{"type":"screen-added","file":"/Users/manuelarteaga/Documents/simulador-estetico-2d/.superpowers/brainstorm/99662-1779240966/content/narrative-final-v3.html"}
+{"type":"server-stopped","reason":"idle timeout"}

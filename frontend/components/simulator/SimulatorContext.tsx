@@ -5,6 +5,7 @@ import type {
   SimulatorState, ActiveProcedure, Procedimiento, TecnicaSesion,
   CanvasMode, AnnotationPin, DrawingStroke,
 } from './types'
+import type { FaceView } from '@/utils/viewClassifier'
 import {
   getDefaultSliderValues, getAvailableTechniques,
 } from '@/lib/procedures'
@@ -26,6 +27,10 @@ type Action =
   | { type: 'ADD_STROKE'; stroke: DrawingStroke }
   | { type: 'SET_NOTES'; notes: string }
   | { type: 'SET_SAVING'; isSaving: boolean }
+  | { type: 'SET_BRUSH_RADIUS'; value: number }
+  | { type: 'TOGGLE_LANDMARKS' }
+  | { type: 'SET_VIEW'; view: FaceView | null }
+  | { type: 'APPLY_PRESET'; presetId: string; values: Record<string, number> }
 
 function makeInitialActive(proc: Procedimiento): ActiveProcedure {
   const techniques = getAvailableTechniques(proc)
@@ -95,6 +100,26 @@ function reducer(state: SimulatorState, action: Action): SimulatorState {
       return { ...state, notes: action.notes }
     case 'SET_SAVING':
       return { ...state, isSaving: action.isSaving }
+    case 'SET_BRUSH_RADIUS':
+      return { ...state, brushRadius: action.value }
+    case 'TOGGLE_LANDMARKS':
+      return { ...state, showLandmarks: !state.showLandmarks }
+    case 'SET_VIEW':
+      return { ...state, currentView: action.view }
+    case 'APPLY_PRESET': {
+      const procs = state.activeProcedures.map((p, i) => {
+        if (i !== state.selectedProcedureIndex) return p
+        // Defaults para sliders no incluidos en el preset → 0 (limpia el estado previo).
+        const defaults: Record<string, number> = {}
+        for (const k of Object.keys(p.sliderValues)) defaults[k] = 0
+        return {
+          ...p,
+          sliderValues: { ...defaults, ...action.values },
+          presetId: action.presetId,
+        }
+      })
+      return { ...state, activeProcedures: procs }
+    }
     default:
       return state
   }
@@ -117,6 +142,10 @@ interface SimulatorContextValue {
   removePin: (id: string) => void
   addStroke: (stroke: DrawingStroke) => void
   setNotes: (notes: string) => void
+  setBrushRadius: (value: number) => void
+  toggleLandmarks: () => void
+  setCurrentView: (view: FaceView | null) => void
+  applyPreset: (presetId: string, values: Record<string, number>) => void
 }
 
 const SimulatorContext = createContext<SimulatorContextValue | null>(null)
@@ -136,13 +165,16 @@ export function SimulatorProvider({
     imageUrl: null,
     activeProcedures: [],
     selectedProcedureIndex: 0,
-    canvasMode: 'simulation',
+    canvasMode: 'original',
     hudVisible: false,
     pins: [],
     strokes: [],
     activeTool: 'none',
     notes: '',
     isSaving: false,
+    brushRadius: 0.07,
+    showLandmarks: true,
+    currentView: null,
   })
 
   const addProcedure    = useCallback((proc: Procedimiento) => dispatch({ type: 'ADD_PROCEDURE', proc }), [])
@@ -160,13 +192,22 @@ export function SimulatorProvider({
   const removePin       = useCallback((id: string) => dispatch({ type: 'REMOVE_PIN', id }), [])
   const addStroke       = useCallback((stroke: DrawingStroke) => dispatch({ type: 'ADD_STROKE', stroke }), [])
   const setNotes        = useCallback((notes: string) => dispatch({ type: 'SET_NOTES', notes }), [])
+  const setBrushRadius  = useCallback((value: number) => dispatch({ type: 'SET_BRUSH_RADIUS', value }), [])
+  const toggleLandmarks = useCallback(() => dispatch({ type: 'TOGGLE_LANDMARKS' }), [])
+  const setCurrentView  = useCallback((view: FaceView | null) => dispatch({ type: 'SET_VIEW', view }), [])
+  const applyPreset     = useCallback(
+    (presetId: string, values: Record<string, number>) =>
+      dispatch({ type: 'APPLY_PRESET', presetId, values }),
+    [],
+  )
 
   return (
     <SimulatorContext.Provider value={{
       state, addProcedure, removeProcedure, selectProcedure,
       updateSlider, updateTechnique, updateIntensity, setCanvasMode,
       setImage, setHudVisible, setActiveTool, addPin, updatePinLabel,
-      removePin, addStroke, setNotes,
+      removePin, addStroke, setNotes, setBrushRadius, toggleLandmarks,
+      setCurrentView, applyPreset,
     }}>
       {children}
     </SimulatorContext.Provider>

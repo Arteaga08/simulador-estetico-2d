@@ -1,38 +1,50 @@
-'use client'
+"use client";
 
-import { useSimulator } from './SimulatorContext'
-import { SliderControl } from './SliderControl'
-import { PresetPicker } from './PresetPicker'
-import { PROCEDURE_LABELS, TECHNIQUE_LABELS, getSliderDefs, getAvailableTechniques } from '@/lib/procedures'
-import type { ActiveProcedure } from './types'
+import { useSimulator } from "./SimulatorContext";
+import { SliderControl } from "./SliderControl";
+import { PresetPicker } from "./PresetPicker";
+import {
+  PROCEDURE_LABELS,
+  TECHNIQUE_LABELS,
+  getSliderDefs,
+  getAvailableTechniques,
+} from "@/lib/procedures";
+import type { ActiveProcedure } from "./types";
 
 interface ProcedureTabProps {
-  procedure: ActiveProcedure
-  isSelected: boolean
+  procedure: ActiveProcedure;
+  isSelected: boolean;
 }
 
-export function ProcedureTab({ procedure, isSelected }: ProcedureTabProps) {
-  const { updateSlider, updateTechnique, updateIntensity } = useSimulator()
+const VIEW_LABEL: Record<string, string> = {
+  frontal: 'foto frontal',
+  perfil: 'foto de perfil',
+  'tres-cuartos': 'foto en tres-cuartos',
+};
 
-  const sliders = getSliderDefs(procedure.procedimiento)
-  const techniques = getAvailableTechniques(procedure.procedimiento)
+export function ProcedureTab({ procedure, isSelected }: ProcedureTabProps) {
+  const { state, updateSlider, updateTechnique, updateIntensity } = useSimulator();
+  const { currentView } = state;
+
+  const sliders = getSliderDefs(procedure.procedimiento);
+  const techniques = getAvailableTechniques(procedure.procedimiento);
 
   return (
     <div className="flex flex-col gap-0">
       {/* Header */}
       <div className="px-3.5 pt-3.5 pb-2.5">
-        <p className="text-[0.78rem] font-semibold text-[#1E1B4B]">
+        <p className="text-sm font-semibold text-text-primary">
           {PROCEDURE_LABELS[procedure.procedimiento]}
         </p>
         <div className="flex gap-1.5 flex-wrap mt-1.5">
-          {techniques.map(t => (
+          {techniques.map((t) => (
             <button
               key={t}
               onClick={() => updateTechnique(t)}
-              className={`text-[0.67rem] font-semibold px-2 py-0.5 rounded-full transition-colors ${
+              className={`text-[12px] font-semibold px-2 py-0.5 rounded-full transition-colors ${
                 procedure.tecnica === t
-                  ? 'bg-[#EEF2FF] text-[#4338CA]'
-                  : 'bg-transparent text-[#9CA3AF] hover:bg-[#F9FAFB]'
+                  ? "bg-indigo-muted text-indigo-dark"
+                  : "bg-transparent text-[#9CA3AF] hover:bg-[#F9FAFB]"
               }`}
             >
               {TECHNIQUE_LABELS[t]}
@@ -45,13 +57,25 @@ export function ProcedureTab({ procedure, isSelected }: ProcedureTabProps) {
 
       {/* Sliders */}
       <div className="px-3.5 pt-3 pb-2">
-        {sliders.map(slider => {
+        {sliders.map((slider) => {
           const isBlocked =
             slider.blockedNegativeInRinomodelacion &&
-            procedure.tecnica === 'RINOMODELACION'
-          const effectiveMin = isBlocked ? 0 : slider.min
-          const rawValue = procedure.sliderValues[slider.id] ?? slider.defaultValue
-          const effectiveValue = isBlocked ? Math.max(0, rawValue) : rawValue
+            procedure.tecnica === "RINOMODELACION";
+          const effectiveMin = isBlocked ? 0 : slider.min;
+          const rawValue =
+            procedure.sliderValues[slider.id] ?? slider.defaultValue;
+          const effectiveValue = isBlocked ? Math.max(0, rawValue) : rawValue;
+
+          // Gating por tipo de foto: si la pose actual no está en validInViews
+          // del slider, lo deshabilitamos con un tooltip explicativo.
+          const viewMismatch =
+            !!slider.validInViews &&
+            currentView !== null &&
+            !slider.validInViews.includes(currentView);
+          const disabled = !isSelected || viewMismatch;
+          const disabledReason = viewMismatch
+            ? `No aplicable en ${VIEW_LABEL[currentView!] ?? currentView}. Cargar otra toma para usar este parámetro.`
+            : undefined;
 
           return (
             <SliderControl
@@ -62,10 +86,11 @@ export function ProcedureTab({ procedure, isSelected }: ProcedureTabProps) {
               max={slider.max}
               step={slider.step}
               value={effectiveValue}
-              onChange={v => updateSlider(slider.id, v)}
-              disabled={!isSelected}
+              onChange={(v) => updateSlider(slider.id, v)}
+              disabled={disabled}
+              disabledReason={disabledReason}
             />
-          )
+          );
         })}
       </div>
 
@@ -73,7 +98,7 @@ export function ProcedureTab({ procedure, isSelected }: ProcedureTabProps) {
 
       {/* Intensity */}
       <div className="px-3.5 pt-3 pb-2">
-        <p className="text-[0.62rem] font-bold tracking-widest uppercase text-[#9CA3AF] mb-2.5">
+        <p className="text-[11px] font-bold tracking-widest uppercase text-[#9CA3AF] mb-2.5">
           Intensidad global
         </p>
         <SliderControl
@@ -93,7 +118,7 @@ export function ProcedureTab({ procedure, isSelected }: ProcedureTabProps) {
 
       {/* Presets */}
       <div className="px-3.5 pt-3 pb-3">
-        <p className="text-[0.62rem] font-bold tracking-widest uppercase text-[#9CA3AF] mb-2">
+        <p className="text-[11px] font-bold tracking-widest uppercase text-[#9CA3AF] mb-2">
           Presets
         </p>
         <PresetPicker
@@ -102,5 +127,5 @@ export function ProcedureTab({ procedure, isSelected }: ProcedureTabProps) {
         />
       </div>
     </div>
-  )
+  );
 }

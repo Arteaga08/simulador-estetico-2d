@@ -19,14 +19,14 @@ export function SimulatorBottombar({ onExportPDF, onShare }: SimulatorBottombarP
   const { save, isSaving } = useSaveSession()
 
   const ghostBtn = {
-    base: 'flex items-center gap-1.5 text-[0.72rem] font-medium px-2.5 rounded-lg border border-transparent text-text-muted',
+    base: 'flex items-center gap-1.5 text-[13px] font-medium px-2.5 rounded-lg border border-transparent text-text-muted',
     hover: { background: '#F9FAFB', borderColor: '#E9D5FF' },
     leave: { background: 'transparent', borderColor: 'transparent' },
     style: { height: '30px', transition: 'background 150ms var(--ease-out), border-color 150ms var(--ease-out)' } as React.CSSProperties,
   }
 
   const outlineBtn = {
-    base: 'flex items-center gap-1.5 text-[0.72rem] font-medium px-2.5 rounded-lg border border-border bg-white text-text-muted',
+    base: 'flex items-center gap-1.5 text-[13px] font-medium px-2.5 rounded-lg border border-border bg-white text-text-muted',
     style: { height: '30px', transition: 'background 150ms var(--ease-out)' } as React.CSSProperties,
   }
 
@@ -92,7 +92,7 @@ export function SimulatorBottombar({ onExportPDF, onShare }: SimulatorBottombarP
       <button
         onClick={save}
         disabled={isSaving}
-        className="flex items-center gap-1.5 text-[0.72rem] font-semibold px-3 rounded-lg bg-indigo text-white disabled:opacity-60 disabled:cursor-not-allowed"
+        className="flex items-center gap-1.5 text-[13px] font-semibold px-3 rounded-lg bg-indigo text-white disabled:opacity-60 disabled:cursor-not-allowed"
         style={{
           height: '30px',
           transition: 'background 150ms var(--ease-out), transform 100ms var(--ease-out)',

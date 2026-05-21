@@ -22,7 +22,7 @@ export function SlidersPanel() {
             <button
               key={p.procedimiento}
               onClick={() => selectProcedure(i)}
-              className="relative flex items-center gap-1 px-3 py-2.5 text-[0.67rem] font-semibold whitespace-nowrap shrink-0"
+              className="relative flex items-center gap-1 px-3 py-2.5 text-[12px] font-semibold whitespace-nowrap shrink-0"
               style={{
                 color: isActive ? '#4338CA' : '#9CA3AF',
                 borderBottom: isActive ? '2px solid #667EEA' : '2px solid transparent',
@@ -63,7 +63,7 @@ export function SlidersPanel() {
           className="border-b border-border py-2.5 px-3 shrink-0"
           style={{ background: '#FAFAFA' }}
         >
-          <p className="text-[0.6rem] font-bold uppercase tracking-widest text-[#9CA3AF] mb-2">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-[#9CA3AF] mb-2">
             Agregar procedimiento
           </p>
           <div className="flex flex-wrap gap-1">
@@ -71,7 +71,7 @@ export function SlidersPanel() {
               <button
                 key={p}
                 onClick={() => { addProcedure(p); setShowProcPicker(false) }}
-                className="text-[0.67rem] px-2 py-1 rounded-full bg-indigo-muted text-indigo-dark font-medium"
+                className="text-[12px] px-2 py-1 rounded-full bg-indigo-muted text-indigo-dark font-medium"
                 style={{ transition: 'background 120ms var(--ease-out)' }}
                 onMouseEnter={e => { e.currentTarget.style.background = '#E0E7FF' }}
                 onMouseLeave={e => { e.currentTarget.style.background = '' }}
@@ -86,8 +86,8 @@ export function SlidersPanel() {
       {/* Empty state */}
       {activeProcedures.length === 0 && (
         <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-8">
-          <p className="text-[0.78rem] font-semibold text-text-primary mb-1">Sin procedimiento</p>
-          <p className="text-[0.72rem] text-[#9CA3AF]">
+          <p className="text-sm font-semibold text-text-primary mb-1">Sin procedimiento</p>
+          <p className="text-[13px] text-[#9CA3AF]">
             Selecciona un procedimiento en el panel izquierdo o usa el + de arriba.
           </p>
         </div>
@@ -104,7 +104,7 @@ export function SlidersPanel() {
           {/* Clinical notes */}
           <div className="h-px bg-[#F3F4F6]" />
           <div className="px-3.5 pt-3 pb-3">
-            <p className="text-[0.6rem] font-bold tracking-widest uppercase text-[#9CA3AF] mb-2">
+            <p className="text-[11px] font-bold tracking-widest uppercase text-[#9CA3AF] mb-2">
               Notas clínicas
             </p>
             <textarea
@@ -112,7 +112,7 @@ export function SlidersPanel() {
               onChange={e => setNotes(e.target.value)}
               placeholder="Observaciones de la sesión..."
               rows={3}
-              className="w-full text-[0.72rem] text-text-muted bg-[#FAFAFA] border border-border rounded-lg p-2.5 outline-none resize-none placeholder:text-[#D1D5DB]"
+              className="w-full text-[13px] text-text-muted bg-[#FAFAFA] border border-border rounded-lg p-2.5 outline-none resize-none placeholder:text-[#D1D5DB]"
               style={{
                 transition: 'border-color 150ms var(--ease-out), box-shadow 150ms var(--ease-out)',
               }}

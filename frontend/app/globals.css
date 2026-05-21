@@ -20,10 +20,11 @@
   --text-placeholder:  #94A3B8;
 
   /* Surfaces */
-  --bg-page:        #F5F3FF;
-  --bg-surface:     #FFFFFF;
-  --bg-surface-alt: #FAFAF9;
-  --bg-hero-light:  #F4F8FF;
+  --bg-page:         #F5F3FF;
+  --bg-surface:      #FFFFFF;
+  --bg-surface-alt:  #FAFAF9;
+  --bg-hero-light:   #F4F8FF;
+  --bg-dark-section: #0A1628;
 
   /* Border */
   --border: #E9D5FF;
@@ -64,11 +65,12 @@
   --color-text-placeholder: #94A3B8;
 
   /* Surfaces */
-  --color-bg-page:        #F5F3FF;
-  --color-bg-surface:     #FFFFFF;
-  --color-bg-surface-alt: #FAFAF9;
-  --color-bg-hero-light:  #F4F8FF;
-  --color-border:         #E9D5FF;
+  --color-bg-page:         #F5F3FF;
+  --color-bg-surface:      #FFFFFF;
+  --color-bg-surface-alt:  #FAFAF9;
+  --color-bg-hero-light:   #F4F8FF;
+  --color-bg-dark-section: #0A1628;
+  --color-border:          #E9D5FF;
 
   /* Semantic */
   --color-success:    #22C55E;
@@ -188,8 +190,17 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes hero-demo-in {
+  from { opacity: 0; transform: translateY(24px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0px) scale(1); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   @keyframes hero-fade-up {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes hero-demo-in {
     from { opacity: 0; }
     to   { opacity: 1; }
   }
@@ -199,6 +210,104 @@ body {
 @keyframes marquee {
   from { transform: translateX(0); }
   to   { transform: translateX(-33.33%); }
+}
+
+/* ─── NarrativeSection animations ───────────────────────────────────── */
+@keyframes narrative-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.narrative-item {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+.narrative-visible .narrative-item {
+  animation: narrative-fade-up 700ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+.narrative-visible .narrative-item:nth-child(1) { animation-delay: 0ms; }
+.narrative-visible .narrative-item:nth-child(2) { animation-delay: 90ms; }
+.narrative-visible .narrative-item:nth-child(3) { animation-delay: 180ms; }
+.narrative-visible .narrative-item:nth-child(4) { animation-delay: 270ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .narrative-visible .narrative-item {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ─── Feature sections (Hud/Annotations/Share) ──────────────────────── */
+@keyframes feature-fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.feature-item {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.feature-visible .feature-item {
+  animation: feature-fade-up 700ms var(--ease-out) both;
+}
+.feature-visible .feature-item:nth-child(1) { animation-delay: 0ms; }
+.feature-visible .feature-item:nth-child(2) { animation-delay: 70ms; }
+.feature-visible .feature-item:nth-child(3) { animation-delay: 140ms; }
+.feature-visible .feature-item:nth-child(4) { animation-delay: 210ms; }
+.feature-visible .feature-item:nth-child(5) { animation-delay: 280ms; }
+.feature-visible .feature-item:nth-child(6) { animation-delay: 350ms; }
+
+/* Slider bars: animate from 0 to value using scaleX (GPU). */
+.slider-fill {
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 900ms var(--ease-out);
+}
+.feature-visible .slider-fill { transform: scaleX(var(--p, 1)); }
+
+/* Pin entrance for annotated face mock. */
+.pin-enter {
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 360ms var(--ease-out), transform 360ms var(--ease-out);
+}
+.feature-visible .pin-enter { opacity: 1; transform: scale(1); }
+.feature-visible .pin-enter[data-delay="1"] { transition-delay: 240ms; }
+.feature-visible .pin-enter[data-delay="2"] { transition-delay: 380ms; }
+.feature-visible .pin-enter[data-delay="3"] { transition-delay: 520ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-visible .feature-item,
+  .feature-visible .pin-enter {
+    animation: none;
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+  .slider-fill,
+  .feature-visible .slider-fill {
+    transition: none;
+    transform: scaleX(var(--p, 1));
+  }
+}
+
+/* Before/After interactive divider. */
+.beforeafter-after {
+  clip-path: inset(0 calc(100% - var(--split, 50%)) 0 0);
+  transition: clip-path 280ms var(--ease-out);
+}
+.beforeafter-handle {
+  left: var(--split, 50%);
+  transition: left 280ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .beforeafter-root:hover .beforeafter-after,
+  .beforeafter-root:hover .beforeafter-handle {
+    transition-duration: 0ms;
+  }
 }
 
 /* ─── Button utilities ───────────────────────────────────────────────── */

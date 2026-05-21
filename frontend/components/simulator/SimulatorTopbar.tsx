@@ -20,7 +20,7 @@ export function SimulatorTopbar({ patientName, sessionNumber }: SimulatorTopbarP
       style={{ borderColor: '#E9D5FF' }}
     >
       {/* Breadcrumb */}
-      <div className="flex items-center gap-1.5 text-[0.73rem] min-w-0">
+      <div className="flex items-center gap-1.5 text-[13px] min-w-0">
         <a
           href="/patients"
           className="text-[#9CA3AF] hover:text-text-muted transition-colors shrink-0"
@@ -33,7 +33,7 @@ export function SimulatorTopbar({ patientName, sessionNumber }: SimulatorTopbarP
         <span className="text-[#D1D5DB] shrink-0">/</span>
         <span className="text-text-primary font-semibold shrink-0">Sesión #{sessionNumber}</span>
         {selected && (
-          <span className="ml-1 text-[0.67rem] font-semibold px-2 py-0.5 rounded-full bg-indigo-muted text-indigo-dark shrink-0">
+          <span className="ml-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-indigo-muted text-indigo-dark shrink-0">
             {PROCEDURE_LABELS[selected.procedimiento]} · {TECHNIQUE_LABELS[selected.tecnica]}
           </span>
         )}

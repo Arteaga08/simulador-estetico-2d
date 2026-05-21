@@ -1,0 +1,133 @@
+<style>
+  .section-mockup {
+    background: white;
+    padding: 48px 40px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  .tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #4FACFE;
+    margin-bottom: 20px;
+  }
+  .headline { color: #1e293b; line-height: 1.2; font-weight: 500; }
+  .accent { color: #4FACFE; font-weight: 600; }
+  .subtext { color: #94a3b8; margin-top: 12px; display: block; }
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+  }
+  .pillar-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #1e293b;
+    margin-bottom: 8px;
+  }
+  .pillar-bar {
+    width: 24px;
+    height: 2px;
+    background: #4FACFE;
+    margin-bottom: 16px;
+  }
+  .pillar-text { font-size: 13px; line-height: 1.6; color: #64748b; }
+  .badge-current {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    background: #fef3c7;
+    color: #92400e;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+</style>
+
+<h2>¿Qué tamaño de headline se siente correcto?</h2>
+<p class="subtitle">Tres variantes del statement principal — misma sección, diferente jerarquía tipográfica y densidad de texto.</p>
+
+<div class="cards">
+
+  <!-- Variante A -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="section-mockup">
+        <div class="badge-current">Actual</div>
+        <p class="tag">El estándar LuminaMD</p>
+        <p class="headline" style="font-size:34px;">
+          El paciente que no puede visualizar el resultado <span class="accent">duda</span>.
+          El cirujano que no puede mostrarlo <span class="accent">pierde la consulta</span>.
+          <span class="subtext" style="font-size:22px;">LuminaMD cambia esa dinámica.</span>
+        </p>
+        <div class="pillars">
+          <div><div class="pillar-bar"></div><p class="pillar-title">Precisión Vectorial</p><p class="pillar-text">Motor de deformación fluida a <strong>60 FPS</strong>. Precisión cefalométrica local sin latencia de red ni depender de software genérico de edición.</p></div>
+          <div><div class="pillar-bar"></div><p class="pillar-title">Zero-Trust Clínico</p><p class="pillar-text">Expedientes fotográficos <strong>cifrados y privados</strong> por defecto. Procesamiento sin metadatos que garantiza el cumplimiento de normativas médicas internacionales.</p></div>
+          <div><div class="pillar-bar"></div><p class="pillar-title">Acelerador de Cierre</p><p class="pillar-text">Exportación de <strong>enlaces temporales (48 hrs)</strong>. Permite al paciente visualizar su proyección en su propio móvil, impulsando la decisión de cirugía.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Actual</h3>
+      <p>Headline grande (52px → aquí ~34px). Texto completo en pilares. Mucho peso visual.</p>
+    </div>
+  </div>
+
+  <!-- Variante B -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="section-mockup">
+        <p class="tag">El estándar LuminaMD</p>
+        <p class="headline" style="font-size:26px;">
+          El paciente que no visualiza <span class="accent">duda</span>.
+          El cirujano que no puede mostrarlo <span class="accent">pierde la consulta</span>.
+          <span class="subtext" style="font-size:16px;">LuminaMD cambia esa dinámica.</span>
+        </p>
+        <div class="pillars">
+          <div><div class="pillar-bar"></div><p class="pillar-title">Precisión Vectorial</p><p class="pillar-text">Motor de deformación a <strong>60 FPS</strong>. Procesamiento local, sin latencia de red.</p></div>
+          <div><div class="pillar-bar"></div><p class="pillar-title">Zero-Trust Clínico</p><p class="pillar-text">Expedientes <strong>cifrados por defecto</strong>. Cumplimiento de normativas médicas internacionales.</p></div>
+          <div><div class="pillar-bar"></div><p class="pillar-title">Acelerador de Cierre</p><p class="pillar-text"><strong>Links de 48 hrs</strong> para que el paciente visualice su resultado desde el móvil.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Compacto</h3>
+      <p>Headline reducido (26px). Pilares a 2 líneas cada uno. Más respirable, menos fatiga.</p>
+    </div>
+  </div>
+
+  <!-- Variante C -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="section-mockup">
+        <p class="tag">El estándar LuminaMD</p>
+        <p class="headline" style="font-size:22px; max-width: 520px;">
+          El paciente que no visualiza el resultado <span class="accent">duda</span>.
+          El cirujano que no puede mostrarlo <span class="accent">pierde la consulta</span>.
+        </p>
+        <p style="font-size:14px; color:#94a3b8; margin-top:8px; font-style:italic;">LuminaMD cambia esa dinámica.</p>
+        <div class="pillars">
+          <div><div class="pillar-bar"></div><p class="pillar-title">Precisión Vectorial</p><p class="pillar-text">60 FPS. Procesamiento local cefalométrico.</p></div>
+          <div><div class="pillar-bar"></div><p class="pillar-title">Zero-Trust Clínico</p><p class="pillar-text">Cifrado por defecto. Sin metadatos.</p></div>
+          <div><div class="pillar-bar"></div><p class="pillar-title">Acelerador de Cierre</p><p class="pillar-text">Links 48 hrs al móvil del paciente.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Ultra-minimalista</h3>
+      <p>Headline muy pequeño (22px). Pilares a 1 línea. Estilo ficha técnica, muy denso pero limpio.</p>
+    </div>
+  </div>
+
+</div>

@@ -31,7 +31,7 @@ self.onmessage = (e: MessageEvent<WorkerInMessage>) => {
       return
     }
     try {
-      const result = applyLiquify(originalImageData, msg.config.controlPoints)
+      const result = applyLiquify(originalImageData, msg.config.controlPoints, msg.config.noseBbox)
       ctx.putImageData(result, 0, 0)
       postOut({ type: 'DONE' })
     } catch (err) {

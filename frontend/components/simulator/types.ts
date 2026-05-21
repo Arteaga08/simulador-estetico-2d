@@ -21,6 +21,8 @@ export type TecnicaSesion =
   | 'LASER'
   | 'MICRONEEDLING'
 
+import type { FaceView } from '@/utils/viewClassifier'
+
 export interface SliderDef {
   id: string
   label: string
@@ -30,6 +32,8 @@ export interface SliderDef {
   defaultValue: number
   /** When true and technique is RINOMODELACION, clamp min to 0 */
   blockedNegativeInRinomodelacion?: boolean
+  /** Views where this slider is geometrically valid. Omitted = valid in all views. */
+  validInViews?: FaceView[]
 }
 
 export interface ActiveProcedure {
@@ -66,7 +70,11 @@ export interface SimulatorState {
   hudVisible: boolean
   pins: AnnotationPin[]
   strokes: DrawingStroke[]
-  activeTool: 'none' | 'pin' | 'hud' | 'angle' | 'draw'
+  activeTool: 'none' | 'pan' | 'pin' | 'hud' | 'angle' | 'draw' | 'broca'
   notes: string
   isSaving: boolean
+  brushRadius: number  // fracción del refSize, rango 0.03–0.18, default 0.07
+  showLandmarks: boolean
+  /** Detectada al cargar foto + landmarks. null mientras no hay detección. */
+  currentView: FaceView | null
 }
