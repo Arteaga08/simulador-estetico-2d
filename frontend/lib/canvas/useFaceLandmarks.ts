@@ -23,16 +23,18 @@ import { FaceLandmarker, FaceDetector, FilesetResolver } from '@mediapipe/tasks-
 // Face bbox landmarks: 10=forehead, 152=chin, 234=left cheek, 454=right cheek
 //
 // Anchor point indices (used to pin surrounding tissue in MLS):
+// ─── ANILLO PERINASAL (Muro de contención clínico) ───────────────────
+// Estos puntos rodean la pirámide nasal a milímetros de distancia.
+// Impiden que la deformación MLS "sangre" hacia los pómulos, ojos o boca.
 const ANCHOR_INDICES = [
-  10,   // forehead high
-  151,  // forehead mid
-  33,   // outer corner left eye
-  263,  // outer corner right eye
-  116,  // left zygomatic (cheekbone)
-  345,  // right zygomatic
-  61,   // left mouth corner
-  291,  // right mouth corner
-  152,  // chin
+  8,    // Nasion superior / Glabela (detiene el jalón en la frente)
+  133,  // Inner corner left eye (Lagrimal izquierdo - protege el ojo)
+  362,  // Inner corner right eye (Lagrimal derecho - protege el ojo)
+  117,  // Maxilar interno izquierdo (protege el pómulo)
+  346,  // Maxilar interno derecho (protege el pómulo)
+  205,  // Surco nasogeniano izquierdo (protege la mejilla baja)
+  425,  // Surco nasogeniano derecho (protege la mejilla baja)
+  164,  // Philtrum / Labio superior central (protege la boca)
 ]
 
 export interface NoseLandmarks {

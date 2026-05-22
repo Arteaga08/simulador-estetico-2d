@@ -1,40 +1,42 @@
 import type { NoseLandmarks } from '@/lib/canvas/useFaceLandmarks'
 
-export type FaceView = 'frontal' | 'tres-cuartos' | 'perfil'
+export type FaceView = 'frontal' | 'perfil'
 
 /**
- * Clasifica el tipo de toma (frontal, ¾, perfil) a partir de los landmarks.
+ * Clasifica el tipo de toma (frontal o perfil) a partir de los landmarks.
  *
- * Estrategia: comparar la distancia X del tip a cada esquina externa del ojo.
- * - Frontal: ambos ojos casi equidistantes (ratio ≈ 1)
- * - ¾: un ojo cerca, el otro lejos (ratio 1.5–3.5)
- * - Perfil: un ojo apenas visible o detrás del tip (ratio > 3.5)
+ * Métrica primaria: distancia horizontal entre las esquinas externas de los
+ * ojos (lm33 y lm263) dividida por el ancho del bounding box facial.
  *
- * Las esquinas externas vienen como anchors[2] (lm33, ojo izq) y anchors[3]
- * (lm263, ojo der) en useFaceLandmarks.ts. Si los anchors no están disponibles,
- * se cae a una heurística basada en la asimetría de los nostrils.
+ *   Frontal: los ojos se separan amplio (~25-35% del ancho de cara)
+ *   Perfil:  los dos ojos colapsan al mismo plano X en proyección 2D (~0-10%)
+ *
+ * Esto es mucho más confiable que comparar la distancia tip→ojo, porque en
+ * perfil estricto MediaPipe estima la posición del ojo oculto detrás de la
+ * nariz, dando distancias similares a ambos ojos (ratio ≈ 1, antes
+ * clasificaba erróneamente como frontal).
+ *
+ * Umbral: 0.18 — separa claramente fotos frontales de perfil.
  */
 export function classifyFaceView(landmarks: NoseLandmarks): FaceView {
   const anchors = landmarks.anchors
-  const tipX = landmarks.tip.x
 
   if (anchors && anchors.length >= 4) {
-    const leftEye  = anchors[2]
-    const rightEye = anchors[3]
-    const dL = Math.abs(tipX - leftEye.x)
-    const dR = Math.abs(rightEye.x - tipX)
-    const ratio = Math.max(dL, dR) / Math.max(Math.min(dL, dR), 1)
-    if (ratio < 1.5) return 'frontal'
-    if (ratio < 3.5) return 'tres-cuartos'
-    return 'perfil'
+    const leftEye  = anchors[2]  // lm33
+    const rightEye = anchors[3]  // lm263
+    const eyeDistance = Math.abs(rightEye.x - leftEye.x)
+    const faceWidth = landmarks.faceBoundingBox?.width ?? eyeDistance * 4
+    if (faceWidth > 1e-6) {
+      const ratio = eyeDistance / faceWidth
+      return ratio < 0.18 ? 'perfil' : 'frontal'
+    }
   }
 
-  // Fallback: asimetría de nostrils respecto al eje radix→tip
+  // Fallback: asimetría de nostrils respecto al eje radix→tip.
+  // En perfil, uno de los nostrils colapsa cerca del eje, el otro queda lejos.
   const midX = (landmarks.bridge.x + landmarks.tip.x) / 2
   const dL = Math.abs(landmarks.nostrilL.x - midX)
   const dR = Math.abs(landmarks.nostrilR.x - midX)
   const ratio = Math.max(dL, dR) / Math.max(Math.min(dL, dR), 1)
-  if (ratio < 1.4) return 'frontal'
-  if (ratio < 3.0) return 'tres-cuartos'
-  return 'perfil'
+  return ratio >= 2.2 ? 'perfil' : 'frontal'
 }

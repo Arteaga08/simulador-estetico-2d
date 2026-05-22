@@ -202,6 +202,23 @@ export function CanvasToolbar({
         </span>
       )}
 
+      {/* View indicator pill */}
+      {state.currentView && detectionStatus === 'detected' && (
+        <span
+          className="flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full"
+          style={{
+            background: state.currentView === 'perfil' ? '#EDE9FE' : '#E0F2FE',
+            color: state.currentView === 'perfil' ? '#6D28D9' : '#0369A1',
+          }}
+        >
+          <span
+            className="w-1.5 h-1.5 rounded-full"
+            style={{ background: state.currentView === 'perfil' ? '#7C3AED' : '#0284C7' }}
+          />
+          {state.currentView === 'perfil' ? 'Vista perfil' : 'Vista frontal'}
+        </span>
+      )}
+
       {/* Recolocar puntos */}
       {showRestartButton && (
         <button

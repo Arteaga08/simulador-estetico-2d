@@ -91,8 +91,9 @@ export function computeNoseBbox(
   landmarks,
   canvasW,
   canvasH,
-  marginFactor = 0.35,
+  marginFactor = 0.15, // Reducimos el margen artificial porque los anclajes ya expanden la caja
 ) {
+  // AQUÍ ESTÁ LA MAGIA: Agregamos los anclajes al cálculo de la caja
   const pts = [
     landmarks.bridge,
     landmarks.bridgeMid,
@@ -100,21 +101,26 @@ export function computeNoseBbox(
     landmarks.nostrilL,
     landmarks.nostrilR,
     landmarks.base,
+    ...(landmarks.anchors || []), // <-- ESTO EVITA EL CORTE FEO
   ];
+
   let minX = Infinity,
     maxX = -Infinity,
     minY = Infinity,
     maxY = -Infinity;
+
   for (const p of pts) {
     if (p.x < minX) minX = p.x;
     if (p.x > maxX) maxX = p.x;
     if (p.y < minY) minY = p.y;
     if (p.y > maxY) maxY = p.y;
   }
+
   const nW = maxX - minX;
   const nH = maxY - minY;
   const mx = nW * marginFactor;
   const my = nH * marginFactor;
+
   return {
     x: Math.max(0, minX - mx),
     y: Math.max(0, minY - my),

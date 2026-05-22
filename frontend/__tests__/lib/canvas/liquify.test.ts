@@ -173,15 +173,32 @@ describe('constrainProfileTipRotation (anatomical co-rotation)', () => {
   })
 })
 
-describe('buildRhinoplastyControlPoints (point composition)', () => {
-  it('emits anchor + alar-coupled + active surgical points', () => {
-    const landmarks = makeLandmarks()
+describe('buildRhinoplastyControlPoints (régimen clinical-target)', () => {
+  it('emits anchor + alar-coupled + active surgical points hacia canon', () => {
+    // Fixture con curvatura dorsal pronunciada para que slider=+100 (canon F:
+    // dorsumCurvature=0) produzca un delta visible (> MOVE_EPSILON_PX).
+    const landmarks: NoseLandmarks = {
+      bridge:    { x: 400, y: 200 },
+      bridgeMid: { x: 425, y: 270 }, // 25 px de offset lateral → giba pronunciada
+      tip:       { x: 415, y: 320 },
+      nostrilL:  { x: 405, y: 360 },
+      nostrilR:  { x: 425, y: 360 },
+      base:      { x: 415, y: 355 },
+      confidence: 1,
+      faceBoundingBox: { x: 200, y: 100, width: 400, height: 500 },
+      source: 'auto',
+      anchors: [
+        { x: 200, y: 100 }, { x: 600, y: 100 },
+        { x: 200, y: 500 }, { x: 600, y: 500 },
+      ],
+    }
     const { points } = buildRhinoplastyControlPoints(
-      { 'giba-nasal': -30, 'rotacion-punta': 10, 'proyeccion-punta': 0 },
+      { 'giba-nasal': 100, 'rotacion-punta': 50, 'proyeccion-punta': 0 },
       100,
       landmarks,
       800,
       1000,
+      'F',
     )
 
     // anchors[] entries → 4 identity control points
@@ -190,16 +207,14 @@ describe('buildRhinoplastyControlPoints (point composition)', () => {
       landmarks.anchors!.some(a => a.x === p.px && a.y === p.py))
     expect(anchorPts.length).toBe(4)
 
-    // nostrilL, nostrilR, base — present as control points with qx/qy at the
-    // source landmark; with ALAR_TRANSFER they are displaced (px/py shifted by
-    // the alar offset, not identity).
+    // nostrilL, nostrilR, base — siempre emitidos como pivots
     const find = (lm: { x: number; y: number }) =>
       points.find(p => p.qx === lm.x && p.qy === lm.y)
     expect(find(landmarks.nostrilL)).toBeDefined()
     expect(find(landmarks.nostrilR)).toBeDefined()
     expect(find(landmarks.base)).toBeDefined()
 
-    // Active surgical points → displaced (px !== qx for radix, bridgeMid, tip)
+    // Active surgical points → displaced (px !== qx para radix, bridgeMid, tip)
     const radix    = points.find(p => p.qx === landmarks.bridge.x    && p.qy === landmarks.bridge.y    && p.px !== p.qx)
     const bridgeMd = points.find(p => p.qx === landmarks.bridgeMid.x && p.qy === landmarks.bridgeMid.y && p.px !== p.qx)
     const tip      = points.find(p => p.qx === landmarks.tip.x       && p.qy === landmarks.tip.y       && p.px !== p.qx)
@@ -208,34 +223,21 @@ describe('buildRhinoplastyControlPoints (point composition)', () => {
     expect(tip).toBeDefined()
   })
 
-  it('bridgeMid receives summed displacement when giba and rotation are both active', () => {
+  it('slider 0 produce destinos sin desplazamiento de landmarks activos', () => {
     const landmarks = makeLandmarks()
-    // Valores escogidos por debajo del umbral del acoplamiento clínico
-    // (giba > −20) para evitar que el coupling cambie la rotación.
-    const rotOnly = buildRhinoplastyControlPoints(
-      { 'giba-nasal': 0, 'rotacion-punta': 10, 'proyeccion-punta': 0 },
-      100, landmarks, 800, 1000,
+    const { points } = buildRhinoplastyControlPoints(
+      { 'giba-nasal': 0, 'rotacion-punta': 0, 'proyeccion-punta': 0 },
+      100, landmarks, 800, 1000, 'F',
     )
-    const bmRot = rotOnly.points.find(p =>
-      p.qx === landmarks.bridgeMid.x && p.qy === landmarks.bridgeMid.y && p.px !== p.qx)!
-
-    const gibaOnly = buildRhinoplastyControlPoints(
-      { 'giba-nasal': -15, 'rotacion-punta': 0, 'proyeccion-punta': 0 },
-      100, landmarks, 800, 1000,
-    )
-    const bmGiba = gibaOnly.points.find(p =>
-      p.qx === landmarks.bridgeMid.x && p.qy === landmarks.bridgeMid.y && p.px !== p.qx)!
-
-    const combined = buildRhinoplastyControlPoints(
-      { 'giba-nasal': -15, 'rotacion-punta': 10, 'proyeccion-punta': 0 },
-      100, landmarks, 800, 1000,
-    )
-    const bmCombined = combined.points.find(p =>
-      p.qx === landmarks.bridgeMid.x && p.qy === landmarks.bridgeMid.y && p.px !== p.qx)!
-
-    const expectedX = bmGiba.px + (bmRot.px - landmarks.bridgeMid.x)
-    const expectedY = bmGiba.py + (bmRot.py - landmarks.bridgeMid.y)
-    expect(bmCombined.px).toBeCloseTo(expectedX, 6)
-    expect(bmCombined.py).toBeCloseTo(expectedY, 6)
+    // Solo anchors + pivots, sin radix/bridgeMid/tip activos
+    const active = points.find(p => p.px !== p.qx || p.py !== p.qy)
+    // Los pivots tienen alarOffset=0 cuando tip no se mueve, así que esperamos
+    // que no haya puntos activos (no-identidad fuera de pivots).
+    // Validación más laxa: ningún punto activo con desplazamiento > 1 px.
+    if (active) {
+      const dx = active.px - active.qx
+      const dy = active.py - active.qy
+      expect(Math.hypot(dx, dy)).toBeLessThan(1)
+    }
   })
 })

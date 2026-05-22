@@ -24,16 +24,20 @@ export const TECHNIQUES_BY_PROCEDURE: Record<Procedimiento, TecnicaSesion[]> = {
 
 export const SLIDERS_BY_PROCEDURE: Record<Procedimiento, SliderDef[]> = {
   RINOPLASTIA: [
-    // Perfil + ¾: primitivas dependientes del eje sagital
-    { id: 'giba-nasal',       label: 'Giba nasal',          min: -60, max: 30, step: 1, defaultValue: 0, blockedNegativeInRinomodelacion: true, validInViews: ['perfil', 'tres-cuartos'] },
-    { id: 'proyeccion-punta', label: 'Proyección de punta', min: -20, max: 40, step: 1, defaultValue: 0, validInViews: ['perfil', 'tres-cuartos'] },
-    { id: 'rotacion-punta',   label: 'Rotación de punta',   min: -15, max: 15, step: 1, defaultValue: 0, validInViews: ['perfil', 'tres-cuartos', 'frontal'] },
-    // Frontal + ¾: primitivas en el plano coronal — rangos simétricos para
-    // permitir tanto reducir como aumentar (las primitivas soportan factor > 1).
-    { id: 'reduccion-global', label: 'Reducción global',    min: -30, max: 15, step: 1, defaultValue: 0, validInViews: ['frontal', 'tres-cuartos'] },
-    { id: 'adelgazar-dorso',  label: 'Osteotomía lateral',  min: -20, max: 15, step: 1, defaultValue: 0, validInViews: ['frontal', 'tres-cuartos'] },
-    { id: 'reseccion-alar',   label: 'Resección alar',      min: -20, max: 15, step: 1, defaultValue: 0, validInViews: ['frontal', 'tres-cuartos'] },
-    { id: 'refinamiento-punta', label: 'Refinamiento de punta', min: -20, max: 15, step: 1, defaultValue: 0, validInViews: ['frontal', 'tres-cuartos'] },
+    // Régimen clinical-target: TODOS los sliders en [-100, +100]:
+    //   +100 = métrica = canon (ideal estético del género del paciente)
+    //      0 = sin cambio (métrica original)
+    //   -100 = métrica = anti-canon (exagerada en el extremo opuesto)
+    //
+    // Perfil: primitivas cefalométricas
+    { id: 'giba-nasal',         label: 'Giba nasal',           min: -100, max: 100, step: 1, defaultValue: 0, blockedNegativeInRinomodelacion: true, validInViews: ['perfil'] },
+    { id: 'proyeccion-punta',   label: 'Proyección de punta', min: -100, max: 100, step: 1, defaultValue: 0, validInViews: ['perfil'] },
+    { id: 'rotacion-punta',     label: 'Rotación de punta',   min: -100, max: 100, step: 1, defaultValue: 0, validInViews: ['perfil', 'frontal'] },
+    // Frontal: primitivas de proporciones
+    { id: 'reduccion-global',   label: 'Reducción global',     min: -100, max: 100, step: 1, defaultValue: 0, validInViews: ['frontal'] },
+    { id: 'adelgazar-dorso',    label: 'Osteotomía lateral',   min: -100, max: 100, step: 1, defaultValue: 0, validInViews: ['frontal'] },
+    { id: 'reseccion-alar',     label: 'Resección alar',       min: -100, max: 100, step: 1, defaultValue: 0, validInViews: ['frontal'] },
+    { id: 'refinamiento-punta', label: 'Refinamiento de punta', min: -100, max: 100, step: 1, defaultValue: 0, validInViews: ['frontal'] },
   ],
   LIFTING_CEJAS: [
     { id: 'altura-ceja-int', label: 'Altura ceja interna', min: -10, max: 20, step: 1, defaultValue: 0 },

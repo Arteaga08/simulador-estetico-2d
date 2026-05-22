@@ -60,6 +60,8 @@ export interface DrawingStroke {
   width: number
 }
 
+export type PatientGender = 'F' | 'M'
+
 export interface SimulatorState {
   sessionId: string | null
   patientId: string | null
@@ -77,4 +79,6 @@ export interface SimulatorState {
   showLandmarks: boolean
   /** Detectada al cargar foto + landmarks. null mientras no hay detección. */
   currentView: FaceView | null
+  /** Sexo del paciente: define el canon estético al que apuntan los sliders. */
+  patientGender: PatientGender
 }

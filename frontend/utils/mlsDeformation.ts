@@ -1,18 +1,20 @@
 /**
- * Moving Least Squares (MLS) As-Rigid-As-Possible image deformation,
+ * Moving Least Squares (MLS) AFFINE image deformation,
  * extended with per-point hydrodynamic mass (w) to model differential
  * tissue stiffness in rhinoplasty simulation.
  *
- * Reference: Schaefer, McPhail, Warren — "Image Deformation Using
- * Moving Least Squares" (SIGGRAPH 2006).
+ * ── Affine vs Rigid ─────────────────────────────────────────────────
+ * Rígido (Rigid): Solo permite rotación y traslación. Destruye la simetría
+ * cuando se intenta afinar la nariz (comprimir).
+ * Afín (Affine): Permite rotación, traslación Y ESCALADO DIRECCIONAL.
+ * Permite que los "puntos fantasma" compriman el tejido hacia el centro
+ * logrando un afinamiento fotorrealista sin desviar la nariz.
+ * * Estrategia: mesh-accelerated backward warp (Bilineal sobre Grid 33x33).
  */
 
 import type { ControlPoint, NoseBbox } from "@/lib/canvas/types";
 
-// Grid resolution for the nose bbox (33×33 = 1 089 vertices).
 const BBOX_GRID = 32;
-
-// Grid resolution for full-image broca warp (65×65 = 4 225 vertices).
 const FULL_GRID = 64;
 
 // ─── Bilinear sampler ─────────────────────────────────────────────────────────
@@ -60,9 +62,9 @@ function bilinearSample(
   ];
 }
 
-// ─── MLS rigid backward warp (single point) ───────────────────────────────────
+// ─── MLS AFFINE backward warp (single point) ──────────────────────────────────
 
-function mlsRigidBackward(
+function mlsAffineBackward(
   vx: number,
   vy: number,
   pts: ControlPoint[],
@@ -74,15 +76,21 @@ function mlsRigidBackward(
   let W = 0;
   const ws = new Float64Array(n);
   for (let i = 0; i < n; i++) {
-    const dx = pts[i].px - vx;
-    const dy = pts[i].py - vy;
+    // CORRECCIÓN CRÍTICA: En un backward warp, la distancia se calcula
+    // respecto al punto de DESTINO (qx, qy), no al de origen (px, py).
+    const dx = pts[i].qx - vx;
+    const dy = pts[i].qy - vy;
     const d2 = dx * dx + dy * dy;
-    if (d2 < EPS_SQ) return { sx: pts[i].qx, sy: pts[i].qy };
+
+    // Si el píxel cae exactamente en el destino, devolvemos el origen
+    if (d2 < EPS_SQ) return { sx: pts[i].px, sy: pts[i].py };
+
     const massI = pts[i].w ?? 1.0;
     ws[i] = (alpha === 1 ? 1 / d2 : 1 / Math.pow(d2, alpha)) * massI;
     W += ws[i];
   }
 
+  // Centros de Masa Ponderados
   let pStarX = 0,
     pStarY = 0,
     qStarX = 0,
@@ -99,26 +107,64 @@ function mlsRigidBackward(
   qStarX /= W;
   qStarY /= W;
 
+  // Matrices de Covarianza para deformación Afín
+  let mu11 = 0,
+    mu12 = 0,
+    mu22 = 0;
   let A11 = 0,
-    A12 = 0;
+    A12 = 0,
+    A21 = 0,
+    A22 = 0;
+
   for (let i = 0; i < n; i++) {
     const wi = ws[i];
-    const phx = pts[i].px - pStarX,
-      phy = pts[i].py - pStarY;
-    const qhx = pts[i].qx - qStarX,
-      qhy = pts[i].qy - qStarY;
-    A11 += wi * (phx * qhx + phy * qhy);
-    A12 += wi * (phx * qhy - phy * qhx);
+    const phx = pts[i].px - pStarX;
+    const phy = pts[i].py - pStarY;
+    const qhx = pts[i].qx - qStarX;
+    const qhy = pts[i].qy - qStarY;
+
+    // Covarianza del destino
+    mu11 += wi * qhx * qhx;
+    mu12 += wi * qhx * qhy;
+    mu22 += wi * qhy * qhy;
+
+    // Matriz cruzada (Destino -> Origen)
+    A11 += wi * qhx * phx;
+    A12 += wi * qhx * phy;
+    A21 += wi * qhy * phx;
+    A22 += wi * qhy * phy;
   }
 
-  const theta = Math.atan2(A12, A11);
-  const cosT = Math.cos(theta);
-  const sinT = Math.sin(theta);
-  const vhx = vx - pStarX;
-  const vhy = vy - pStarY;
+  // Inversión de la matriz de Covarianza
+  const det = mu11 * mu22 - mu12 * mu12;
+
+  // Guard-clause: Si los puntos son perfectamente colineales (determinante 0),
+  // evitamos que la matriz explote y hacemos un fallback a traslación pura.
+  if (Math.abs(det) < 1e-8) {
+    return {
+      sx: vx - qStarX + pStarX,
+      sy: vy - qStarY + pStarY,
+    };
+  }
+
+  const invDet = 1.0 / det;
+  const invMu11 = mu22 * invDet;
+  const invMu12 = -mu12 * invDet;
+  const invMu22 = mu11 * invDet;
+
+  // Matriz de Transformación Afín resultante (M = Mu^-1 * A)
+  const M11 = invMu11 * A11 + invMu12 * A21;
+  const M12 = invMu11 * A12 + invMu12 * A22;
+  const M21 = invMu12 * A11 + invMu22 * A21;
+  const M22 = invMu12 * A12 + invMu22 * A22;
+
+  // Aplicar transformación al píxel
+  const vhx = vx - qStarX;
+  const vhy = vy - qStarY;
+
   return {
-    sx: cosT * vhx - sinT * vhy + qStarX,
-    sy: sinT * vhx + cosT * vhy + qStarY,
+    sx: vhx * M11 + vhy * M21 + pStarX,
+    sy: vhx * M12 + vhy * M22 + pStarY,
   };
 }
 
@@ -145,17 +191,19 @@ function meshWarp(
   const gx = new Float32Array(gCols1 * gRows1);
   const gy = new Float32Array(gCols1 * gRows1);
 
+  // Paso 1: Computar vértices usando MLS AFFINE
   for (let r = 0; r < gRows1; r++) {
     const vy = y0 + (r / rows) * bH;
     for (let c = 0; c < gCols1; c++) {
       const vx = x0 + (c / cols) * bW;
-      const { sx, sy } = mlsRigidBackward(vx, vy, controlPoints, alpha);
+      const { sx, sy } = mlsAffineBackward(vx, vy, controlPoints, alpha);
       const vi = r * gCols1 + c;
       gx[vi] = sx;
       gy[vi] = sy;
     }
   }
 
+  // Paso 2: Interpolación Bilineal (O(1) por píxel)
   const cellW = bW / cols;
   const cellH = bH / rows;
   const invCW = 1 / cellW;
@@ -194,7 +242,7 @@ function meshWarp(
   }
 }
 
-// ─── Public API Corregido con Difuminado de Bordes Avanzado ───────────────────
+// ─── Public API ─────────────────────────────────────────────────────────────
 
 export function applyMLSDeformation(
   srcImageData: ImageData,
@@ -215,14 +263,12 @@ export function applyMLSDeformation(
   if (allIdentity) return new ImageData(dstData, width, height);
 
   if (bbox) {
-    // 1. Añadimos un margen extra (padding) a los bordes calculados para dar espacio al difuminado
     const padding = 50;
     const x0 = Math.max(0, Math.floor(bbox.x) - padding);
     const y0 = Math.max(0, Math.floor(bbox.y) - padding);
     const x1 = Math.min(width, Math.ceil(bbox.x + bbox.width) + padding);
     const y1 = Math.min(height, Math.ceil(bbox.y + bbox.height) + padding);
 
-    // 2. Creamos un buffer intermedio para calcular la deformación de la malla completa
     const warpData = new Uint8ClampedArray(srcData);
     meshWarp(
       srcImageData,
@@ -237,12 +283,10 @@ export function applyMLSDeformation(
       alpha,
     );
 
-    // 3. Campo de Influencia: Difuminado progresivo en los límites del recuadro
-    const blendZone = 40; // Ancho de la franja de suavizado en píxeles
+    const blendZone = 40;
 
     for (let y = y0; y < y1; y++) {
       for (let x = x0; x < x1; x++) {
-        // Distancia del píxel actual al borde más cercano de la caja expandida
         const distLeft = x - x0;
         const distRight = x1 - x;
         const distTop = y - y0;
@@ -250,25 +294,21 @@ export function applyMLSDeformation(
 
         const minDist = Math.min(distLeft, distRight, distTop, distBottom);
 
-        // Factor de interpolación (t = 1 -> deformación total, t = 0 -> píxel original)
         let t = 1.0;
         if (minDist < blendZone) {
           const ratio = minDist / blendZone;
-          // Curva de interpolación sigmoide para un desvanecimiento orgánico
           t = ratio * ratio * (3 - 2 * ratio);
         }
 
         const di = (y * width + x) * 4;
 
-        // Mezcla alfa matemática entre la foto original y el buffer deformado
         dstData[di] = srcData[di] * (1 - t) + warpData[di] * t;
         dstData[di + 1] = srcData[di + 1] * (1 - t) + warpData[di + 1] * t;
         dstData[di + 2] = srcData[di + 2] * (1 - t) + warpData[di + 2] * t;
-        dstData[di + 3] = srcData[di + 3]; // Conservar canal alfa intacto
+        dstData[di + 3] = srcData[di + 3];
       }
     }
   } else {
-    // Modo brocha de pantalla completa
     const aspect = width / height;
     const gCols = Math.round(FULL_GRID * Math.max(1, aspect));
     const gRows = Math.round(FULL_GRID * Math.max(1, 1 / aspect));

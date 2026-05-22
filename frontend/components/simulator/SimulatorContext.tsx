@@ -3,7 +3,7 @@
 import { createContext, useContext, useReducer, useCallback, type ReactNode } from 'react'
 import type {
   SimulatorState, ActiveProcedure, Procedimiento, TecnicaSesion,
-  CanvasMode, AnnotationPin, DrawingStroke,
+  CanvasMode, AnnotationPin, DrawingStroke, PatientGender,
 } from './types'
 import type { FaceView } from '@/utils/viewClassifier'
 import {
@@ -31,6 +31,7 @@ type Action =
   | { type: 'TOGGLE_LANDMARKS' }
   | { type: 'SET_VIEW'; view: FaceView | null }
   | { type: 'APPLY_PRESET'; presetId: string; values: Record<string, number> }
+  | { type: 'SET_GENDER'; gender: PatientGender }
 
 function makeInitialActive(proc: Procedimiento): ActiveProcedure {
   const techniques = getAvailableTechniques(proc)
@@ -106,6 +107,8 @@ function reducer(state: SimulatorState, action: Action): SimulatorState {
       return { ...state, showLandmarks: !state.showLandmarks }
     case 'SET_VIEW':
       return { ...state, currentView: action.view }
+    case 'SET_GENDER':
+      return { ...state, patientGender: action.gender }
     case 'APPLY_PRESET': {
       const procs = state.activeProcedures.map((p, i) => {
         if (i !== state.selectedProcedureIndex) return p
@@ -146,6 +149,7 @@ interface SimulatorContextValue {
   toggleLandmarks: () => void
   setCurrentView: (view: FaceView | null) => void
   applyPreset: (presetId: string, values: Record<string, number>) => void
+  setPatientGender: (gender: PatientGender) => void
 }
 
 const SimulatorContext = createContext<SimulatorContextValue | null>(null)
@@ -175,6 +179,7 @@ export function SimulatorProvider({
     brushRadius: 0.07,
     showLandmarks: true,
     currentView: null,
+    patientGender: 'F',
   })
 
   const addProcedure    = useCallback((proc: Procedimiento) => dispatch({ type: 'ADD_PROCEDURE', proc }), [])
@@ -200,6 +205,10 @@ export function SimulatorProvider({
       dispatch({ type: 'APPLY_PRESET', presetId, values }),
     [],
   )
+  const setPatientGender = useCallback(
+    (gender: PatientGender) => dispatch({ type: 'SET_GENDER', gender }),
+    [],
+  )
 
   return (
     <SimulatorContext.Provider value={{
@@ -207,7 +216,7 @@ export function SimulatorProvider({
       updateSlider, updateTechnique, updateIntensity, setCanvasMode,
       setImage, setHudVisible, setActiveTool, addPin, updatePinLabel,
       removePin, addStroke, setNotes, setBrushRadius, toggleLandmarks,
-      setCurrentView, applyPreset,
+      setCurrentView, applyPreset, setPatientGender,
     }}>
       {children}
     </SimulatorContext.Provider>

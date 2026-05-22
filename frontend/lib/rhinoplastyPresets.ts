@@ -12,86 +12,87 @@ export interface RhinoplastyPreset {
 }
 
 /**
- * Presets quirúrgicos curados con valores que respetan cánones cefalométricos
- * clásicos (Powell-Humphries, Crumley). Cada combinación está diseñada para
- * producir un resultado balanceado sin requerir ajuste manual posterior.
+ * Presets quirúrgicos en régimen clinical-target.
  *
- * Convención de unidades:
- *   giba-nasal     en {−60..30}    negativo = reducir dorso
- *   rotacion-punta en {−15..15}    positivo = punta hacia arriba
- *   proyeccion-punta en {−20..40}  positivo = más proyectada
- *   reduccion-global / adelgazar-dorso / reseccion-alar en {−30..0}
+ * Convención: todos los sliders están en rango [-100, +100] donde:
+ *   +100 = métrica = canon (ideal del género del paciente)
+ *      0 = sin cambio
+ *   -100 = métrica = anti-canon (caricatura del extremo opuesto)
+ *
+ * Los valores aquí son "% del camino hacia el canon", no magnitudes mágicas.
+ * Como el canon depende del género, el mismo preset produce resultados
+ * armónicos para paciente F y paciente M (ej: rot=+80 lleva al nasolabial
+ * a 102° en F y a 94° en M).
  */
 export const RHINOPLASTY_PRESETS: RhinoplastyPreset[] = [
   {
-    id: 'femenina-refinada',
-    label: 'Femenina refinada',
-    appliesTo: ['perfil', 'tres-cuartos'],
-    rationale: 'Dorso pronunciado, supratip break marcado, nasolabial ≈ 108°, Goode ≈ 0.55.',
+    id: 'ideal-completo',
+    label: 'Ideal completo',
+    appliesTo: ['perfil'],
+    rationale: 'Acerca todas las métricas al canon del género (85% del camino).',
     values: {
-      'giba-nasal': -35,
-      'rotacion-punta': 10,
-      'proyeccion-punta': -10,
-      'reseccion-alar': -12,
+      'giba-nasal':        85,
+      'rotacion-punta':    80,
+      'proyeccion-punta':  70,
+      'reseccion-alar':    60,
     },
   },
   {
-    id: 'masculinizacion-dorsal',
-    label: 'Masculinización dorsal',
-    appliesTo: ['perfil', 'tres-cuartos'],
-    rationale: 'Dorso recto definido, nasolabial ≈ 90°, sin reducción de alas.',
+    id: 'masculinizacion',
+    label: 'Masculinización',
+    appliesTo: ['perfil'],
+    rationale: 'Aplica solo al canon masculino: dorso recto, nasolabial 95°.',
     values: {
-      'giba-nasal': -15,
-      'rotacion-punta': -3,
-      'proyeccion-punta': 0,
+      'giba-nasal':       70,
+      'rotacion-punta':   60,
+      'proyeccion-punta': 40,
     },
   },
   {
     id: 'reduccion-conservadora',
     label: 'Reducción conservadora',
-    appliesTo: ['perfil', 'tres-cuartos'],
-    rationale: 'Cambio moderado: giba visible, punta rotada, alas intactas.',
+    appliesTo: ['perfil'],
+    rationale: 'Mid-camino hacia el canon (50%). Cambio sutil pero balanceado.',
     values: {
-      'giba-nasal': -18,
-      'rotacion-punta': 5,
-      'proyeccion-punta': -4,
+      'giba-nasal':        50,
+      'rotacion-punta':    50,
+      'proyeccion-punta':  40,
     },
   },
   {
-    id: 'refinamiento-punta',
+    id: 'refinamiento-punta-preset',
     label: 'Refinamiento de punta',
-    appliesTo: ['perfil', 'tres-cuartos'],
-    rationale: 'Foco en punta: rotación cefálica marcada + reducción de proyección + alas leves.',
+    appliesTo: ['perfil'],
+    rationale: 'Solo rotación + Goode + alas, sin tocar el dorso.',
     values: {
-      'giba-nasal': 0,
-      'rotacion-punta': 9,
-      'proyeccion-punta': -8,
-      'reseccion-alar': -6,
+      'rotacion-punta':    80,
+      'proyeccion-punta':  60,
+      'reseccion-alar':    50,
     },
   },
   {
     id: 'frontal-armoniosa',
     label: 'Armonía frontal',
-    appliesTo: ['frontal', 'tres-cuartos'],
-    rationale: 'Dorso más delgado + base alar más estrecha + punta refinada.',
+    appliesTo: ['frontal'],
+    rationale: 'Proporciones nasales acercadas al canon en el plano coronal.',
     values: {
-      'reduccion-global': -12,
-      'adelgazar-dorso': -10,
-      'reseccion-alar': -10,
-      'refinamiento-punta': -8,
-      'rotacion-punta': 5,
+      'reduccion-global':    75,
+      'adelgazar-dorso':     80,
+      'reseccion-alar':      75,
+      'refinamiento-punta':  70,
+      'rotacion-punta':      50,
     },
   },
   {
     id: 'frontal-nariz-pequena',
     label: 'Nariz pequeña',
     appliesTo: ['frontal'],
-    rationale: 'Reducción global pronunciada con osteotomía y refinamiento.',
+    rationale: 'Énfasis en reducción global + refinamiento de punta.',
     values: {
-      'reduccion-global': -22,
-      'adelgazar-dorso': -8,
-      'reseccion-alar': -8,
-      'refinamiento-punta': -10,
+      'reduccion-global':    95,
+      'adelgazar-dorso':     70,
+      'reseccion-alar':      70,
+      'refinamiento-punta':  85,
     },
   },
 ]

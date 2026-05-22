@@ -3,7 +3,7 @@
 import { useRef, useEffect, useCallback } from 'react'
 import { useLiquify } from '@/lib/canvas/useLiquify'
 import type { NoseLandmarks } from '@/lib/canvas/useFaceLandmarks'
-import type { ActiveProcedure } from '@/components/simulator/types'
+import type { ActiveProcedure, PatientGender } from '@/components/simulator/types'
 import { buildRhinoplastyControlPoints } from '@/utils/surgicalLimits'
 
 interface RhinoplastyConfig {
@@ -11,6 +11,7 @@ interface RhinoplastyConfig {
   canvasW: number
   canvasH: number
   nose: NoseLandmarks | null
+  patientGender: PatientGender
 }
 
 interface UseRhinoplastyEngineReturn {
@@ -51,6 +52,7 @@ export function useRhinoplastyEngine(): UseRhinoplastyEngineReturn {
             cfg.nose,
             cfg.canvasW,
             cfg.canvasH,
+            cfg.patientGender,
           )
           applyConfig({ width: cfg.canvasW, height: cfg.canvasH, controlPoints: points, noseBbox })
         }

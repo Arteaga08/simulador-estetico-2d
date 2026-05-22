@@ -117,8 +117,9 @@ export function CanvasWorkspace() {
       canvasW: canvas.width,
       canvasH: canvas.height,
       nose: noseLandmarksRef.current,
+      patientGender: state.patientGender,
     })
-  }, [state.activeProcedures, state.canvasMode, applyRhinoplasty, reset, canvasRef])
+  }, [state.activeProcedures, state.canvasMode, state.patientGender, applyRhinoplasty, reset, canvasRef])
 
   useEffect(() => {
     const el = containerRef.current

@@ -19,15 +19,15 @@ interface ProcedureTabProps {
 const VIEW_LABEL: Record<string, string> = {
   frontal: 'foto frontal',
   perfil: 'foto de perfil',
-  'tres-cuartos': 'foto en tres-cuartos',
 };
 
 export function ProcedureTab({ procedure, isSelected }: ProcedureTabProps) {
-  const { state, updateSlider, updateTechnique, updateIntensity } = useSimulator();
-  const { currentView } = state;
+  const { state, updateSlider, updateTechnique, updateIntensity, setPatientGender } = useSimulator();
+  const { currentView, patientGender } = state;
 
   const sliders = getSliderDefs(procedure.procedimiento);
   const techniques = getAvailableTechniques(procedure.procedimiento);
+  const isRhinoplasty = procedure.procedimiento === 'RINOPLASTIA';
 
   return (
     <div className="flex flex-col gap-0">
@@ -51,6 +51,38 @@ export function ProcedureTab({ procedure, isSelected }: ProcedureTabProps) {
             </button>
           ))}
         </div>
+
+        {/* Selector de sexo del paciente (solo Rinoplastia): define el canon
+            cefalométrico al que apuntan los sliders. */}
+        {isRhinoplasty && (
+          <div className="flex gap-1.5 mt-2.5 items-center">
+            <span className="text-[10px] uppercase tracking-widest text-[#9CA3AF] font-semibold">
+              Canon
+            </span>
+            <button
+              onClick={() => setPatientGender('F')}
+              title="Canon femenino: nasolabial ≈ 105°, dorso suave, alas estrechas"
+              className={`text-[12px] font-semibold px-2 py-0.5 rounded-full transition-colors ${
+                patientGender === 'F'
+                  ? 'bg-pink-100 text-pink-700'
+                  : 'bg-transparent text-[#9CA3AF] hover:bg-[#F9FAFB]'
+              }`}
+            >
+              ♀ Femenino
+            </button>
+            <button
+              onClick={() => setPatientGender('M')}
+              title="Canon masculino: nasolabial ≈ 95°, dorso recto, alas más anchas"
+              className={`text-[12px] font-semibold px-2 py-0.5 rounded-full transition-colors ${
+                patientGender === 'M'
+                  ? 'bg-sky-100 text-sky-700'
+                  : 'bg-transparent text-[#9CA3AF] hover:bg-[#F9FAFB]'
+              }`}
+            >
+              ♂ Masculino
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="h-px bg-[#F3F4F6]" />
