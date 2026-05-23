@@ -178,10 +178,12 @@ function constrainGibaToTarget(
     y: landmarks.bridge.y + 0.55 * (landmarks.bridgeMid.y - landmarks.bridge.y),
   };
   return {
-    // Radix casi fijo: en rinoplastia el nasion no baja con la giba
+    // Radix sigue parcialmente al apex (35%) — necesario para evitar el
+    // valle topológico entre supra1 (zona superior, ~22%) y gibaApex (100%).
+    // Sin esto el MLS interpola con ondulación visible (joroba residual).
     radixDest: {
-      x: landmarks.bridge.x + nx * delta * 0.10,
-      y: landmarks.bridge.y + ny * delta * 0.10,
+      x: landmarks.bridge.x + nx * delta * 0.35,
+      y: landmarks.bridge.y + ny * delta * 0.35,
     },
     // Ápex absorbe el 100% del delta — es el punto más prominente que debe bajar
     gibaApexSrc,
@@ -204,58 +206,132 @@ interface TipRotationDestinations {
 
 const SUPRATIP_TRANSFER = 0.35;
 
+/** Delta angular clínico máximo en cada extremo del slider (15°). */
+const MAX_ROTATION_RAD = Math.PI / 12;
+
+/** Posición del ghost columela principal: 55% del camino base→tip. */
+const COLUMELLA_GHOST_T = 0.55;
+
+/** Magnitud máxima del desplazamiento perpendicular = 22% del largo nasal. */
+const MAX_COLUMELLA_MOVE_RATIO = 0.22;
+
+interface ColumellaResult {
+  ghostSrc: Point;
+  ghostDest: Point;
+  ghost2Src: Point;
+  ghost2Dest: Point;
+}
+
+/**
+ * Retracción columelar — efecto hamaca con ghost point.
+ *
+ * El tejido entre la base y el tip se desplaza perpendicular al eje base→tip,
+ * mientras los extremos (tip y base) quedan inmóviles como muros. Esto simula
+ * la corrección quirúrgica de columela colgante sin rotar la nariz completa.
+ */
+function constrainColumellaRetraction(
+  slider: number,
+  landmarks: NoseLandmarks,
+): ColumellaResult | null {
+  const normalized = Math.max(-1, Math.min(1, slider / 100));
+  if (normalized === 0) return null;
+
+  const dx = landmarks.tip.x - landmarks.base.x;
+  const dy = landmarks.tip.y - landmarks.base.y;
+  const noseLen = Math.hypot(dx, dy);
+  if (noseLen < 1e-6) return null;
+
+  // Ghost source al 45% desde base hacia tip
+  const ghostSrc: Point = {
+    x: landmarks.base.x + dx * COLUMELLA_GHOST_T,
+    y: landmarks.base.y + dy * COLUMELLA_GHOST_T,
+  };
+
+  // Vector perpendicular apuntando "hacia arriba" en screen-coords (Y negativo)
+  let nx = -dy;
+  let ny = dx;
+  if (ny > 0) {
+    nx = -nx;
+    ny = -ny;
+  }
+  const nLen = Math.hypot(nx, ny);
+  const unitNx = nx / nLen;
+  const unitNy = ny / nLen;
+
+  // Magnitud final del desplazamiento
+  const magnitude = normalized * MAX_COLUMELLA_MOVE_RATIO * noseLen;
+
+  // Segundo ghost al 25% base→tip (más cerca de la base) para esparcir el aplanamiento
+  const ghost2T = 0.25;
+  const ghost2Src: Point = {
+    x: landmarks.base.x + dx * ghost2T,
+    y: landmarks.base.y + dy * ghost2T,
+  };
+  const ghost2Magnitude = magnitude * 0.75;
+
+  return {
+    ghostSrc,
+    ghostDest: {
+      x: ghostSrc.x + unitNx * magnitude,
+      y: ghostSrc.y + unitNy * magnitude,
+    },
+    ghost2Src,
+    ghost2Dest: {
+      x: ghost2Src.x + unitNx * ghost2Magnitude,
+      y: ghost2Src.y + unitNy * ghost2Magnitude,
+    },
+  };
+}
+
 export function constrainTipRotationToTarget(
   slider: number,
   landmarks: NoseLandmarks,
-  canon: NasalCanon,
+  _canon: NasalCanon,
 ): TipRotationDestinations {
+  // Detección de orientación: necesaria para que +slider rote la punta
+  // hacia arriba en coords de pantalla independientemente del lado al
+  // que mire el paciente.
   const dx = landmarks.tip.x - landmarks.base.x;
-  const dy = landmarks.tip.y - landmarks.base.y;
-
-  // getNasolabialAngle = atan2(-dy, dx) only gives clinical values (90–180°) for
-  // LEFT-facing profiles (dx < 0).  For RIGHT-facing profiles (dx > 0) it returns
-  // 0–90°, so the computed delta overshoot in the wrong direction.
-  //
-  // Fix: mirror dx for right-facing so the angle lands in the clinical range, then
-  // negate the resulting delta so the screen-coord rotation direction is correct.
   const facingRight = dx > 0;
-  const current =
-    Math.atan2(-dy, facingRight ? -dx : dx) * (180 / Math.PI);
 
-  // Anti-canon: overshoot past current in the direction AWAY from canon.
-  // Using current × 0.80 breaks for noses above canon (both +100 and -100 would
-  // reduce the angle, producing the same visual result in opposite directions).
-  const t = slider / 100;
-  let target: number;
-  if (t >= 0) {
-    target = current + (canon.nasolabialAngle - current) * t;
-  } else {
-    const anti = current + (current - canon.nasolabialAngle) * 1.5;
-    target = current + (anti - current) * -t;
-  }
-  const deltaRad = (target - current) * (Math.PI / 180);
-  // For right-facing, reducing the nasolabial angle requires a COUNTERCLOCKWISE
-  // rotation in screen coords (positive JS angle), which is the opposite sign.
-  const actualDeltaRad = facingRight ? -deltaRad : deltaRad;
+  // Slider normalizado a [-1, 1] con clamp de seguridad
+  const normalized = Math.max(-1, Math.min(1, slider / 100));
 
+  // Theta clínico: +1 → +15° (punta arriba), -1 → -15° (punta abajo)
+  const clinicalTheta = normalized * MAX_ROTATION_RAD;
+
+  // Corrección de signo para coords de pantalla (Y invertida).
+  // Right-facing: clínica arriba = CW visual = ángulo negativo en math.
+  const screenTheta = facingRight ? -clinicalTheta : clinicalTheta;
+
+  // Arco circular del tip alrededor del subnasal (pivote fijo, radio preservado)
   const tipDest = rotateTipAroundSubnasal(
     landmarks.tip,
     landmarks.base,
-    actualDeltaRad,
+    screenTheta,
   );
+
+  // Arrastre del supratip con decay (mismo pivote, menor ángulo)
   const bridgeMidDest = rotateTipAroundSubnasal(
     landmarks.bridgeMid,
     landmarks.base,
-    actualDeltaRad * SUPRATIP_TRANSFER,
+    screenTheta * SUPRATIP_TRANSFER,
   );
+
   return { tipDest, bridgeMidDest };
+}
+
+interface ProjectionResult {
+  /** Vector colinear al eje base→tip, a aplicar con decay en supratip/columela. */
+  vectorDelta: Point;
+  tipDest: Point;
 }
 
 function constrainProjectionToTarget(
   slider: number,
   landmarks: NoseLandmarks,
   canon: NasalCanon,
-): Point {
+): ProjectionResult {
   const current = measureGoodeRatio(landmarks);
   const target = interpolateTarget(
     slider,
@@ -263,7 +339,9 @@ function constrainProjectionToTarget(
     canon.goodeRatio,
     ANTI_CANON_MULTIPLIER.goodeRatio,
   );
-  if (current < 1e-6) return { ...landmarks.tip };
+  if (current < 1e-6) {
+    return { vectorDelta: { x: 0, y: 0 }, tipDest: { ...landmarks.tip } };
+  }
   // Factor de escala del vector subnasal→tip para alcanzar target ratio.
   const factor = target / current;
   const dx = landmarks.tip.x - landmarks.base.x;
@@ -279,11 +357,20 @@ function constrainProjectionToTarget(
   const deltaX = rawX - landmarks.tip.x;
   const deltaY = rawY - landmarks.tip.y;
   const deltaLen = Math.hypot(deltaX, deltaY);
+  let tipDest: Point;
   if (deltaLen > maxDelta && deltaLen > 1e-6) {
     const s = maxDelta / deltaLen;
-    return { x: landmarks.tip.x + deltaX * s, y: landmarks.tip.y + deltaY * s };
+    tipDest = { x: landmarks.tip.x + deltaX * s, y: landmarks.tip.y + deltaY * s };
+  } else {
+    tipDest = { x: rawX, y: rawY };
   }
-  return { x: rawX, y: rawY };
+  return {
+    vectorDelta: {
+      x: tipDest.x - landmarks.tip.x,
+      y: tipDest.y - landmarks.tip.y,
+    },
+    tipDest,
+  };
 }
 
 interface UniformShrinkDestinations {
@@ -455,15 +542,16 @@ export function applyClinicalCoupling(
 ): CouplingResult {
   const out: Record<string, number> = { ...sliders };
   const autoAdjusted: string[] = [];
-  // Con sliders en régimen [-100, +100] hacia canon, los acoplamientos se
-  // reducen porque alcanzar +100 en giba ya implica un dorso recto que
-  // requeriría una rotación coherente. Pero por seguridad: cuando el usuario
-  // pide reducción dorsal fuerte (giba ≥ +60) sin tocar rotación, asistirla.
+  // Quitar giba siempre rota el tip arriba anatómicamente.
+  // Progresivo: giba 30 → +0 rot, giba 60 → ~21 rot, giba 100 → ~50 rot.
   const giba = out["giba-nasal"] ?? 0;
   const rot = out["rotacion-punta"] ?? 0;
-  if (giba >= 60 && rot < 20) {
-    out["rotacion-punta"] = Math.max(rot, 20);
-    autoAdjusted.push("rotacion-punta");
+  if (giba >= 30) {
+    const suggestedRot = Math.round((giba - 30) * 0.71);
+    if (rot < suggestedRot) {
+      out["rotacion-punta"] = suggestedRot;
+      autoAdjusted.push("rotacion-punta");
+    }
   }
   return { values: out, autoAdjusted };
 }
@@ -494,6 +582,7 @@ export function buildRhinoplastyControlPoints(
   const giba = s("giba-nasal");
   const rot = s("rotacion-punta");
   const proy = s("proyeccion-punta");
+  const retraccion = s("retraccion-columelar");
   const reduccion = s("reduccion-global");
   const adelgazar = s("adelgazar-dorso");
   const reseccion = s("reseccion-alar");
@@ -510,6 +599,12 @@ export function buildRhinoplastyControlPoints(
   let tipGhosts: TipNarrowDestinations | null = null;
   let gibaApexSrc: Point | null = null;
   let gibaApexDest: Point | null = null;
+  let projectionVector: Point | null = null;
+  let columellaGhost: ColumellaResult | null = null;
+
+  if (retraccion !== 0) {
+    columellaGhost = constrainColumellaRetraction(retraccion, landmarks);
+  }
 
   // ─── PERFIL — sliders cefalométricos ─────────────────────────────────────
   if (giba !== 0) {
@@ -530,8 +625,14 @@ export function buildRhinoplastyControlPoints(
   }
   if (proy !== 0) {
     const p = constrainProjectionToTarget(proy, landmarks, canon);
-    finalTip.x += p.x - landmarks.tip.x;
-    finalTip.y += p.y - landmarks.tip.y;
+    // Tip: 100% del vector colinear base→tip
+    finalTip.x += p.vectorDelta.x;
+    finalTip.y += p.vectorDelta.y;
+    // Supratip: 50% del vector — decay hacia el dorso
+    finalBridgeMid.x += p.vectorDelta.x * 0.50;
+    finalBridgeMid.y += p.vectorDelta.y * 0.50;
+    // Guardar el vector para el control point de columela
+    projectionVector = p.vectorDelta;
   }
 
   // ─── FRONTAL — sliders de proporciones ───────────────────────────────────
@@ -667,6 +768,42 @@ export function buildRhinoplastyControlPoints(
       qy: gibaApexSrc.y,
       w: SURGICAL_MASS.activeDorsum,
     });
+
+    // Supraradix: extiende el efecto de giba al área entre radix y glabela.
+    // Cadena de gradiente: glabella(ancla) → supra2(30%) → supra1(55%) → gibaApex(100%).
+    const apexDX = gibaApexDest.x - gibaApexSrc.x;
+    const apexDY = gibaApexDest.y - gibaApexSrc.y;
+    const glabella = landmarks.anchors?.[0];
+    if (
+      glabella &&
+      (Math.abs(apexDX) > MOVE_EPSILON_PX || Math.abs(apexDY) > MOVE_EPSILON_PX)
+    ) {
+      // Cadena monótona arriba del bridge (35%) hacia glabella (0%):
+      //   glabella(0%) → supra2(14%) → supra1(22%) → bridge(35%) → gibaApex(100%)
+      // Mantiene la pendiente descendente del campo de deformación sin valles.
+      const supraSrc: Point = {
+        x: landmarks.bridge.x + (glabella.x - landmarks.bridge.x) * 0.45,
+        y: landmarks.bridge.y + (glabella.y - landmarks.bridge.y) * 0.45,
+      };
+      points.push({
+        px: supraSrc.x + apexDX * 0.22,
+        py: supraSrc.y + apexDY * 0.22,
+        qx: supraSrc.x,
+        qy: supraSrc.y,
+        w: 5.0,
+      });
+      const supra2Src: Point = {
+        x: landmarks.bridge.x + (glabella.x - landmarks.bridge.x) * 0.65,
+        y: landmarks.bridge.y + (glabella.y - landmarks.bridge.y) * 0.65,
+      };
+      points.push({
+        px: supra2Src.x + apexDX * 0.14,
+        py: supra2Src.y + apexDY * 0.14,
+        qx: supra2Src.x,
+        qy: supra2Src.y,
+        w: 4.0,
+      });
+    }
   }
 
   // Tip activo
@@ -680,6 +817,75 @@ export function buildRhinoplastyControlPoints(
       qx: landmarks.tip.x,
       qy: landmarks.tip.y,
       w: SURGICAL_MASS.activeTip,
+    });
+
+    // Sub-tip: extiende el movimiento del tip hacia la columela (sin tocar la base).
+    // Sigue 45% del delta del tip — evita el "escalón" entre tip activo y base estática.
+    const subTipSrc: Point = {
+      x: landmarks.tip.x + (landmarks.base.x - landmarks.tip.x) * 0.45,
+      y: landmarks.tip.y + (landmarks.base.y - landmarks.tip.y) * 0.45,
+    };
+    points.push({
+      px: subTipSrc.x + tipDeltaX * 0.45,
+      py: subTipSrc.y + tipDeltaY * 0.45,
+      qx: subTipSrc.x,
+      qy: subTipSrc.y,
+      w: 4.0,
+    });
+  }
+
+  // Columela de proyección: refuerza la cadena con el vector colinear puro.
+  // Posicionado al 35% tip→base, sigue 40% del vector de proyección.
+  // Asegura que la zona de la columela acompañe la magnitud sin desviarse en dirección.
+  if (projectionVector) {
+    const columelaSrc: Point = {
+      x: landmarks.tip.x + (landmarks.base.x - landmarks.tip.x) * 0.35,
+      y: landmarks.tip.y + (landmarks.base.y - landmarks.tip.y) * 0.35,
+    };
+    points.push({
+      px: columelaSrc.x + projectionVector.x * 0.40,
+      py: columelaSrc.y + projectionVector.y * 0.40,
+      qx: columelaSrc.x,
+      qy: columelaSrc.y,
+      w: 4.0,
+    });
+  }
+
+  // Retracción columelar: efecto hamaca con ghost point.
+  // Tip y base actúan como muros de masa alta — la deformación queda confinada
+  // a la zona columelar sin rotar la nariz completa.
+  if (columellaGhost) {
+    // Muro 1: tip anclado en su posición final
+    points.push({
+      px: finalTip.x,
+      py: finalTip.y,
+      qx: finalTip.x,
+      qy: finalTip.y,
+      w: SURGICAL_MASS.anchor,
+    });
+    // Muro 2: base anclada en su posición final
+    points.push({
+      px: finalBase.x,
+      py: finalBase.y,
+      qx: finalBase.x,
+      qy: finalBase.y,
+      w: SURGICAL_MASS.anchor,
+    });
+    // Ghost columela 1: principal al 45% base→tip
+    points.push({
+      px: columellaGhost.ghostDest.x,
+      py: columellaGhost.ghostDest.y,
+      qx: columellaGhost.ghostSrc.x,
+      qy: columellaGhost.ghostSrc.y,
+      w: SURGICAL_MASS.activeTip,
+    });
+    // Ghost columela 2: secundario al 30% base→tip — esparce el aplanamiento
+    points.push({
+      px: columellaGhost.ghost2Dest.x,
+      py: columellaGhost.ghost2Dest.y,
+      qx: columellaGhost.ghost2Src.x,
+      qy: columellaGhost.ghost2Src.y,
+      w: SURGICAL_MASS.activeTip * 0.75,
     });
   }
 

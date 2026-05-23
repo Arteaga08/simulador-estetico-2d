@@ -207,6 +207,7 @@ export function useFaceLandmarks() {
       try {
         const result = tryDetect(img, W, H)
         if (result) { setDetectionStatus('detected'); return result }
+        console.info('[useFaceLandmarks] pass 1 (original) failed — MediaPipe found no face. Likely close-up or extreme angle.')
       } catch (err) {
         console.warn('[useFaceLandmarks] pass 1 (original) failed:', err)
       }

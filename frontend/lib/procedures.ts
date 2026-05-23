@@ -33,6 +33,7 @@ export const SLIDERS_BY_PROCEDURE: Record<Procedimiento, SliderDef[]> = {
     { id: 'giba-nasal',         label: 'Giba nasal',           min: -100, max: 100, step: 1, defaultValue: 0, blockedNegativeInRinomodelacion: true, validInViews: ['perfil'] },
     { id: 'proyeccion-punta',   label: 'Proyección de punta', min: -100, max: 100, step: 1, defaultValue: 0, validInViews: ['perfil'] },
     { id: 'rotacion-punta',     label: 'Rotación de punta',   min: -100, max: 100, step: 1, defaultValue: 0, validInViews: ['perfil', 'frontal'] },
+    { id: 'retraccion-columelar', label: 'Retracción columelar', min: -100, max: 100, step: 1, defaultValue: 0, validInViews: ['perfil'] },
     // Frontal: primitivas de proporciones
     { id: 'reduccion-global',   label: 'Reducción global',     min: -100, max: 100, step: 1, defaultValue: 0, validInViews: ['frontal'] },
     { id: 'adelgazar-dorso',    label: 'Osteotomía lateral',   min: -100, max: 100, step: 1, defaultValue: 0, validInViews: ['frontal'] },
