@@ -17,6 +17,14 @@ self.onmessage = (e: MessageEvent<WorkerInMessage>) => {
     return
   }
 
+  if (msg.type === 'RELOAD') {
+    if (!ctx) { postOut({ type: 'ERROR', message: 'No ctx' }); return }
+    originalImageData = msg.imageData
+    ctx.putImageData(originalImageData, 0, 0)
+    postOut({ type: 'DONE' })
+    return
+  }
+
   if (msg.type === 'RESET') {
     if (ctx && originalImageData) {
       ctx.putImageData(originalImageData, 0, 0)

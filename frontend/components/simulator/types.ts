@@ -22,6 +22,7 @@ export type TecnicaSesion =
   | "MICRONEEDLING";
 
 import type { FaceView } from "@/utils/viewClassifier";
+import type { QualityReport } from "@/lib/canvas/imageQuality";
 
 export interface SliderDef {
   id: string;
@@ -91,4 +92,20 @@ export interface SimulatorState {
   patientGender: PatientGender;
   zoomScale: number; // <--- No olvides agregarlo aquí también
   panOffset: { x: number; y: number };
+  backgroundRemoved: boolean;
+  backgroundProcessing: boolean;
+  processedImageUrl: string | null;
+  facialGridVisible: boolean;
+  /** Dev-only: overlay candidate MediaPipe landmark indices over the face
+   *  so we can verify which raw lm[N] sits on each anatomical point. */
+  debugLandmarksVisible: boolean;
+  /** Anatomical view tagged by the surgeon at upload time. Used to cross-
+   *  check against MediaPipe's detected view and to drive view-specific
+   *  slider availability. Null until the user picks one. */
+  taggedView: FaceView | null;
+  /** Soft warnings about the current photo's quality (lighting, framing,
+   *  background, etc.). Null = no photo loaded or analysis not run yet. */
+  qualityReport: QualityReport | null;
+  /** Modal visibility: photo capture protocol guide. */
+  photoGuideOpen: boolean;
 }

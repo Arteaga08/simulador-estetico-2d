@@ -45,10 +45,17 @@ export interface NasalCanon {
  */
 export const FEMININE_CANON: NasalCanon = {
   nasolabialAngle:       105,
-  goodeRatio:            0.55,
+  // Ratio Byrd canónico (P/L = 0.67). NOTA: el campo se llama `goodeRatio` por
+  // legado, pero `measureGoodeRatio` en surgicalLimits.ts en realidad mide
+  // Byrd (P horizontal / L nasion→tip), NO el Goode clásico (P / altura vertical).
+  goodeRatio:            0.67,
   dorsumCurvature:       0,
   noseWidthRatio:        0.20,
-  bridgeAlarRatio:       0.70,
+  // bridgeAlarRatio: el proxy `measureBridgeAlarRatio` devuelve 0.60 hardcoded
+  // (basado en la geometría inicial de los ghosts: 2 × 0.30 × alarWidth).
+  // Para que +slider ESTRECHE el puente, el canon debe ser < 0.60.
+  // 0.45 corresponde a un dorso refinado femenino (45% del ancho alar).
+  bridgeAlarRatio:       0.45,
   alarIntercanthalRatio: 0.90,
   tipAlarRatio:          0.45,
 }
@@ -62,10 +69,15 @@ export const FEMININE_CANON: NasalCanon = {
  */
 export const MASCULINE_CANON: NasalCanon = {
   nasolabialAngle:       95,
-  goodeRatio:            0.60,
+  // Ratio Byrd canónico — el ratio armónico P/L no difiere significativamente
+  // por género; lo que cambia es el ángulo nasolabial.
+  goodeRatio:            0.67,
   dorsumCurvature:       0,
   noseWidthRatio:        0.22,
-  bridgeAlarRatio:       0.80,
+  // Misma corrección que femenino: el proxy es 0.60, canon debe ser < 0.60
+  // para que +slider estreche. Masculino mantiene el puente algo más ancho
+  // que femenino (~55% del alar) pero todavía menos que el original.
+  bridgeAlarRatio:       0.55,
   alarIntercanthalRatio: 1.00,
   tipAlarRatio:          0.55,
 }
@@ -83,7 +95,7 @@ export const MASCULINE_CANON: NasalCanon = {
 export const ANTI_CANON_MULTIPLIER = {
   nasolabialAngle:       0.80,
   goodeRatio:            1.35,
-  dorsumCurvature:       2.5,
+  dorsumCurvature:       5.0,
   noseWidthRatio:        1.40,
   bridgeAlarRatio:       1.30,
   alarIntercanthalRatio: 1.40,

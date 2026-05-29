@@ -11,13 +11,17 @@ import {
   Camera,
   Eye,
   EyeSlash,
+  PersonSimple,
+  Ruler,
+  Target,
+  Question,
 } from "@phosphor-icons/react";
-
 interface CanvasToolbarProps {
   onUploadPhoto: () => void;
+  onToggleBackground: () => void;
   detectionStatus?: DetectionStatus;
   manualStep: number | null;
-  manualReason?: 'detection-failed' | 'user-restart' | null;
+  manualReason?: "detection-failed" | "user-restart" | null;
   canRestartManual: boolean;
   onRestartManual: () => void;
 }
@@ -28,33 +32,85 @@ const MODES: Array<{ id: CanvasMode; label: string }> = [
   { id: "split", label: "Split" },
 ];
 
-const iconBtn = {
-  base: {
-    height: "26px",
-    padding: "0 8px",
-    borderRadius: "6px",
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "4px",
-    fontSize: "13px",
-    fontWeight: 500,
-    cursor: "pointer",
-    border: "1px solid transparent",
-    color: "#9CA3AF",
-    background: "transparent",
-    transition: "background 150ms var(--ease-out), color 150ms var(--ease-out)",
-  } as React.CSSProperties,
+// ─── Tokens ──────────────────────────────────────────────────────────────────
+const BTN_HEIGHT = 30;
+
+const labeledBtn: React.CSSProperties = {
+  height: BTN_HEIGHT,
+  padding: "0 10px",
+  borderRadius: 7,
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 6,
+  fontSize: 12.5,
+  fontWeight: 500,
+  cursor: "pointer",
+  border: "1px solid transparent",
+  color: "#6B7280",
+  background: "transparent",
+  transition:
+    "background 160ms ease, color 160ms ease, border-color 160ms ease",
+  whiteSpace: "nowrap",
+  flexShrink: 0,
 };
+
+function toggleStyles(active: boolean, disabled = false): React.CSSProperties {
+  return {
+    background: active ? "#EEF2FF" : "transparent",
+    color: active ? "#4338CA" : "#6B7280",
+    borderColor: active ? "#C7D2FE" : "transparent",
+    opacity: disabled ? 0.4 : 1,
+    cursor: disabled ? "not-allowed" : "pointer",
+  };
+}
+
+const Divider = () => (
+  <div
+    aria-hidden="true"
+    style={{
+      width: 1,
+      height: 20,
+      background: "#E5E7EB",
+      flexShrink: 0,
+      margin: "0 6px",
+    }}
+  />
+);
+
+// Wraps a related group of toggles inside a subtle card so the user can
+// see at a glance that they belong together (guías, comparación, etc.).
+const ToolGroup = ({
+  label,
+  children,
+}: {
+  label?: string;
+  children: React.ReactNode;
+}) => (
+  <div
+    className="flex items-center"
+    style={{
+      gap: 2,
+      padding: 2,
+      background: "#F9FAFB",
+      border: "1px solid #E5E7EB",
+      borderRadius: 9,
+      flexShrink: 0,
+    }}
+    aria-label={label}
+    role={label ? "group" : undefined}
+  >
+    {children}
+  </div>
+);
 
 function buildPill(
   status: DetectionStatus | undefined,
   manualStep: number | null,
-  manualReason?: 'detection-failed' | 'user-restart' | null,
+  manualReason?: "detection-failed" | "user-restart" | null,
 ) {
   if (manualStep !== null) {
     const step = MANUAL_STEPS[manualStep];
-    // Si entró a manual por fallo de detección, usar color ámbar para diferenciar
-    const isAuto = manualReason === 'detection-failed';
+    const isAuto = manualReason === "detection-failed";
     return {
       bg: isAuto ? "#FEF3C7" : "#DBEAFE",
       color: isAuto ? "#92400E" : "#1E40AF",
@@ -89,6 +145,7 @@ function buildPill(
 
 export function CanvasToolbar({
   onUploadPhoto,
+  onToggleBackground,
   detectionStatus,
   manualStep,
   manualReason,
@@ -103,14 +160,21 @@ export function CanvasToolbar({
     setBrushRadius,
     toggleLandmarks,
     setZoomScale,
+    setFacialGridVisible,
+    setDebugLandmarksVisible,
+    setPhotoGuideOpen,
   } = useSimulator();
 
   const pill = buildPill(detectionStatus, manualStep, manualReason);
   const showRestartButton = canRestartManual && manualStep === null;
+  const bgDisabled = !state.imageUrl || state.backgroundProcessing;
 
   return (
-    <div className="h-10 bg-white border-b border-border flex items-center px-3 gap-1.5 shrink-0">
-      {/* View tools */}
+    <div
+      className="bg-white border-b border-border flex items-center px-4 gap-2 shrink-0"
+      style={{ height: 52 }}
+    >
+      {/* ── Viewport tools (Zoom, Pan) ─────────────────────── */}
       {[
         { Icon: MagnifyingGlassPlus, label: "Zoom", tool: "zoom" as const },
         { Icon: HandGrabbing, label: "Pan", tool: "pan" as const },
@@ -119,30 +183,24 @@ export function CanvasToolbar({
         return (
           <button
             key={label}
-            title={label}
+            title={`${label} (alterna haciendo clic de nuevo)`}
             onClick={() =>
               setActiveTool(state.activeTool === tool ? "none" : tool)
             }
-            style={{
-              ...iconBtn.base,
-              background: isActive ? "#EEF2FF" : "transparent",
-              color: isActive ? "#4338CA" : "#9CA3AF",
-              border: isActive ? "1px solid #C7D2FE" : "1px solid transparent",
-            }}
+            style={{ ...labeledBtn, ...toggleStyles(isActive) }}
           >
-            <Icon size={13} />
+            <Icon size={15} weight={isActive ? "fill" : "regular"} />
             {label}
           </button>
         );
       })}
 
-      {/* Zoom slider */}
       {state.activeTool === "zoom" && (
         <div
-          className="flex items-center gap-2 border border-border rounded-lg px-2.5"
-          style={{ height: "26px" }}
+          className="flex items-center gap-2 border border-border rounded-lg px-3"
+          style={{ height: BTN_HEIGHT, background: "#F9FAFB" }}
         >
-          <label className="text-[11px] font-semibold text-[#9CA3AF]">
+          <label className="text-[11px] font-semibold text-text-muted">
             Zoom
           </label>
           <input
@@ -152,71 +210,124 @@ export function CanvasToolbar({
             step={0.1}
             value={state.zoomScale || 1}
             onChange={(e) => setZoomScale(parseFloat(e.target.value))}
-            className="w-20 accent-indigo-500"
+            className="w-24 accent-indigo-500"
           />
         </div>
       )}
 
-      <div className="w-px bg-border mx-0.5" style={{ height: "16px" }} />
+      <Divider />
 
-      {/* Mode toggle */}
+      {/* ── Mode segmented control ─────────────────────────── */}
       <div
         className="flex rounded-lg p-0.5 border border-border"
-        style={{ background: "#F9FAFB" }}
+        style={{ background: "#F9FAFB", flexShrink: 0 }}
+        role="radiogroup"
+        aria-label="Modo de visualización"
       >
-        {MODES.map((mode) => (
-          <button
-            key={mode.id}
-            onClick={() => setCanvasMode(mode.id)}
-            className="px-2.5 rounded-md text-[12px] font-semibold"
-            style={{
-              height: "22px",
-              background:
-                state.canvasMode === mode.id ? "white" : "transparent",
-              color: state.canvasMode === mode.id ? "#4338CA" : "#9CA3AF",
-            }}
-          >
-            {mode.label}
-          </button>
-        ))}
+        {MODES.map((mode) => {
+          const selected = state.canvasMode === mode.id;
+          return (
+            <button
+              key={mode.id}
+              onClick={() => setCanvasMode(mode.id)}
+              role="radio"
+              aria-checked={selected}
+              className="px-3 rounded-md text-[12.5px] font-semibold"
+              style={{
+                height: 26,
+                background: selected ? "white" : "transparent",
+                color: selected ? "#4338CA" : "#6B7280",
+                boxShadow: selected
+                  ? "0 1px 2px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(199, 210, 254, 0.6)"
+                  : undefined,
+                transition: "background 160ms ease, color 160ms ease",
+              }}
+            >
+              {mode.label}
+            </button>
+          );
+        })}
       </div>
 
-      {/* HUD & Landmarks */}
-      <button
-        onClick={() => setHudVisible(!state.hudVisible)}
-        title="HUD"
-        style={{
-          ...iconBtn.base,
-          background: state.hudVisible ? "#EEF2FF" : "transparent",
-          color: state.hudVisible ? "#4338CA" : "#9CA3AF",
-          border: state.hudVisible ? "1px solid #C7D2FE" : "1px solid transparent",
-        }}
-      >
-        <GridFour size={13} />
-        HUD
-      </button>
+      <Divider />
 
-      <button
-        onClick={toggleLandmarks}
-        title="Puntos"
-        style={{
-          ...iconBtn.base,
-          background: state.showLandmarks ? "#EEF2FF" : "transparent",
-          color: state.showLandmarks ? "#4338CA" : "#9CA3AF",
-          border: state.showLandmarks ? "1px solid #C7D2FE" : "1px solid transparent",
-        }}
-      >
-        {state.showLandmarks ? <Eye size={13} /> : <EyeSlash size={13} />}
-        Puntos
-      </button>
+      {/* ── Guías (overlays clínicos) ──────────────────────── */}
+      <ToolGroup label="Guías visuales">
+        <button
+          onClick={() => setHudVisible(!state.hudVisible)}
+          title="HUD: plano Frankfort y línea media (ayuda para validar la inclinación de la foto)"
+          style={{
+            ...labeledBtn,
+            height: 26,
+            padding: "0 9px",
+            ...toggleStyles(state.hudVisible),
+          }}
+        >
+          <GridFour size={14} weight={state.hudVisible ? "fill" : "regular"} />
+          HUD
+        </button>
+        <button
+          onClick={toggleLandmarks}
+          title={
+            state.showLandmarks
+              ? "Ocultar puntos de referencia de la nariz"
+              : "Mostrar puntos de referencia de la nariz"
+          }
+          style={{
+            ...labeledBtn,
+            height: 26,
+            padding: "0 9px",
+            ...toggleStyles(state.showLandmarks),
+          }}
+        >
+          {state.showLandmarks ? <Eye size={14} /> : <EyeSlash size={14} />}
+          Puntos
+        </button>
+        <button
+          onClick={() => setFacialGridVisible(!state.facialGridVisible)}
+          title="Canon facial: cuadrícula de tercios y quintos para justificar proporciones"
+          style={{
+            ...labeledBtn,
+            height: 26,
+            padding: "0 9px",
+            ...toggleStyles(state.facialGridVisible),
+          }}
+        >
+          <Ruler
+            size={14}
+            weight={state.facialGridVisible ? "fill" : "regular"}
+          />
+          Canon
+        </button>
+        {process.env.NODE_ENV !== "production" && (
+          <button
+            onClick={() =>
+              setDebugLandmarksVisible(!state.debugLandmarksVisible)
+            }
+            title="Debug · candidatos MediaPipe (lm[N]) sobre la cara"
+            style={{
+              ...labeledBtn,
+              height: 26,
+              padding: "0 9px",
+              ...toggleStyles(state.debugLandmarksVisible),
+            }}
+          >
+            <Target
+              size={14}
+              weight={state.debugLandmarksVisible ? "fill" : "regular"}
+            />
+            Debug
+          </button>
+        )}
+      </ToolGroup>
 
-      {/* Brush slider */}
+      {/* ── Brush slider (contextual) ──────────────────────── */}
       {state.activeTool === "broca" && (
         <div
-          className="flex items-center gap-2 border border-border rounded-lg px-2.5"
-          style={{ height: "26px" }}
+          className="flex items-center gap-2 border border-border rounded-lg px-3"
+          style={{ height: BTN_HEIGHT, background: "#F9FAFB" }}
         >
-          <label className="text-[11px] font-semibold text-[#9CA3AF]">
+          <label className="text-[11px] font-semibold text-text-muted">
             Pincel
           </label>
           <input
@@ -226,29 +337,25 @@ export function CanvasToolbar({
             step={0.005}
             value={state.brushRadius}
             onChange={(e) => setBrushRadius(parseFloat(e.target.value))}
-            className="w-20 accent-indigo-500"
+            className="w-24 accent-indigo-500"
           />
         </div>
       )}
 
-      {/* Pills & Actions */}
+      {/* ── Estado del análisis (siempre visible tras Guías) ── */}
       {pill && (
         <span
-          className="flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full"
+          className="flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap shrink-0"
           style={{ background: pill.bg, color: pill.color }}
         >
-          <span
-            className="w-1.5 h-1.5 rounded-full"
-            style={{ background: pill.dot }}
-          />{" "}
+          <span className="w-1.5 h-1.5 rounded-full" style={{ background: pill.dot }} />
           {pill.label}
         </span>
       )}
 
-      {/* View indicator pill (frontal/perfil) */}
       {state.currentView && detectionStatus === "detected" && (
         <span
-          className="flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full"
+          className="flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap shrink-0"
           style={{
             background: state.currentView === "perfil" ? "#EDE9FE" : "#E0F2FE",
             color: state.currentView === "perfil" ? "#6D28D9" : "#0369A1",
@@ -262,18 +369,19 @@ export function CanvasToolbar({
         </span>
       )}
 
-      {/* Recolocar puntos */}
       {showRestartButton && (
         <button
           onClick={onRestartManual}
           title="Recolocar los puntos de referencia de la nariz"
+          className="whitespace-nowrap shrink-0"
           style={{
-            ...iconBtn.base,
+            ...labeledBtn,
+            height: 26,
+            padding: "0 10px",
             background: "white",
             border: "1px solid #E5E7EB",
             color: "#6B7280",
             fontSize: 11,
-            height: 22,
             fontWeight: 600,
           }}
         >
@@ -282,13 +390,65 @@ export function CanvasToolbar({
         </button>
       )}
 
-      <div className="ml-auto">
+      {/* Spacer — empuja acciones de imagen a la derecha */}
+      <div className="flex-1" />
+
+      {/* ── Right-aligned actions ──────────────────────────── */}
+      <div className="flex items-center gap-2 shrink-0">
+        <button
+          onClick={onToggleBackground}
+          disabled={bgDisabled}
+          title={
+            state.backgroundProcessing
+              ? "Procesando…"
+              : state.backgroundRemoved
+                ? "Restaurar fondo original"
+                : "Aislar al sujeto y reemplazar fondo por negro"
+          }
+          style={{
+            ...labeledBtn,
+            ...toggleStyles(state.backgroundRemoved, bgDisabled),
+          }}
+        >
+          <PersonSimple
+            size={15}
+            weight={state.backgroundRemoved ? "fill" : "regular"}
+          />
+          {state.backgroundProcessing
+            ? "Procesando…"
+            : state.backgroundRemoved
+              ? "Fondo aislado"
+              : "Sin fondo"}
+        </button>
+
+        <button
+          onClick={() => setPhotoGuideOpen(true)}
+          title="Cómo tomar una buena foto (protocolo fotográfico)"
+          style={labeledBtn}
+        >
+          <Question size={15} />
+          Ayuda
+        </button>
+
         <button
           onClick={onUploadPhoto}
-          className="flex items-center gap-1.5 px-2.5 rounded-md text-[13px] font-medium border border-border bg-white text-text-muted"
-          style={{ height: "26px" }}
+          className="flex items-center gap-1.5 px-3 rounded-md text-[13px] font-semibold whitespace-nowrap"
+          style={{
+            height: BTN_HEIGHT,
+            background: "#4F46E5",
+            color: "white",
+            border: "1px solid #4338CA",
+            boxShadow: "0 1px 2px rgba(15, 23, 42, 0.12)",
+            transition: "background 160ms ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "#4338CA";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "#4F46E5";
+          }}
         >
-          <Camera size={13} /> Subir foto
+          <Camera size={14} weight="fill" /> Subir foto
         </button>
       </div>
     </div>

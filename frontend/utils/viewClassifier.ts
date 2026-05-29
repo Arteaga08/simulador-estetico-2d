@@ -19,24 +19,38 @@ export type FaceView = 'frontal' | 'perfil'
  * Umbral: 0.18 — separa claramente fotos frontales de perfil.
  */
 export function classifyFaceView(landmarks: NoseLandmarks): FaceView {
-  const anchors = landmarks.anchors
-
-  if (anchors && anchors.length >= 4) {
-    const leftEye  = anchors[2]  // lm33
-    const rightEye = anchors[3]  // lm263
-    const eyeDistance = Math.abs(rightEye.x - leftEye.x)
-    const faceWidth = landmarks.faceBoundingBox?.width ?? eyeDistance * 4
-    if (faceWidth > 1e-6) {
-      const ratio = eyeDistance / faceWidth
-      return ratio < 0.18 ? 'perfil' : 'frontal'
-    }
+  // Primary signal: visibleAlar. In useFaceLandmarks we already classify whether
+  // the nose is in profile based on the horizontal offset between tip and
+  // subnasal (|tip.x - base.x| vs nose length). This is the right signal for
+  // profile detection because:
+  //   - It uses only nose landmarks, which MediaPipe places reliably even in
+  //     strict profile.
+  //   - It does NOT depend on the outer eye corners. In profile, MediaPipe
+  //     hallucinates the position of the hidden eye behind the nose, which
+  //     ruins any eye-distance heuristic.
+  if (landmarks.visibleAlar && landmarks.visibleAlar !== 'both') {
+    return 'perfil'
   }
 
-  // Fallback: asimetría de nostrils respecto al eje radix→tip.
-  // En perfil, uno de los nostrils colapsa cerca del eje, el otro queda lejos.
+  // Secondary: nostril asymmetry around the radix→tip axis. In profile, one
+  // nostril collapses close to the axis while the other stays far. Already
+  // captured above via visibleAlar, but kept as a defensive cross-check for
+  // near-3/4 views where visibleAlar may say 'both' but the face isn't truly
+  // frontal.
   const midX = (landmarks.bridge.x + landmarks.tip.x) / 2
   const dL = Math.abs(landmarks.nostrilL.x - midX)
   const dR = Math.abs(landmarks.nostrilR.x - midX)
-  const ratio = Math.max(dL, dR) / Math.max(Math.min(dL, dR), 1)
-  return ratio >= 2.2 ? 'perfil' : 'frontal'
+  const asymmetry = Math.max(dL, dR) / Math.max(Math.min(dL, dR), 1)
+  if (asymmetry >= 2.2) return 'perfil'
+
+  // Tertiary: face bounding box aspect ratio. Frontal faces are typically
+  // wider than ~0.62 × height; strict profiles tend to be narrower because
+  // the bbox includes only one cheek.
+  const bb = landmarks.faceBoundingBox
+  if (bb && bb.height > 1e-6) {
+    const aspect = bb.width / bb.height
+    if (aspect < 0.60) return 'perfil'
+  }
+
+  return 'frontal'
 }

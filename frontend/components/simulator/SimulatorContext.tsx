@@ -18,6 +18,7 @@ import type {
   PatientGender,
 } from "./types";
 import type { FaceView } from "@/utils/viewClassifier";
+import type { QualityReport } from "@/lib/canvas/imageQuality";
 import {
   getDefaultSliderValues,
   getAvailableTechniques,
@@ -46,7 +47,15 @@ type Action =
   | { type: "SET_ZOOM_SCALE"; scale: number } // Acción agregada
   | { type: "SET_PAN_OFFSET"; offset: { x: number; y: number } }
   | { type: "APPLY_PRESET"; presetId: string; values: Record<string, number> }
-  | { type: "SET_GENDER"; gender: PatientGender };
+  | { type: "SET_GENDER"; gender: PatientGender }
+  | { type: "SET_BG_REMOVED"; value: boolean }
+  | { type: "SET_BG_PROCESSING"; value: boolean }
+  | { type: "SET_PROCESSED_IMAGE"; url: string | null }
+  | { type: "SET_FACIAL_GRID"; value: boolean }
+  | { type: "SET_DEBUG_LANDMARKS"; value: boolean }
+  | { type: "SET_TAGGED_VIEW"; view: FaceView | null }
+  | { type: "SET_QUALITY_REPORT"; report: QualityReport | null }
+  | { type: "SET_PHOTO_GUIDE_OPEN"; open: boolean };
 
 function makeInitialActive(proc: Procedimiento): ActiveProcedure {
   const techniques = getAvailableTechniques(proc);
@@ -153,6 +162,22 @@ function reducer(state: SimulatorState, action: Action): SimulatorState {
       return { ...state, currentView: action.view };
     case "SET_GENDER":
       return { ...state, patientGender: action.gender };
+    case "SET_BG_REMOVED":
+      return { ...state, backgroundRemoved: action.value };
+    case "SET_BG_PROCESSING":
+      return { ...state, backgroundProcessing: action.value };
+    case "SET_PROCESSED_IMAGE":
+      return { ...state, processedImageUrl: action.url };
+    case "SET_FACIAL_GRID":
+      return { ...state, facialGridVisible: action.value };
+    case "SET_DEBUG_LANDMARKS":
+      return { ...state, debugLandmarksVisible: action.value };
+    case "SET_TAGGED_VIEW":
+      return { ...state, taggedView: action.view };
+    case "SET_QUALITY_REPORT":
+      return { ...state, qualityReport: action.report };
+    case "SET_PHOTO_GUIDE_OPEN":
+      return { ...state, photoGuideOpen: action.open };
     case "APPLY_PRESET": {
       const procs = state.activeProcedures.map((p, i) => {
         if (i !== state.selectedProcedureIndex) return p;
@@ -195,6 +220,14 @@ interface SimulatorContextValue {
   setCurrentView: (view: FaceView | null) => void;
   applyPreset: (presetId: string, values: Record<string, number>) => void;
   setPatientGender: (gender: PatientGender) => void;
+  setBackgroundRemoved: (value: boolean) => void;
+  setBackgroundProcessing: (value: boolean) => void;
+  setProcessedImage: (url: string | null) => void;
+  setFacialGridVisible: (value: boolean) => void;
+  setDebugLandmarksVisible: (value: boolean) => void;
+  setTaggedView: (view: FaceView | null) => void;
+  setQualityReport: (report: QualityReport | null) => void;
+  setPhotoGuideOpen: (open: boolean) => void;
 }
 
 const SimulatorContext = createContext<SimulatorContextValue | null>(null);
@@ -227,6 +260,14 @@ export function SimulatorProvider({
     patientGender: "F",
     zoomScale: 1, // <--- ESTO SOLUCIONA EL ERROR ts(2345)
     panOffset: { x: 0, y: 0 },
+    backgroundRemoved: false,
+    backgroundProcessing: false,
+    processedImageUrl: null,
+    facialGridVisible: false,
+    debugLandmarksVisible: false,
+    taggedView: null,
+    qualityReport: null,
+    photoGuideOpen: false,
   });
 
   const setZoomScale = useCallback(
@@ -323,6 +364,39 @@ export function SimulatorProvider({
     (gender: PatientGender) => dispatch({ type: "SET_GENDER", gender }),
     [],
   );
+  const setBackgroundRemoved = useCallback(
+    (value: boolean) => dispatch({ type: "SET_BG_REMOVED", value }),
+    [],
+  );
+  const setBackgroundProcessing = useCallback(
+    (value: boolean) => dispatch({ type: "SET_BG_PROCESSING", value }),
+    [],
+  );
+  const setProcessedImage = useCallback(
+    (url: string | null) => dispatch({ type: "SET_PROCESSED_IMAGE", url }),
+    [],
+  );
+  const setFacialGridVisible = useCallback(
+    (value: boolean) => dispatch({ type: "SET_FACIAL_GRID", value }),
+    [],
+  );
+  const setDebugLandmarksVisible = useCallback(
+    (value: boolean) => dispatch({ type: "SET_DEBUG_LANDMARKS", value }),
+    [],
+  );
+  const setTaggedView = useCallback(
+    (view: FaceView | null) => dispatch({ type: "SET_TAGGED_VIEW", view }),
+    [],
+  );
+  const setQualityReport = useCallback(
+    (report: QualityReport | null) =>
+      dispatch({ type: "SET_QUALITY_REPORT", report }),
+    [],
+  );
+  const setPhotoGuideOpen = useCallback(
+    (open: boolean) => dispatch({ type: "SET_PHOTO_GUIDE_OPEN", open }),
+    [],
+  );
 
   return (
     <SimulatorContext.Provider
@@ -350,6 +424,14 @@ export function SimulatorProvider({
         setPatientGender,
         setZoomScale,
         setPanOffset,
+        setBackgroundRemoved,
+        setBackgroundProcessing,
+        setProcessedImage,
+        setFacialGridVisible,
+        setDebugLandmarksVisible,
+        setTaggedView,
+        setQualityReport,
+        setPhotoGuideOpen,
       }}
     >
       {children}

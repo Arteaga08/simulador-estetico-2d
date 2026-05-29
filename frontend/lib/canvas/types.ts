@@ -21,6 +21,8 @@ export interface NoseBbox {
   y: number
   width: number
   height: number
+  /** Anatomical blend zone in pixels (derived from intercanthal distance). Falls back to 40px. */
+  blendZone?: number
 }
 
 export interface LiquifyConfig {
@@ -34,6 +36,7 @@ export interface LiquifyConfig {
 
 export type WorkerInMessage =
   | { type: 'INIT'; canvas: OffscreenCanvas; imageData: ImageData }
+  | { type: 'RELOAD'; imageData: ImageData }
   | { type: 'APPLY'; config: LiquifyConfig }
   | { type: 'RESET' }
 

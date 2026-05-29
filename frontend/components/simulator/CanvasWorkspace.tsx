@@ -3,18 +3,25 @@
 import { useRef, useEffect, useCallback, useState } from "react";
 import { useSimulator } from "./SimulatorContext";
 import { useCanvas } from "@/lib/canvas/useCanvas";
-import { useFaceLandmarks } from "@/lib/canvas/useFaceLandmarks";
+import { useFaceLandmarks, RHINION_T, SUBTIP_T } from "@/lib/canvas/useFaceLandmarks";
 import type {
   NoseLandmarks,
   DetectionStatus,
 } from "@/lib/canvas/useFaceLandmarks";
 import { useRhinoplastyEngine } from "@/hooks/useRhinoplastyEngine";
+import { useBackgroundRemoval } from "@/lib/canvas/useBackgroundRemoval";
 import { CanvasToolbar } from "./CanvasToolbar";
 import { HudOverlay } from "./HudOverlay";
+import { FacialGridOverlay } from "./FacialGridOverlay";
 import { AnnotationLayer } from "./AnnotationLayer";
 import { DrawingLayer } from "./DrawingLayer";
 import { NoseLandmarksOverlay, type LandmarkKey } from "./NoseLandmarksOverlay";
-import { classifyFaceView } from "@/utils/viewClassifier";
+import { LandmarkDebugOverlay } from "./LandmarkDebugOverlay";
+import { PhotoUploadModal } from "./PhotoUploadModal";
+import { PhotoQualityBanner } from "./PhotoQualityBanner";
+import { PhotoCaptureGuide } from "./PhotoCaptureGuide";
+import { classifyFaceView, type FaceView } from "@/utils/viewClassifier";
+import { analyzeImageQuality } from "@/lib/canvas/imageQuality";
 
 // ─── Manual placement ─────────────────────────────────────────────────────────
 
@@ -61,12 +68,12 @@ export const MANUAL_STEPS_PERFIL: ManualStep[] = [
   {
     key: "bridge",
     label: "Nasion (raíz nasal)",
-    hint: "Parte alta del puente, a la altura de los ojos",
+    hint: "El punto MÁS HUNDIDO entre frente y dorso — NO en la ceja. A la altura del lagrimal.",
   },
   {
     key: "bridgeMid",
-    label: "Supratip",
-    hint: "Mitad del dorso, entre nasion y la punta",
+    label: "Dorso medio (giba)",
+    hint: "El punto que MÁS SOBRESALE del dorso hacia adelante — la cima de la joroba. Si el dorso es recto, el punto central entre nasion y punta.",
   },
   {
     key: "tip",
@@ -81,12 +88,12 @@ export const MANUAL_STEPS_PERFIL: ManualStep[] = [
   {
     key: "nostrilR",
     label: "Aleta oculta (estimada)",
-    hint: "Colócala simétrica a la visible, ligeramente atrás",
+    hint: "Desplázala hacia atrás ~20-30% del alto de la nariz desde la aleta visible",
   },
   {
     key: "base",
     label: "Subnasal",
-    hint: "Donde la columela se une al labio superior",
+    hint: "Donde la columela se une al labio. DEBE quedar más hacia el rostro que la punta (atrás, no delante).",
   },
 ];
 
@@ -100,10 +107,14 @@ function createEmptyLandmarks(W: number, H: number): NoseLandmarks {
   return {
     bridge: zero,
     bridgeMid: zero,
+    midDorsum: zero,
+    rhinion: zero,
     tip: zero,
+    subtip: zero,
     nostrilL: zero,
     nostrilR: zero,
     base: zero,
+    visibleAlar: 'both',
     confidence: 0,
     faceBoundingBox: { x: 0, y: 0, width: W, height: H },
     source: "manual",
@@ -116,8 +127,11 @@ function computeFaceBboxFromNose(
   W: number,
   H: number,
 ): NoseLandmarks["faceBoundingBox"] {
-  const noseW = Math.abs(nose.nostrilR.x - nose.nostrilL.x);
+  const noseW_raw = Math.abs(nose.nostrilR.x - nose.nostrilL.x);
   const noseH = Math.abs(nose.base.y - nose.bridge.y);
+  // En perfil la separación entre nostrils es ~0 — usamos noseH como proxy
+  // de ancho facial para que las anclas no se peguen a la nariz.
+  const noseW = Math.max(noseW_raw, noseH * 0.6);
   const cx = (nose.nostrilL.x + nose.nostrilR.x) / 2;
   const cy = (nose.bridge.y + nose.base.y) / 2;
   const faceW = Math.max(noseW * 3.5, W * 0.2);
@@ -146,19 +160,101 @@ function eventToCanvasPx(
   };
 }
 
+// ─── Profile nose diagram (anatomical reference during manual placement) ──────
+
+const PROFILE_DIAGRAM_PTS: Record<LandmarkKey, [number, number]> = {
+  bridge:    [18, 43],   // Nasion — deepest concavity between forehead and dorsum
+  bridgeMid: [36, 70],   // Mid-dorsum / giba apex — most protruding point on dorsum
+  rhinion:   [43, 74],   // K-area — keystone bone↔cartilage transition (45% radix→tip)
+  tip:       [74, 112],  // Pronasal — most anterior / forward point
+  subtip:    [63, 120],  // Sub-tip / break columelar (35% base→tip)
+  nostrilL:  [58, 124],  // Visible alar — inferior border of visible nostril
+  nostrilR:  [36, 120],  // Hidden alar (estimated) — behind
+  base:      [42, 136],  // Subnasal — junction of columella and upper lip
+};
+
+function ProfileNoseDiagram({ currentKey }: { currentKey: LandmarkKey }) {
+  const [tipX] = PROFILE_DIAGRAM_PTS.tip;
+  return (
+    <svg
+      viewBox="0 0 110 148"
+      style={{ width: 88, height: 118, display: "block", flexShrink: 0 }}
+      aria-hidden="true"
+    >
+      {/* Vertical ref from tip — makes clear that subnasal must be BEHIND it */}
+      {currentKey === "base" && (
+        <line
+          x1={tipX} y1={8} x2={tipX} y2={146}
+          stroke="rgba(99,102,241,0.4)" strokeWidth={0.8} strokeDasharray="3 2"
+        />
+      )}
+
+      {/* Forehead stub */}
+      <line x1="28" y1="0" x2="28" y2="22" stroke="#9CA3AF" strokeWidth="1.5" />
+
+      {/* External nose profile: forehead → nasion → tip → columella → subnasal */}
+      <path
+        d="M 28 22 C 26 30 22 36 18 43 C 20 58 36 74 50 88 C 58 96 66 104 74 112 C 70 120 58 130 48 134 C 46 135 44 136 42 136"
+        fill="none" stroke="#9CA3AF" strokeWidth="1.5"
+      />
+
+      {/* Nostril arch (dashed) */}
+      <path
+        d="M 42 136 C 40 126 46 118 56 115 C 64 114 70 120 68 126 C 66 130 64 128 58 124"
+        fill="none" stroke="#9CA3AF" strokeWidth="1.2" strokeDasharray="2.5 1.8"
+      />
+
+      {/* Upper lip reference */}
+      <line x1="6" y1="138" x2="44" y2="138" stroke="#9CA3AF" strokeWidth="0.8" strokeDasharray="3 2" />
+
+      {/* Inactive dots */}
+      {(Object.entries(PROFILE_DIAGRAM_PTS) as [LandmarkKey, [number, number]][]).map(
+        ([key, [x, y]]) => {
+          if (key === currentKey) return null;
+          return <circle key={key} cx={x} cy={y} r={3} fill="#6B7280" opacity={0.4} />;
+        }
+      )}
+
+      {/* Active landmark — indigo ring + dot */}
+      {(() => {
+        const [ax, ay] = PROFILE_DIAGRAM_PTS[currentKey];
+        return (
+          <g>
+            <circle cx={ax} cy={ay} r={7} fill="rgba(99,102,241,0.22)" />
+            <circle cx={ax} cy={ay} r={4.5} fill="#4F46E5" />
+            <circle cx={ax} cy={ay} r={1.8} fill="white" />
+          </g>
+        );
+      })()}
+    </svg>
+  );
+}
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function CanvasWorkspace() {
-  const { state, setImage, setCurrentView, setZoomScale, setPanOffset } =
-    useSimulator();
+  const {
+    state,
+    setImage,
+    setCurrentView,
+    setZoomScale,
+    setPanOffset,
+    setTaggedView,
+    setQualityReport,
+    setPhotoGuideOpen,
+    setBackgroundRemoved,
+    setBackgroundProcessing,
+    setProcessedImage,
+  } = useSimulator();
   const { canvasRef, loadImage } = useCanvas();
+  const { removeBackground } = useBackgroundRemoval();
   const {
     detectNoseLandmarks,
     detectionStatus,
     setDetectionStatus,
     deriveAnchorsFromBbox,
   } = useFaceLandmarks();
-  const { initWorker, applyRhinoplasty, applyBrushStroke, reset } =
+  const { initWorker, reloadImage, applyRhinoplasty, applyBrushStroke, reset } =
     useRhinoplastyEngine();
 
   const offscreenRef = useRef<OffscreenCanvas | null>(null);
@@ -181,6 +277,9 @@ export function CanvasWorkspace() {
   const [manualStep, setManualStep] = useState<number | null>(null);
   const [manualReason, setManualReason] = useState<'detection-failed' | 'user-restart' | null>(null);
   const [manualViewMode, setManualViewMode] = useState<'frontal' | 'perfil' | null>(null);
+  // Two-step upload: file is selected first, then the surgeon tags the view
+  // in a modal before we process anything.
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
   const activeSteps = manualViewMode === 'perfil' ? MANUAL_STEPS_PERFIL : MANUAL_STEPS_FRONTAL;
 
   // ─── Cámara (Viewport Pan & Zoom) ─── fuente de verdad en SimulatorContext
@@ -232,18 +331,99 @@ export function CanvasWorkspace() {
     triggerApply();
   }, [triggerApply]);
 
+  // Step 1: choose a file → store it and let the modal ask the surgeon
+  // which anatomical view it is. No image processing happens yet.
   const handleUploadPhoto = useCallback(() => {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/jpeg,image/png,image/webp";
-    input.onchange = async () => {
+    input.onchange = () => {
       const file = input.files?.[0];
       if (!file) return;
-      const url = URL.createObjectURL(file);
+      setPendingFile(file);
+    };
+    input.click();
+  }, []);
+
+  const handleToggleBackground = useCallback(async () => {
+    if (!state.imageUrl) return;
+    setBackgroundProcessing(true);
+    try {
+      if (state.backgroundRemoved) {
+        const imageData = await loadImage(state.imageUrl);
+        await reloadImage(imageData);
+        triggerApply();
+        setBackgroundRemoved(false);
+        return;
+      }
+      let processedUrl = state.processedImageUrl;
+      if (!processedUrl) {
+        processedUrl = await removeBackground(state.imageUrl, "#000000");
+        setProcessedImage(processedUrl);
+      }
+      const imageData = await loadImage(processedUrl);
+      await reloadImage(imageData);
+      triggerApply();
+      setBackgroundRemoved(true);
+    } catch (err) {
+      console.error("[bg-removal] failed", err);
+      alert("No pudimos aislar el fondo. Intenta de nuevo con otra foto.");
+    } finally {
+      setBackgroundProcessing(false);
+    }
+  }, [
+    state.imageUrl,
+    state.backgroundRemoved,
+    state.processedImageUrl,
+    loadImage,
+    removeBackground,
+    reloadImage,
+    triggerApply,
+    setBackgroundRemoved,
+    setBackgroundProcessing,
+    setProcessedImage,
+  ]);
+
+  // Step 2: surgeon confirmed the view → run EXIF rotation, detection,
+  // quality analysis, and the canvas/worker pipeline.
+  const processPendingPhoto = useCallback(
+    async (taggedView: FaceView) => {
+      const file = pendingFile;
+      if (!file) return;
+      setPendingFile(null);
+      setTaggedView(taggedView);
+      setQualityReport(null);
+
+      // EXIF auto-rotation via createImageBitmap. Supported in all evergreen
+      // browsers; if unavailable we fall back to the raw blob URL.
+      let displayUrl: string
+      let analysisSource: HTMLImageElement | ImageBitmap
       try {
-        const imageData = await loadImage(url);
+        const bitmap = await createImageBitmap(file, {
+          imageOrientation: "from-image",
+        })
+        const oriented = document.createElement("canvas")
+        oriented.width = bitmap.width
+        oriented.height = bitmap.height
+        const octx = oriented.getContext("2d")
+        if (!octx) throw new Error("canvas 2d unavailable")
+        octx.drawImage(bitmap, 0, 0)
+        displayUrl = oriented.toDataURL("image/png")
+        analysisSource = bitmap
+      } catch (err) {
+        console.warn("[upload] EXIF rotation fallback:", err)
+        displayUrl = URL.createObjectURL(file)
+        analysisSource = new Image()
+        ;(analysisSource as HTMLImageElement).src = displayUrl
+        await new Promise<void>((r) => {
+          ;(analysisSource as HTMLImageElement).onload = () => r()
+        })
+      }
+
+      try {
+        const imageData = await loadImage(displayUrl);
         const imgEl = new Image();
-        imgEl.src = url;
+        imgEl.src = displayUrl;
         await new Promise<void>((r) => {
           imgEl.onload = () => r();
         });
@@ -269,12 +449,23 @@ export function CanvasWorkspace() {
         forceUpdate((n) => n + 1);
         brushStrokesRef.current = [];
 
+        // Run quality analysis once we know the face bbox (or know detection
+        // failed). Always returns a report; banner only shows if warnings.
+        const detectedView = detected ? classifyFaceView(detected) : null
+        const report = analyzeImageQuality({
+          img: analysisSource,
+          faceBoundingBox: detected?.faceBoundingBox,
+          taggedView,
+          detectedView,
+        })
+        setQualityReport(report)
+
         const offscreen = canvas.transferControlToOffscreen();
         offscreenRef.current = offscreen;
         await initWorker(offscreen, imageData);
 
         // Reset Viewport Data
-        setImage(url);
+        setImage(displayUrl);
         setPanOffset({ x: 0, y: 0 });
         setZoomScale(1);
 
@@ -282,18 +473,22 @@ export function CanvasWorkspace() {
       } catch (err) {
         console.error("Error loading image:", err);
       }
-    };
-    input.click();
-  }, [
-    loadImage,
-    initWorker,
-    setImage,
-    canvasRef,
-    detectNoseLandmarks,
-    triggerApply,
-    setCurrentView,
-    setDetectionStatus,
-  ]);
+    },
+    [
+      pendingFile,
+      loadImage,
+      initWorker,
+      setImage,
+      canvasRef,
+      detectNoseLandmarks,
+      triggerApply,
+      setCurrentView,
+      setTaggedView,
+      setQualityReport,
+      setPanOffset,
+      setZoomScale,
+    ],
+  );
 
   const restartManual = useCallback(() => {
     const canvas = canvasRef.current;
@@ -305,6 +500,7 @@ export function CanvasWorkspace() {
     setManualStep(0);
     setManualReason('user-restart');
     setManualViewMode(null);
+    setCurrentView(null);
     forceUpdate((n) => n + 1);
     void reset();
   }, [canvasRef, reset]);
@@ -330,10 +526,27 @@ export function CanvasWorkspace() {
       if (!innerEl || !canvas || !noseLandmarksRef.current) return;
       const pt = eventToCanvasPx(e, innerEl, canvas);
       if (!pt) return;
-      noseLandmarksRef.current = {
+      const next: NoseLandmarks = {
         ...noseLandmarksRef.current,
         [key]: { x: pt.x, y: pt.y },
       };
+      // Si el médico arrastra el radix o la punta, el rhinion se recalcula
+      // automáticamente (45% radix→tip). Si arrastra el rhinion directamente,
+      // se respeta su posición manual.
+      if (key === "bridge" || key === "tip") {
+        next.rhinion = {
+          x: next.bridge.x + (next.tip.x - next.bridge.x) * RHINION_T,
+          y: next.bridge.y + (next.tip.y - next.bridge.y) * RHINION_T,
+        };
+      }
+      // Sub-tip se recalcula cuando se mueve tip o base (35% base→tip).
+      if (key === "tip" || key === "base") {
+        next.subtip = {
+          x: next.base.x + (next.tip.x - next.base.x) * SUBTIP_T,
+          y: next.base.y + (next.tip.y - next.base.y) * SUBTIP_T,
+        };
+      }
+      noseLandmarksRef.current = next;
       forceUpdate((n) => n + 1);
     }
     function onUp() {
@@ -378,8 +591,16 @@ export function CanvasWorkspace() {
             canvas.height,
           );
           updated.anchors = deriveAnchorsFromBbox(updated.faceBoundingBox);
+          updated.rhinion = {
+            x: updated.bridge.x + (updated.tip.x - updated.bridge.x) * RHINION_T,
+            y: updated.bridge.y + (updated.tip.y - updated.bridge.y) * RHINION_T,
+          };
+          updated.subtip = {
+            x: updated.base.x + (updated.tip.x - updated.base.x) * SUBTIP_T,
+            y: updated.base.y + (updated.tip.y - updated.base.y) * SUBTIP_T,
+          };
           noseLandmarksRef.current = updated;
-          setCurrentView(classifyFaceView(updated));
+          setCurrentView(manualViewMode);
           setManualStep(null);
           setManualReason(null);
           setManualViewMode(null);
@@ -556,15 +777,20 @@ export function CanvasWorkspace() {
         : detectionStatus;
 
   const hasLandmarks = noseLandmarksRef.current !== null;
-  const placedSteps = manualStep ?? MANUAL_STEPS.length;
+  // Keys placed so far: slice activeSteps by manualStep (null = all done → empty, isManualGuided=false so unused)
+  const placedKeys: LandmarkKey[] = manualStep !== null
+    ? activeSteps.slice(0, manualStep).map(s => s.key)
+    : [];
 
   return (
+    <>
     <div
       className="flex flex-col flex-1 overflow-hidden"
       style={{ background: "#F5F3FF" }}
     >
       <CanvasToolbar
         onUploadPhoto={handleUploadPhoto}
+        onToggleBackground={handleToggleBackground}
         detectionStatus={effectiveStatus}
         manualStep={manualStep}
         manualReason={manualReason}
@@ -581,6 +807,11 @@ export function CanvasWorkspace() {
           backgroundSize: "20px 20px",
         }}
       >
+        <PhotoQualityBanner
+          report={state.qualityReport}
+          onDismiss={() => setQualityReport(null)}
+          onOpenGuide={() => setPhotoGuideOpen(true)}
+        />
         {!state.imageUrl && (
           <div className="text-center absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             <p className="text-[0.85rem] font-semibold text-text-primary mb-1.5">
@@ -661,7 +892,11 @@ export function CanvasWorkspace() {
 
               {state.imageUrl && state.canvasMode !== "simulation" && (
                 <img
-                  src={state.imageUrl}
+                  src={
+                    state.backgroundRemoved && state.processedImageUrl
+                      ? state.processedImageUrl
+                      : state.imageUrl
+                  }
                   alt="Original"
                   className="absolute inset-0 w-full h-full object-contain pointer-events-none"
                   style={{
@@ -672,6 +907,7 @@ export function CanvasWorkspace() {
                   }}
                 />
               )}
+
               {state.canvasMode === "split" && state.imageUrl && (
                 <>
                   <div
@@ -721,13 +957,29 @@ export function CanvasWorkspace() {
                     canvasWidth={canvasWidth}
                     canvasHeight={canvasHeight}
                     manualStep={manualStep}
-                    placedSteps={placedSteps}
+                    placedKeys={placedKeys}
                     onLandmarkPointerDown={handleLandmarkPointerDown}
+                  />
+                )}
+
+              {state.debugLandmarksVisible &&
+                noseLandmarksRef.current &&
+                canvasWidth > 0 && (
+                  <LandmarkDebugOverlay
+                    landmarks={noseLandmarksRef.current}
+                    canvasWidth={canvasWidth}
+                    canvasHeight={canvasHeight}
                   />
                 )}
 
               {state.hudVisible && (
                 <HudOverlay width={containerSize.w} height={containerSize.h} />
+              )}
+              {state.facialGridVisible && (
+                <FacialGridOverlay
+                  width={containerSize.w}
+                  height={containerSize.h}
+                />
               )}
               <AnnotationLayer
                 width={containerSize.w}
@@ -867,16 +1119,27 @@ export function CanvasWorkspace() {
                   <div style={{ fontSize: 14, fontWeight: 600, marginTop: 4 }}>
                     {activeSteps[manualStep].label}
                   </div>
-                  <div
-                    style={{
-                      fontSize: 12,
-                      opacity: 0.85,
-                      marginTop: 6,
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    {activeSteps[manualStep].hint}
-                  </div>
+                  {manualViewMode === "perfil" ? (
+                    <div style={{ display: "flex", gap: 10, alignItems: "flex-start", marginTop: 8 }}>
+                      <div style={{ flex: 1, fontSize: 12, opacity: 0.85, lineHeight: 1.4 }}>
+                        {activeSteps[manualStep].hint}
+                      </div>
+                      <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: 8, padding: "6px 6px 4px", border: "1px solid rgba(255,255,255,0.14)", flexShrink: 0 }}>
+                        <ProfileNoseDiagram currentKey={activeSteps[manualStep].key} />
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        fontSize: 12,
+                        opacity: 0.85,
+                        marginTop: 6,
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      {activeSteps[manualStep].hint}
+                    </div>
+                  )}
                   <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
                     <button
                       onClick={() => setManualStep(Math.max(0, manualStep - 1))}
@@ -930,5 +1193,20 @@ export function CanvasWorkspace() {
         </div>
       </div>
     </div>
+
+    <PhotoUploadModal
+      open={pendingFile !== null}
+      fileName={pendingFile?.name ?? null}
+      onCancel={() => setPendingFile(null)}
+      onConfirm={(view) => {
+        void processPendingPhoto(view);
+      }}
+      onOpenGuide={() => setPhotoGuideOpen(true)}
+    />
+    <PhotoCaptureGuide
+      open={state.photoGuideOpen}
+      onClose={() => setPhotoGuideOpen(false)}
+    />
+    </>
   );
 }

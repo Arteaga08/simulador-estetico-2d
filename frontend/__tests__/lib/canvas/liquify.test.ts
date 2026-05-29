@@ -113,13 +113,17 @@ function makeLandmarks(overrides: Partial<NoseLandmarks> = {}): NoseLandmarks {
   return {
     bridge:    { x: 400, y: 200 },
     bridgeMid: { x: 408, y: 270 },
+    midDorsum: { x: 405, y: 235 }, // peak de giba, ~50% bridge→tip
+    rhinion:   { x: 407, y: 254 }, // 45% bridge→tip
     tip:       { x: 415, y: 320 },
+    subtip:    { x: 415, y: 343 }, // 35% base→tip
     nostrilL:  { x: 405, y: 360 },
     nostrilR:  { x: 425, y: 360 },
     base:      { x: 415, y: 355 },
+    visibleAlar: 'L' as const,
     confidence: 1,
     faceBoundingBox: { x: 200, y: 100, width: 400, height: 500 },
-    source: 'auto',
+    source: 'auto' as const,
     anchors: [
       { x: 200, y: 100 }, { x: 600, y: 100 },
       { x: 200, y: 500 }, { x: 600, y: 500 },
@@ -180,10 +184,14 @@ describe('buildRhinoplastyControlPoints (régimen clinical-target)', () => {
     const landmarks: NoseLandmarks = {
       bridge:    { x: 400, y: 200 },
       bridgeMid: { x: 425, y: 270 }, // 25 px de offset lateral → giba pronunciada
+      midDorsum: { x: 425, y: 235 }, // peak de giba, ~50% bridge→tip
+      rhinion:   { x: 407, y: 254 }, // 45% bridge→tip
       tip:       { x: 415, y: 320 },
+      subtip:    { x: 415, y: 343 }, // 35% base→tip
       nostrilL:  { x: 405, y: 360 },
       nostrilR:  { x: 425, y: 360 },
       base:      { x: 415, y: 355 },
+      visibleAlar: 'L',
       confidence: 1,
       faceBoundingBox: { x: 200, y: 100, width: 400, height: 500 },
       source: 'auto',

@@ -3,6 +3,7 @@ import type { LiquifyConfig, WorkerInMessage, WorkerOutMessage } from './types'
 
 interface UseLiquifyReturn {
   initWorker: (canvas: OffscreenCanvas, imageData: ImageData) => Promise<void>
+  reloadImage: (imageData: ImageData) => Promise<void>
   applyConfig: (config: LiquifyConfig) => Promise<void>
   reset: () => Promise<void>
   isReady: () => boolean
@@ -60,7 +61,12 @@ export function useLiquify(): UseLiquifyReturn {
     await sendAndWait({ type: 'RESET' })
   }, [])
 
+  const reloadImage = useCallback(async (imageData: ImageData) => {
+    if (!readyRef.current) return
+    await sendAndWait({ type: 'RELOAD', imageData })
+  }, [])
+
   const isReady = useCallback(() => readyRef.current, [])
 
-  return { initWorker, applyConfig, reset, isReady }
+  return { initWorker, reloadImage, applyConfig, reset, isReady }
 }

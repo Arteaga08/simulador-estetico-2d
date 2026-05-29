@@ -38,6 +38,7 @@ export const SLIDERS_BY_PROCEDURE: Record<Procedimiento, SliderDef[]> = {
     { id: 'reduccion-global',   label: 'Reducción global',     min: -100, max: 100, step: 1, defaultValue: 0, validInViews: ['frontal'] },
     { id: 'adelgazar-dorso',    label: 'Osteotomía lateral',   min: -100, max: 100, step: 1, defaultValue: 0, validInViews: ['frontal'] },
     { id: 'reseccion-alar',     label: 'Resección alar',       min: -100, max: 100, step: 1, defaultValue: 0, validInViews: ['frontal'] },
+    { id: 'cierre-alar',        label: 'Cierre alar',          min: -100, max: 100, step: 1, defaultValue: 0, validInViews: ['frontal'] },
     { id: 'refinamiento-punta', label: 'Refinamiento de punta', min: -100, max: 100, step: 1, defaultValue: 0, validInViews: ['frontal'] },
   ],
   LIFTING_CEJAS: [

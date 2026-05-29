@@ -16,6 +16,7 @@ interface RhinoplastyConfig {
 
 interface UseRhinoplastyEngineReturn {
   initWorker: (canvas: OffscreenCanvas, imageData: ImageData) => Promise<void>
+  reloadImage: (imageData: ImageData) => Promise<void>
   applyRhinoplasty: (cfg: RhinoplastyConfig) => void
   applyBrushStroke: (pts: Array<{ px: number; py: number; qx: number; qy: number }>, canvasW: number, canvasH: number) => void
   reset: () => Promise<void>
@@ -29,7 +30,7 @@ interface UseRhinoplastyEngineReturn {
  * only the latest state is dispatched each animation frame.
  */
 export function useRhinoplastyEngine(): UseRhinoplastyEngineReturn {
-  const { initWorker, applyConfig, reset } = useLiquify()
+  const { initWorker, reloadImage, applyConfig, reset } = useLiquify()
 
   // Pending work — updated synchronously, dispatched next RAF tick
   const pendingRef  = useRef(false)
@@ -88,5 +89,5 @@ export function useRhinoplastyEngine(): UseRhinoplastyEngineReturn {
     []
   )
 
-  return { initWorker, applyRhinoplasty, applyBrushStroke, reset }
+  return { initWorker, reloadImage, applyRhinoplasty, applyBrushStroke, reset }
 }
